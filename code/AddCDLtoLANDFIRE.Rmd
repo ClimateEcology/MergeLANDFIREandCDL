@@ -1,0 +1,190 @@
+---
+title: "Add CDL agricultural classes to LANDFIRE vegetation map"
+author: "Melanie Kammerer"
+date: "3/4/2021"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F)
+```
+
+## Objective
+The goal of this script is to create a combined habitat map by merging the USDA NASS Cropland Data Layer and LANDFIRE vegetation layers. To start, I use the LANDFIRE 2.0 National Vegetation Classification, but plan to add the LANDFIRE 1.0.5 also.
+
+Specifically, where LANDFIRE vegetation is agriculture, I add agricultural classes from the CDL to LANDFIRE raster. We decided to add CDL classes to LANDFIRE (not LANDFIRE to CDL) to preserve pixel matching between the vegetation height matching between LANDFIRE vegetation type, vegetation cover, and vegetation height rasters. Also, it is non-trivial to decide which LANDFIRE classes matches CDL (e.g. which LANDFIRE classes match CDL deciduous forest? Should this vary regionally?)
+
+## Specify which LANDFIRE vegetation layer
+The options are 'evt' (2001 existing vegetation type, LANDFIRE v 1.0.5) or 'nvc' (2016 National Vegetation Classification, LANDFIRE v 2.0)
+```{r specifyLFlayer}
+rm(list=ls())
+veglayer <- 'nvc'
+region <- 'NE'
+run_merge <- F #on my laptop (16 GB of memory), running the spatial merge for the Finger Lakes region takes ~10 minutes
+```
+
+## Filter CDL class table to only agricultural classes
+```{r loaddata}
+library(dplyr)
+
+#load table of LANDFIRE vegetation classes
+if (veglayer == 'evt') {
+  vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_105evt/CSV_Data/US_105evt_05262011.csv') %>%
+    dplyr::mutate(VALUE = as.character(Value))
+  name_column <- 'EVT_Name'; name_column <- sym(name_column)
+} else if (veglayer == 'nvc') {
+  vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv') %>%
+      dplyr::mutate(VALUE = as.character(VALUE))
+
+  name_column <- 'NVC_Name'; name_column <- sym(name_column)
+}
+
+#read CDL class names
+cdl_classes <- read.csv('D:/SpatialData/NASS_CDL/NASS_classes_simple.csv') %>% 
+  dplyr::filter(VALUE < 500)  %>%#filter out CDL classes that I created for a different project
+  dplyr::mutate(VALUE = as.character(-VALUE))
+
+```
+
+## Assign CDL agricultural classes to matching LANDFIRE ag class
+LANDFIRE has a relatively small number of agricultural classes (e.g. row crop, close-growing crop, orchard, etc.). Here, I classify all CDL classes (not just those in the Finger Lakes) to avoid repeating this task when working in a different focal region. The distinction between some classes (row crop vs. close grown crop) wasn't totally clear, I assigned some CDL classes to match both row crop AND close-grown crop. 
+
+```{r defineagvegetation}
+
+if (veglayer == 'nvc') {nvc_ag <- dplyr::filter(vegclasses_key, VALUE %in% c(7960:7999)) }
+
+agclass_match <- readxl::read_excel('./data/CDL_NVC_AgClassMatch.xlsx') %>%
+  dplyr::filter(GROUP == 'A') %>%
+  dplyr::select(VALUE, CLASS_NAME, GROUP, NVC_Match1, NVC_Match3)
+
+
+wheat <- dplyr::filter(agclass_match, NVC_Match1 == 'Wheat') %>% dplyr::pull(CLASS_NAME)
+
+orchard <- dplyr::filter(agclass_match, NVC_Match1 == 'Orchard') %>% dplyr::pull(CLASS_NAME)
+
+vineyard <- dplyr::filter(agclass_match, NVC_Match1 == 'Vineyard') %>% dplyr::pull(CLASS_NAME)
+
+row_crop <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Row Crop') | 
+                            grepl(NVC_Match3, pattern= 'Row Crop')) %>%
+                            dplyr::pull(CLASS_NAME)
+
+close_grown_crop <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Close Grown Crop') | 
+                            grepl(NVC_Match3, pattern= 'Close Grown Crop')) %>%
+                            dplyr::pull(CLASS_NAME)
+```
+## Show LANDFIRE NVC agriculture-CDL matches
+
+```{r maketable, echo=F}
+library(knitr); library(kableExtra)
+kable(vineyard, col.names='NVC Vineyard', booktabs = T) %>%
+  kable_styling(full_width = FALSE, position = "float_left")
+kable(orchard, col.names='NVC Orchard', booktabs = T) %>%
+  kable_styling(full_width = FALSE, position = "float_left")
+kable(wheat, col.names='NVC Wheat', booktabs = T) %>%
+  kable_styling(full_width = FALSE, position = "float_left")
+kable(row_crop, col.names='NVC Row Crop', booktabs = T) %>%
+  kable_styling(full_width = FALSE, position = "float_left")
+kable(close_grown_crop, col.names='NVC Close-grown Crop', booktabs = T) %>%
+  kable_styling(full_width = FALSE, position = "left")
+```
+
+## Reassign agricultural classes in LANDFIRE raster to class from CDL
+
+```{r loadrasters}
+library(raster); library(terra)
+evt <- terra::rast('D:/SpatialData/FingerLakesLandUse/LandFire_EVegType10.tif')
+nvc <- terra::rast('D:/SpatialData/FingerLakesLandUse/LandFire_NatVegClassification.tif')
+cdl <- terra::rast('D:/SpatialData/FingerLakesLandUse/USDA_CDL_2016_FingerLakes.tif')
+
+plot(nvc); plot(cdl)
+```
+
+To reassign NVC ag classes to CDL, I loop through each NVC class, calculate where NVC & CDL agree, and reassign those pixels. I am converting the CDL to negative values to avoid conflicts with existing classes (not an issue for NVC but IS for earlier versions of LANDFIRE)
+```{r reassignagvegetation}
+habitat_groups <- c('orchard', 'vineyard', 'row_crop', 'close_grown_crop', 'wheat')
+source('./code/SpeciesByVegType/functions/CapStr.R')
+
+for (habitat_name in habitat_groups) {
+  
+  #replace NVC orchard class with CDL fruit tree types (when they overlap)
+  nvc_tochange <- dplyr::filter(nvc_ag, grepl(NVC_Name, 
+    pattern= CapStr(gsub(habitat_name, pattern="_", replacement=" ")))) %>% dplyr::pull(VALUE)
+    
+  cdl_toadd <- dplyr::filter(cdl_classes, CLASS_NAME %in% get(habitat_name)) %>% dplyr::mutate(VALUE = (as.numeric(VALUE)*-1)) %>%
+    dplyr::pull(VALUE)
+  
+  if (habitat_name == habitat_groups[[1]]) {
+    nvc_copy <- nvc
+  }
+  
+  both_orchard <- (cdl %in% cdl_toadd & nvc_copy %in% as.numeric(nvc_tochange))
+  plot(both_orchard, main= paste0('Both layers are ', habitat_name, "?"))
+  
+  remove <- (!both_orchard) * nvc_copy
+  add <- both_orchard * (-cdl)
+  nvc_copy <- remove + add
+  print(paste0('finished ', habitat_name))
+}
+
+```
+
+## Look at results of LANDFIRE/CDL merge 
+How many pixels of LANDFIRE ag vegetation are left?
+```{r examineresults}
+new <- data.frame(table(values(nvc_copy)))
+old <- data.frame(table(values(nvc)))
+
+sum(new$Freq[new$Var1 %in% c(7960:7999)])/ sum(new$Freq)
+
+sum(old$Freq[old$Var1 %in% c(7960:7999)])/ sum(old$Freq)
+
+unique(values(nvc_copy)[values(nvc_copy) %in% c(7960:7999)])
+```
+
+## When possible, reassign remaining NVC ag classes by looking at surrounding cells
+I am reassigning the remaining NVC agricultural pixels by assuming the focal pixel matches the most common land cover class in the surrounding pixels.  'Surrounding' refers to a 7x7 neighborhood (3 30m cells in each direction not counting the focal cell).
+```{r adjacentcells}
+temp <- nvc_copy
+
+reclass <- data.frame(agveg=c(7970, 7971, 7972, 7973, 7974, 7975, 7978), to=NA)
+temp2 <- terra::classify(temp, rcl=reclass)
+plot(is.na(temp2), main='Which NVC ag pixels did not match CDL?')
+
+source('./code/SpeciesByVegType/functions/reassign_NA.R')
+
+crops = as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
+
+if (run_merge == T) {
+  
+  #Is the option to define crop classes working?
+
+  one <- reassign_NA(map=temp2, xpct=c(0, 0.5), ypct=c(0, 0.5), 
+                     window_size=7, crops=crops)
+  two <- reassign_NA(map=temp2,  xpct=c(0, 0.5),  ypct=c(0.5, 1), 
+                     window_size=5, return_crop=return_crop, crops=crops)
+  three <- reassign_NA(map=temp2, xpct=c(0.5, 1),  ypct=c(0, 0.5), 
+                       window_size=5, return_crop=return_crop, crops=crops)
+  four <- reassign_NA(map=temp2,xpct=c(0.5, 1),  ypct=c(0.5, 1), 
+                      window_size=5, return_crop=return_crop, crops=crops)
+  
+  nvc_gapsfilled <- merge(one, two) %>% merge(three) %>% merge(four)
+  plot(nvc_gapsfilled)
+  
+  sort(unique(values(nvc_gapsfilled)[values(nvc_gapsfilled) < 0]))
+  plot(is.na(nvc_gapsfilled))
+  
+  terra::writeRaster(nvc_gapsfilled, 
+     './data/CombinedVegCDLRasters/MergeCDLandLANDFIRE_v2/NVC_CDL2016.tif', overwrite=T)
+  
+} else {
+  nvc_gapsfilled <- terra::rast('./data/CombinedVegCDLRasters/MergeCDLandLANDFIRE_v2/NVC_CDL2016.tif')
+}
+
+plot(nvc_gapsfilled)
+```
+
+## Which CDL classes did we add to LANDFIRE?
+```{r addedclasses}
+added_classes <- dplyr::filter(cdl_classes, VALUE %in% unique(terra::values(nvc_gapsfilled)))
+
+knitr::kable(added_classes)
+```
