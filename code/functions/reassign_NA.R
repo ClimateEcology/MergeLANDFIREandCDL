@@ -27,7 +27,13 @@ reassign_NA <- function(map, xpct, ypct, window_size, crops=NA) {
 
 
 custom_modal <- function(x, na.rm, ...) { 
-
+  
+  # retrieve list of allowable classes from the global environment
+  # this is a sub-optimal solution because it require configuring the global env correctly
+  # BUT focal does not accept more than two arguements, so I don't see any other way to do this...
+  
+  allow_classes <- get('allow_classes', pryr::where('allow_classes'))
+  
   if (any(x %in% allow_classes)) {
     
     #reassign dis-allowed classes to NA
