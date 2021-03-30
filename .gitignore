@@ -6,5 +6,4 @@
 # do not version control raster files
 **/*.tif
 
-**/SpatialData/*/*
-data/SpatialData/*/*
+**/SpatialData
