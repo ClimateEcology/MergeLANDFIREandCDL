@@ -8,6 +8,6 @@
 #SBATCH -e "stderr.%j.%N" #optional but it prints our standard error
 
 module load r
-Rscript --vanilla ../code/02-mclapply.R
+Rscript --vanilla code/TestRunMerge.R
 
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name="practice_sbatch" #name of the job submitted
+#SBATCH --job-name "TestMergeRasters" #name of the job submitted
 #SBATCH -N 1 #number of nodes in this job
 #SBATCH --cpus-per-task=12 #number of cpus to use for each task
 #SBATCH -t 01:00:00 #time allocated for this job hours:mins:seconds
@@ -10,6 +10,6 @@
 #SBATCH -e "stderr.%j.%N" #optional but it prints our standard error
 
 module load r
-Rscript --vanilla 02-mclapply.R
+Rscript --vanilla ../code/02-mclapply.R
 
 
