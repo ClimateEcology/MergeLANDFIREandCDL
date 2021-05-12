@@ -141,6 +141,4 @@ wholemap <- terra::mosaic(p1, p2, p3, fun='mean',
                           filename=paste0(tiledir, '/', regionName, '_FinalCDLNVCMerge.tif'), overwrite=T)
 tictoc::toc()
 
-plot(wholemap)
-plot(bigmap == wholemap)
 
