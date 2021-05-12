@@ -1,35 +1,26 @@
 
-merge_landfire_cdl <- function(data_dir, CDLYear, cdl_filepath, lf_filepath, window_size, veglayer) {
-  
-  library(dplyr)
-  library(terra)
+merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, window_size) {
   
   ##### Step 0: Setup and load data
   
-  # #set vegetation type based on LANDFIRE file path
-  # if (grepl(lf_filepath, pattern='evt')) {
-  #   veglayer <- 'evt'
-  # } else if (grepl(lf_filepath, pattern='nvc')) {
-  #   veglayer <- 'nvc'
-  # } else {
-  #   warning('LANDFIRE vegetation type is unknown from raster file path. Please set veglayer argument.')
-  # }
+  # specify allow_classes is a global variable (necessary for futures package to work)
+  allow_classes
   
   # load table of LANDFIRE vegetation classes
   if (veglayer == 'evt') {
-    vegclasses_key <- read.csv(paste0(data_dir, '/TabularData/US_105evt_05262011.csv')) %>%
+    vegclasses_key <- read.csv(paste0(datadir, '/TabularData/US_105evt_05262011.csv')) %>%
       dplyr::mutate(VALUE = as.character(Value))
     name_column <- 'EVT_Name'; name_column <- sym(name_column)
   } else if (veglayer == 'nvc') {
-    vegclasses_key <- read.csv(paste0(data_dir, '/TabularData/LF_200NVC_05142020.csv')) %>%
+    vegclasses_key <- read.csv(paste0(datadir, '/TabularData/LF_200NVC_05142020.csv')) %>%
       dplyr::mutate(VALUE = as.character(VALUE))
     
     name_column <- 'NVC_Name'; name_column <- sym(name_column)
   }
   
   # read CDL class names
-  cdl_classes <- read.csv(paste0(data_dir, '/TabularData/NASS_classes_simple.csv')) %>% 
-    dplyr::filter(VALUE < 500)  %>%#filter out CDL classes that I created for a different project
+  cdl_classes <- read.csv(paste0(datadir, '/TabularData/NASS_classes_simple.csv')) %>% 
+    dplyr::filter(VALUE < 500)  %>% #filter out CDL classes that I created for a different project
     dplyr::mutate(VALUE = as.character(-VALUE))
   
   
@@ -38,7 +29,7 @@ merge_landfire_cdl <- function(data_dir, CDLYear, cdl_filepath, lf_filepath, win
   # create vectors listing which CDL classes match LANDFIRE wheat, orchard, vineyard, row crop, and close-grown crop
   if (veglayer == 'nvc') {nvc_ag <- dplyr::filter(vegclasses_key, VALUE %in% c(7960:7999)) }
   
-  agclass_match <- read.csv(paste0(data_dir, '/TabularData/CDL_NVC_AgClassMatch.csv')) %>%
+  agclass_match <- read.csv(paste0(datadir, '/TabularData/CDL_NVC_AgClassMatch.csv')) %>%
     dplyr::filter(GROUP == 'A') %>%
     dplyr::select(VALUE, CLASS_NAME, GROUP, NVC_Match1, NVC_Match3)
   
@@ -59,19 +50,17 @@ merge_landfire_cdl <- function(data_dir, CDLYear, cdl_filepath, lf_filepath, win
   
   
   # Load spatial layers (EVT, NVC, and CDL rasters)
-  #evt <- terra::rast(paste0(data_dir, '/SpatialData/LANDFIRE/US_105evt/grid1/us_105evt'))
-  nvc <- terra::rast(paste0(data_dir, '/SpatialData/LANDFIRE/Tif/us_200nvc.tif'))
-  cdl <- terra::rast(paste0(data_dir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img'))
+  cdl <- terra::rast(tiles[[1]])
+  nvc <- terra::rast(tiles[[2]])
   
   habitat_groups <- c('orchard', 'vineyard', 'row_crop', 'close_grown_crop', 'wheat')
-  source('./code/functions/CapStr.R')
-  
+
   # For each habitat group, replace LANDFIRE class with CDL pixel class (but only if CDL class matches)
   for (habitat_name in habitat_groups) {
     
     # e.g replace NVC orchard class with CDL fruit tree types (when NVC orchard pixels overlap with CDL fruit tree)
     nvc_tochange <- dplyr::filter(nvc_ag, grepl(NVC_Name, 
-      pattern= CapStr(gsub(habitat_name, pattern="_", replacement=" ")))) %>% 
+      pattern= beecoSp::CapStr(gsub(habitat_name, pattern="_", replacement=" ")))) %>% 
       dplyr::pull(VALUE)
     
     cdl_toadd <- dplyr::filter(cdl_classes, CLASS_NAME %in% get(habitat_name)) %>% 
@@ -81,6 +70,7 @@ merge_landfire_cdl <- function(data_dir, CDLYear, cdl_filepath, lf_filepath, win
     if (habitat_name == habitat_groups[[1]]) {
       veglayer_copy <- nvc
     }
+
     
     # create binary layer indicating landfire and cdl match
     both_orchard <- (cdl %in% cdl_toadd & veglayer_copy %in% as.numeric(nvc_tochange))
@@ -100,19 +90,24 @@ merge_landfire_cdl <- function(data_dir, CDLYear, cdl_filepath, lf_filepath, win
   reclass <- data.frame(agveg=c(7970, 7971, 7972, 7973, 7974, 7975, 7978), to=NA)
   temp2 <- terra::classify(temp, rcl=reclass)
 
-  source('./code/functions/reassign_NA.R')
-  
-  crops <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
+  #crops <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
   
   #Is the option to define crop classes working?
-  nvc_gapsfilled <- reassign_NA(map=temp2, xpct=c(0, 1), ypct=c(0, 1), 
-                     window_size=window_size, crops=crops)
+  nvc_gapsfilled <- beecoSp::reassign_NA(map=temp2,
+                       window_size=window_size, replace_any=F)
   
-  sort(unique(values(nvc_gapsfilled)[values(nvc_gapsfilled) < 0]))
 
   ##### Step 3: Save merged raster file
+  if (!dir.exists(paste0(tiledir, "/MergedCDL", toupper(veglayer), "/"))) {
+    dir.create(paste0(tiledir, "/MergedCDL", toupper(veglayer), "/"))
+  }
+  
+  merged_ext <- terra::ext(nvc_gapsfilled)
   
   terra::writeRaster(nvc_gapsfilled, 
-    paste0(data_dir, paste0('/SpatialData/output/NVC_CDL', CDLYear, '.tif')), overwrite=T)
+    paste0(tiledir, "/MergedCDL", toupper(veglayer), "/", 
+           merged_ext[1], "_", merged_ext[3], ".tif"), overwrite=T)
+  
+  return(nvc_gapsfilled)
   
 }
