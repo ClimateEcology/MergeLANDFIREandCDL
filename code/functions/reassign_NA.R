@@ -1,6 +1,9 @@
 
 reassign_NA <- function(map, xpct, ypct, window_size, crops=NA) {
   
+  # specify allow_classes is a global variable (necessary for futures package to work)
+  allow_classes
+  
   bbox <- ext(c( (xmax(map)-xmin(map))*xpct[1] + xmin(map),  (xmax(map)-xmin(map))*xpct[2] + xmin(map),
                  (ymax(map)-ymin(map))*ypct[1] + ymin(map),  (ymax(map)-ymin(map))*ypct[2] + ymin(map))
   )
