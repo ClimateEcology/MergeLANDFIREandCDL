@@ -1,19 +1,19 @@
 rm(list=ls())
 
+source('code/functions/merge_landfire_cdl.R')
+
 #try adding from Github
 devtools::install_github("land-4-bees/beecoSp")
 
 library(dplyr); library(terra)
 # specify input parameters
+
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 CDLYear <- '2016' # year of NASS Cropland Data Layer
 regionalextent <- sf::st_read('./data/SpatialData/NE_region.shp'); regionName <- 'NE'
 writetiles <- T
 div <- c(10,10) # divide regional raster into how many pieces (in x and y directions)
-
-
-
 
 ##### derived parameters 
 window_size <- (buffercells[1]*2) + 1 # diameter of neighborhood analysis window (part 2 only)
@@ -34,7 +34,7 @@ cdl_classes <- read.csv(paste0(datadir, '/TabularData/NASS_classes_simple.csv'))
 allow_classes <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
 
 
-######################################################################################################
+#####################################################################################################
 ##### Part 1: Create Raster Tiles
 
 # run function to grid NE CDL into tiles (using parameters above)
@@ -137,5 +137,3 @@ p3 <- rlang::exec("mosaic", !!!args3, fun='mean',
 wholemap <- terra::mosaic(p1, p2, p3, fun='mean', 
                           filename=paste0(tiledir, '/', regionName, '_FinalCDLNVCMerge.tif'), overwrite=T)
 tictoc::toc()
-
-
