@@ -27,7 +27,7 @@ VALUE,CLASS_NAME,GROUP
 34,Rape Seed,A
 35,Mustard,A
 36,Alfalfa,A
-37,Other Hay/Non Alfalfa,N
+37,Other Hay/Non Alfalfa,A
 38,Camelina,A
 39,Buckwheat,A
 41,Sugarbeets,A
@@ -81,7 +81,7 @@ VALUE,CLASS_NAME,GROUP
 142,Evergreen Forest,N
 143,Mixed Forest,N
 152,Shrubland,N
-176,Grass/Pasture,N
+176,Grass/Pasture,A
 190,Woody Wetlands,N
 195,Herbaceous Wetlands,N
 204,Pistachios,A
