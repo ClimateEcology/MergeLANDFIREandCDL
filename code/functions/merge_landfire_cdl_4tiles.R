@@ -38,6 +38,8 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
   
   orchard <- dplyr::filter(agclass_match, NVC_Match1 == 'Orchard') %>% dplyr::pull(CLASS_NAME)
   
+  berries <- dplyr::filter(agclass_match, NVC_Match1 == "Bush fruit and berries") %>% dplyr::pull(CLASS_NAME)
+  
   vineyard <- dplyr::filter(agclass_match, NVC_Match1 == 'Vineyard') %>% dplyr::pull(CLASS_NAME)
   
   row_crop <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Row Crop') | 
@@ -53,14 +55,15 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
   cdl <- terra::rast(tiles[[1]])
   nvc <- terra::rast(tiles[[2]])
   
-  habitat_groups <- c('orchard', 'vineyard', 'row_crop', 'close_grown_crop', 'wheat')
+  habitat_groups <- c('orchard', 'berries', 'vineyard', 'row_crop', 'close_grown_crop', 'wheat')
 
   # For each habitat group, replace LANDFIRE class with CDL pixel class (but only if CDL class matches)
   for (habitat_name in habitat_groups) {
     
     # e.g replace NVC orchard class with CDL fruit tree types (when NVC orchard pixels overlap with CDL fruit tree)
     nvc_tochange <- dplyr::filter(nvc_ag, grepl(NVC_Name, 
-      pattern= beecoSp::CapStr(gsub(habitat_name, pattern="_", replacement=" ")))) %>% 
+      pattern= beecoSp::CapStr(gsub(habitat_name, pattern="_", replacement=" ")))|
+      grepl(NVC_Name, pattern=habitat_name)) %>% 
       dplyr::pull(VALUE)
     
     cdl_toadd <- dplyr::filter(cdl_classes, CLASS_NAME %in% get(habitat_name)) %>% 
@@ -92,10 +95,26 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
 
   #crops <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
   
-  #Is the option to define crop classes working?
+  # Is the option to define crop classes working?
   nvc_gapsfilled <- beecoSp::reassign_NA(map=temp2,
                        window_size=window_size, replace_any=F)
   
+  ##### Step 4: Crop merged tile to extent of original tiles (remove overlap)
+  
+  # create extent object that removes the buffer cells 
+  delta_x <- terra::res(nvc_gapsfilled)[1]*buffercells[1]
+  delta_y <- terra::res(nvc_gapsfilled)[2]*buffercells[2]
+  
+  # subtract buffer distance from tile extent
+  original_extent <- terra::ext(c(
+  terra::ext(nvc_gapsfilled)$xmin + delta_x,
+  terra::ext(nvc_gapsfilled)$xmax - delta_x,
+  terra::ext(nvc_gapsfilled)$ymin + delta_y,
+  terra::ext(nvc_gapsfilled)$ymax - delta_y
+  ))
+  
+  # crop tile to original extent (without buffer pixels)
+  nvc_gapsfilled <- terra::crop(nvc_gapsfilled, original_extent)
 
   ##### Step 3: Save merged raster file
   if (!dir.exists(paste0(tiledir, "/MergedCDL", toupper(veglayer), "/"))) {
