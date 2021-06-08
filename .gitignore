@@ -10,3 +10,7 @@
 # do not version control raster data folders
 **/data/*
 **/SpatialData
+
+
+# do not version control 'project' folder (has necessary R packages)
+**project/*
