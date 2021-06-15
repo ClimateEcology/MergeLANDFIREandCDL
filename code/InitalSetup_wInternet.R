@@ -11,7 +11,8 @@ regionalextent <- c('Delaware')
 #                     'Massachusetts', 'Rhode Island') # list of states within region OR an sf shapefile
 
 # download shapefile of US states
-region <- tigris::states() %>% dplyr::filter(NAME %in% regionalextent)
+region <- tigris::states() %>% sf::st_as_sf() %>%
+  dplyr::filter(NAME %in% regionalextent)
 
 if (length(regionalextent) > 1) {
   region <- sf::st_combine(region)
