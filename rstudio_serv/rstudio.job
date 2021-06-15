@@ -7,7 +7,7 @@
 #SBATCH --time=12:00:00   # walltime limit (HH:MM:SS)
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
-#SBATCH --partition=short    # standard node(s)
+#SBATCH --partition=atlas    # standard node(s)
 #SBATCH --signal=USR2
 #SBATCH --output=/home/%u/rstudio-%j.out
 

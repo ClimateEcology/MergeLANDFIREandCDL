@@ -6,6 +6,8 @@
 # do not version control raster files
 **/*.tif
 
+# do not version control singularity images
+**/*.sif
 
 # do not version control raster data folders
 **/data/*
