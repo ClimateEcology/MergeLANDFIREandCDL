@@ -2,7 +2,7 @@
 
 # necessary packages are part of 'geospatial_extend' container, adding to rocker project geospatial image
 # container Dockerfile is in 'ContainerLib' repo
-library(dplyr)
+library(dplyr); library(sf)
 
 regionalextent <- c('Delaware')
 

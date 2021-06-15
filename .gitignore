@@ -3,8 +3,9 @@
 .RData
 .Ruserdata
 
-# do not version control raster files
+# do not version control raster and image files
 **/*.tif
+**/*.svg
 
 # do not version control singularity images
 **/*.sif
