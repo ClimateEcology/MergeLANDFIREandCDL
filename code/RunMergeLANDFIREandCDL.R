@@ -11,7 +11,8 @@ library(dplyr); library(terra)
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 CDLYear <- '2016' # year of NASS Cropland Data Layer
-regionalextent <- sf::st_read('./data/SpatialData/NE_region.shp'); regionName <- 'DE'
+regionalextent <- sf::st_read(paste0(datadir, '/SpatialData/DE.shp')); regionName <- 'DE'
+#regionalextent <- sf::st_read('./data/SpatialData/NE_region.shp'); regionName <- 'NorthEast'
 writetiles <- T
 div <- c(12,12) # divide regional raster into how many pieces (in x and y directions)
 

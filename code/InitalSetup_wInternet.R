@@ -1,9 +1,8 @@
 # steps of grid/merge workflow that require internet connection.
 
+# necessary packages are part of 'geospatial_extend' container, adding to rocker project geospatial image
+# container Dockerfile is in 'ContainerLib' repo
 library(dplyr)
-#try adding from Github
-devtools::install_github("land-4-bees/beecoSp")
-devtools::install_github("PredictiveEcology/SpaDES.tools", dependencies = TRUE)
 
 regionalextent <- c('Delaware')
 
@@ -19,4 +18,4 @@ if (length(regionalextent) > 1) {
 }
 class(region)
 
-sf::st_write(region, './data/SpatialData/NE_region.shp', append=F)
+sf::st_write(region, './data/SpatialData/DE.shp', append=F)
