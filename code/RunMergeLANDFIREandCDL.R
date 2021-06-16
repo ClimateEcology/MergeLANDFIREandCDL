@@ -2,9 +2,6 @@ rm(list=ls())
 
 source('code/functions/merge_landfire_cdl.R')
 
-#try adding from Github
-#devtools::install_github("land-4-bees/beecoSp")
-
 library(dplyr); library(terra)
 # specify input parameters
 
@@ -40,13 +37,13 @@ allow_classes <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
 
 # run function to grid NE CDL and LANDFIRE into tiles (using parameters above)
 
-# tiles <- beecoSp::grid_rasters(rasterpath=c(cdl_path, nvc_path),
-#                             rasterID=c(paste0('CDL', CDLYear), 'NVC'),
-#                             regionalextent=regionalextent, tiledir=tiledir,
-#                             div=div, buffercells=buffercells,
-#                             NAvalue=c(0,-9999), writetiles=writetiles)
-# 
-# save(tiles, file=paste0(tiledir, '/tiles.RDA'))
+tiles <- beecoSp::grid_rasters(rasterpath=c(cdl_path, nvc_path),
+                            rasterID=c(paste0('CDL', CDLYear), 'NVC'),
+                            regionalextent=regionalextent, tiledir=tiledir,
+                            div=div, buffercells=buffercells,
+                            NAvalue=c(0,-9999), writetiles=writetiles)
+
+save(tiles, file=paste0(tiledir, '/tiles.RDA'))
 
 ######################################################################################################
 ##### Part 2: Merge Individual CDL and NVC Tiles
