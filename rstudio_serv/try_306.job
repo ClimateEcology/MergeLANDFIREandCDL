@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Copy/paste this job script into a text file called rstudio.job and submit with the command:
+#    sbatch rstudio.job
+# RStudio login information will go to the file $HOME/rstudio-%j.out (where %j is the SLURM job ID)
+
+#SBATCH --time=4:00:00   # walltime limit (HH:MM:SS)
+#SBATCH --nodes=1   # number of nodes
+#SBATCH --ntasks-per-node=1   # 1 processor core(s) per node X 2 threads per core
+#SBATCH --partition=atlas    # standard node(s)
+#SBATCH --output=/home/%u/rstudio-%j.out
+#SBATCH --signal=USR2
+
+set -o errexit -o nounset
+export PASSWORD=$(openssl rand -base64 15)
+# get unused socket per https://unix.stackexchange.com/a/132524
+# tiny race condition between the python & singularity commands
+readonly PORT=$(python -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()')
+cat 1>&2 <<END
+VPN Users:
+
+1. Connect to SCINet VPN and point your web browser to http://$(hostname -s)-eth.scinet.local:${PORT}
+
+2. log in to RStudio Server using the following credentials:
+
+   user: ${USER}
+   password: ${PASSWORD}
+
+SSH users:
+
+1. SSH tunnel from your workstation using the following command (macOS, Linux and Windows PowerShell;
+   for how to enter this in PuTTY on Windows see the Ceres RStudio User Guide)
+
+   ssh -N -L 8787:$(hostname -s)-eth.scinet.local:${PORT} ${USER}@atlas-login.hpc.msstate.edu
+
+   and point your web browser to http://localhost:8787
+
+2. log in to RStudio Server using the following credentials:
+
+   user: ${USER}
+   password: ${PASSWORD}
+
+When done using RStudio Server, terminate the job by:
+
+1. Exit the RStudio Session ("power" button in the top right corner of the RStudio window)
+2. On the Ceres command line, issue the command
+   
+      scancel -f ${SLURM_JOB_ID}
+END
+
+if [ ! -e ${HOME}/.Renviron ]
+then
+  printf '\nNOTE: creating ~/.Renviron file\n\n'
+  echo 'R_LIBS_USER=~/R/%p-library/%v' >> ${HOME}/.Renviron
+fi
+
+
+singularity exec --bind $TMPDIR:/tmp \
+    /project/reference/containers/RStudio/3.6.0/rocker-geospatial.simg \
+    rserver --www-port ${PORT} --www-address $(hostname -s)-eth.scinet.local --auth-none 0 --auth-pam-helper-path=pam-helper
