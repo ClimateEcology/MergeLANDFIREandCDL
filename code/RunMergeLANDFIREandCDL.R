@@ -2,7 +2,7 @@ rm(list=ls())
 
 source('code/functions/merge_landfire_cdl.R')
 
-library(dplyr); library(terra); library(sf)
+library(dplyr) #;  library(terra); library(sf)
 # specify input parameters
 
 datadir <- './data' # directory where tabular and spatial data are stored
