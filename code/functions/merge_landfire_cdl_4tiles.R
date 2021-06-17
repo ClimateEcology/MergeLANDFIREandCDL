@@ -52,13 +52,14 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
                                       grepl(NVC_Match3, pattern= 'Close Grown Crop')) %>%
     dplyr::pull(CLASS_NAME)
   
-  
   # Load spatial layers (EVT, NVC, and CDL rasters)
   cdl <- terra::rast(tiles[[1]])
   nvc <- terra::rast(tiles[[2]])
   
   habitat_groups <- c('orchard', 'berries', 'vineyard', 'row_crop', 'close_grown_crop', 'wheat')
 
+  logger::log_info('Made it to line 61.')
+  
   # For each habitat group, replace LANDFIRE class with CDL pixel class (but only if CDL class matches)
   for (habitat_name in habitat_groups) {
     
@@ -76,6 +77,7 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
       veglayer_copy <- nvc
     }
 
+    logger::log_info('Made it to line 80.')
     
     # create binary layer indicating landfire and cdl match
     both_orchard <- (cdl %in% cdl_toadd & veglayer_copy %in% as.numeric(nvc_tochange))
@@ -85,6 +87,7 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
     veglayer_copy <- remove + add
     print(paste0('finished ', habitat_name))
   }
+  
   logger::log_info('Step 1 complete.')
   logger::log_info('Begin step 2: assign mis-matched pixel via neighborhood analysis.')
   
