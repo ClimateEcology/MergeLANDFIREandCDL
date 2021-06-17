@@ -31,6 +31,11 @@ cdl_classes <- read.csv(paste0(datadir, '/TabularData/NASS_classes_simple.csv'))
 # terra's 'focal' function only accepts one argument 
 allow_classes <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
 
+#set up logger to write status updates
+library(logger)
+logger::log_threshold(DEBUG)
+
+logger::log_info('Finished setting up parameters, beginning operation to create CDL and LANDFIRE tiles.')
 
 #####################################################################################################
 ##### Part 1: Create Raster Tiles
@@ -45,13 +50,15 @@ tiles <- beecoSp::grid_rasters(rasterpath=c(cdl_path, nvc_path),
 
 save(tiles, file=paste0(tiledir, '/tiles.RDA'))
 
+logger::log_info('LANDFIRE and CDL tile saved.')
+
 ######################################################################################################
 ##### Part 2: Merge Individual CDL and NVC Tiles
 
 # load list of raster tiles
 load(paste0(tiledir, '/tiles.RDA'))
 
-logger::log_info('Successfully loaded list of tile pairs.')
+logger::log_info('Successfully loaded list of CDl and LANDFIRE tile pairs.')
 
 # import function to merge together CDL and LANDFIRE tiles
 source('./code/functions/merge_landfire_cdl_4tiles.R')
