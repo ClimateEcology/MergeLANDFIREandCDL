@@ -23,6 +23,8 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
     dplyr::filter(VALUE < 500)  %>% #filter out CDL classes that I created for a different project
     dplyr::mutate(VALUE = as.character(-VALUE))
   
+  logger::log_info('Loaded necessary tabular and spatial data.')
+  logger::log_info('Begin step 1: re-assign pixels where broad land-use class matches (e.g. CDL ag = LANDFIRE ag).')
   
   ##### Step 1: Assign pixels that exactly match
   
@@ -83,7 +85,8 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
     veglayer_copy <- remove + add
     print(paste0('finished ', habitat_name))
   }
-  
+  logger::log_info('Step 1 complete.')
+  logger::log_info('Begin step 2: assign mis-matched pixel via neighborhood analysis.')
   
   ##### Step 2: Assign mismatched pixels based on neighborhood
   
@@ -116,6 +119,9 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
   # crop tile to original extent (without buffer pixels)
   nvc_gapsfilled <- terra::crop(nvc_gapsfilled, original_extent)
 
+  logger::log_info('Step 2 complete.')
+  logger::log_info('Save merged raster tiles.')
+  
   ##### Step 3: Save merged raster file
   if (!dir.exists(paste0(tiledir, "/MergedCDL", toupper(veglayer), "/"))) {
     dir.create(paste0(tiledir, "/MergedCDL", toupper(veglayer), "/"))
