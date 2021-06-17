@@ -1,6 +1,8 @@
 rm(list=ls())
 
 source('code/functions/merge_landfire_cdl.R')
+source('code/functions/DEV_grid_rasters.R')
+
 
 library(dplyr);  library(terra)
 # specify input parameters
@@ -42,7 +44,7 @@ logger::log_info('Finished setting up parameters, beginning operation to create 
 
 # run function to grid NE CDL and LANDFIRE into tiles (using parameters above)
 
-tiles <- beecoSp::grid_rasters(rasterpath=c(cdl_path, nvc_path),
+tiles <- DEV_grid_rasters(rasterpath=c(cdl_path, nvc_path),
                             rasterID=c(paste0('CDL', CDLYear), 'NVC'),
                             regionalextent=regionalextent, tiledir=tiledir,
                             div=div, buffercells=buffercells,
@@ -50,7 +52,7 @@ tiles <- beecoSp::grid_rasters(rasterpath=c(cdl_path, nvc_path),
 
 save(tiles, file=paste0(tiledir, '/tiles.RDA'))
 
-logger::log_info('LANDFIRE and CDL tile saved.')
+logger::log_info('LANDFIRE and CDL tiles saved.')
 
 ######################################################################################################
 ##### Part 2: Merge Individual CDL and NVC Tiles
