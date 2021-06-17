@@ -127,9 +127,12 @@ p2 <- rlang::exec("mosaic", !!!args2, fun='mean',
 p3 <- rlang::exec("mosaic", !!!args3, fun='mean',
                   filename=paste0(tiledir, '/', regionName, '_CDLNVCMerge3.tif'), overwrite=T)
 
+logger::log_info('Mosaic of mega-tiles is complete.')
+
+
 wholemap <- terra::mosaic(p1, p2, p3, fun='mean',
   filename=paste0(tiledir, '/', regionName, '_FinalCDLNVCMerge.tif'), overwrite=T)
 tictoc::toc()
 
-wholemap
-sort(unique(terra::values(wholemap)))
+logger::log_info('Mosaic of full raster is complete!')
+
