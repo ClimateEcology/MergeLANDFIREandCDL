@@ -1,8 +1,8 @@
 rm(list=ls())
 
-source('code/functions/merge_landfire_cdl.R')
-source('code/functions/DEV_grid_rasters.R')
-
+# import function to merge together CDL and LANDFIRE tiles
+source('./code/functions/merge_landfire_cdl_4tiles.R')
+source('./code/functions/DEV_grid_rasters.R')
 
 library(dplyr);  library(terra)
 # specify input parameters
@@ -62,8 +62,6 @@ load(paste0(tiledir, '/tiles.RDA'))
 
 logger::log_info('Successfully loaded list of CDl and LANDFIRE tile pairs.')
 
-# import function to merge together CDL and LANDFIRE tiles
-source('./code/functions/merge_landfire_cdl_4tiles.R')
 
 #turn on parallel processing for furrr package
 library(future)
