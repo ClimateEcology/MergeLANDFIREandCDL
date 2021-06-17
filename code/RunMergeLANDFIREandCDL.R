@@ -51,6 +51,8 @@ save(tiles, file=paste0(tiledir, '/tiles.RDA'))
 # load list of raster tiles
 load(paste0(tiledir, '/tiles.RDA'))
 
+logger::log_info('Successfully loaded list of tile pairs.')
+
 # import function to merge together CDL and LANDFIRE tiles
 source('./code/functions/merge_landfire_cdl_4tiles.R')
 
@@ -68,6 +70,9 @@ furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
                    window_size=window_size, .options=furrr::furrr_options(seed = TRUE))
 future::plan(sequential)
 
+logger::log_info('Made it to line 73.')
+
+
 # read in tiles created by furrr
 toread <- list.files(paste0(tiledir, "/MergedCDLNVC"), full.names=T)
 # exclude any extra files
@@ -81,7 +86,8 @@ for (i in 1:length(toread)) {
 
 tictoc::toc()
 
-
+logger::log_info('Completed processing merge for all the tiles.')
+logger::log_info('Starting mosaic operation.')
 
 ######################################################################################################
 ##### Part 3: Stitch together all the merged tiles
