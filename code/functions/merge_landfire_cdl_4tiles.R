@@ -3,6 +3,8 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
   
   ##### Step 0: Setup and load data
   
+  logger::log_info('Got to line 6 of merge raster.')
+  
   # specify allow_classes is a global variable (necessary for futures package to work)
   allow_classes
   
