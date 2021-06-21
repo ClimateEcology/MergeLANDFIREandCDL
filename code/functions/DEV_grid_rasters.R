@@ -97,7 +97,7 @@ DEV_grid_rasters <- function(rasterpath, rasterID,
   ##### Part 3: Split raster1 into tiles
 
   logger::log_info('Splitting regional rasters into specified number of tiles (n = xdiv * ydiv).')
-
+  logger::log_info('Splitting first raster.')
 
   # set up parallel processing cluster (will be used by splitRaster function)
   cl <- parallel::makeCluster(parallel::detectCores() - 2)  # use all but 2 cores
@@ -110,7 +110,8 @@ DEV_grid_rasters <- function(rasterpath, rasterID,
 
   ######################################################################################################
   ##### Part 4: If raster2 file path is provided, split raster2 into tiles
-
+  logger::log_info('Splitting second raster.')
+  
   nvc_tiles <- SpaDES.tools::splitRaster(r=region_nvc, nx=div[1], ny=div[2],
                                          buffer=buffercells, cl=cl)
 
@@ -120,7 +121,9 @@ DEV_grid_rasters <- function(rasterpath, rasterID,
   # save lists of which raster tiles are all NA values (cdl == 0 & nvc == -9999)
   # We don't need to process raster tiles that are completely NA values (background)
   # I use the purrr map function because it nicely applies a function over a list, which is the format returned by splitRaster
-
+  
+  logger::log_info('Identifying raster tiles that are all NA values.')
+  
   #turn on parallel processing for furrr package
   future::plan(multisession)
 
