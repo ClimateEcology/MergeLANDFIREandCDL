@@ -29,7 +29,7 @@ DEV_grid_rasters <- function(rasterpath, rasterID,
   ##### Part 1: Setup and load data
 
   # load libraries
-  library(future); library(foreach)
+  #library(future); library(foreach)
 
   #separate file paths to CDL and vegetation rasters.
   cdl_path <- rasterpath[1]

@@ -4,7 +4,7 @@ rm(list=ls())
 source('./code/functions/merge_landfire_cdl_4tiles.R')
 source('./code/functions/DEV_grid_rasters.R')
 
-library(dplyr);  library(terra)
+#library(dplyr);  library(terra)
 # specify input parameters
 
 datadir <- './data' # directory where tabular and spatial data are stored
