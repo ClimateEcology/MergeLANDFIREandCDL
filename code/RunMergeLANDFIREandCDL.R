@@ -2,7 +2,6 @@ rm(list=ls())
 
 # import function to merge together CDL and LANDFIRE tiles
 source('./code/functions/merge_landfire_cdl_4tiles.R')
-source('./code/functions/DEV_grid_rasters.R')
 
 library(dplyr);  library(terra)
 # specify input parameters
@@ -44,6 +43,7 @@ logger::log_info('Finished setting up parameters, beginning operation to create 
 
 # run function to grid NE CDL and LANDFIRE into tiles (using parameters above)
 
+<<<<<<< HEAD
 # tiles <- DEV_grid_rasters(rasterpath=c(cdl_path, nvc_path),
 #                            rasterID=c(paste0('CDL', CDLYear), 'NVC'),
 #                            regionalextent=regionalextent, tiledir=tiledir,
@@ -51,6 +51,15 @@ logger::log_info('Finished setting up parameters, beginning operation to create 
 #                            NAvalue=c(0,-9999), writetiles=writetiles)
 #
 # save(tiles, file=paste0(tiledir, '/tiles.RDA'))
+=======
+tiles <- beecoSp::grid_rasters(rasterpath=c(cdl_path, nvc_path),
+                            rasterID=c(paste0('CDL', CDLYear), 'NVC'),
+                            regionalextent=regionalextent, tiledir=tiledir,
+                            div=div, buffercells=buffercells,
+                            NAvalue=c(0,-9999), writetiles=writetiles)
+
+save(tiles, file=paste0(tiledir, '/tiles.RDA'))
+>>>>>>> 68cfcbb9200f3aaf6f16c68227b1a553c8d119ad
 
 logger::log_info('LANDFIRE and CDL tiles saved.')
 
