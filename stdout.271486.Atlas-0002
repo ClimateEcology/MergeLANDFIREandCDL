@@ -1,6 +1,0 @@
-Reading layer `DE' from data source `/project/geoecoservices/MergeLANDFIREandCDL/data/SpatialData/DE.shp' using driver `ESRI Shapefile'
-Simple feature collection with 1 feature and 14 fields
-geometry type:  POLYGON
-dimension:      XY
-bbox:           xmin: -75.78902 ymin: 38.45113 xmax: -74.98416 ymax: 39.83952
-proj4string:    +proj=longlat +ellps=GRS80 +no_defs 
