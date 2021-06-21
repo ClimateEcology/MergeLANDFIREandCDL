@@ -4,17 +4,21 @@
 .Ruserdata
 .Renviron
 
-# do not version control raster and image files
+# raster and image files
 **/*.tif
 **/*.svg
 
-# do not version control singularity images
+# singularity images
 **/*.sif
 
-# do not version control raster data folders
+# raster data folders
 **/data/*
 **/SpatialData
 
 
-# do not version control 'project' folder (has necessary R packages)
+# 'project' folder (has necessary R packages)
 **project/*
+
+# output from sbatch runs
+**/stderr*
+**/stdout*
