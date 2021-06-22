@@ -69,6 +69,8 @@ future::plan(multisession)
 
 tictoc::tic()
 
+logger::log_info('Made it to line 72, starting furrr section.')
+
 # loop through list of tiles in parallel with furrr::future_walk function
 # for some reason, furrr:future_map doesn't return the list of rasters
 # so, we use furrr:walk to generate the files, then read them again
