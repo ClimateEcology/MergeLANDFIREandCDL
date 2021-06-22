@@ -4,7 +4,8 @@ rm(list=ls())
 source('./code/functions/merge_landfire_cdl_4tiles.R')
 source('./code/functions/DEV_grid_rasters.R')
 
-library(dplyr) #;  library(terra)
+library(dplyr);  library(terra); library(logger); library(future)
+
 # specify input parameters
 
 datadir <- './data' # directory where tabular and spatial data are stored
@@ -34,7 +35,6 @@ cdl_classes <- read.csv(paste0(datadir, '/TabularData/NASS_classes_simple.csv'))
 allow_classes <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
 
 #set up logger to write status updates
-library(logger)
 logger::log_threshold(DEBUG)
 
 logger::log_info('Finished setting up parameters, beginning operation to create CDL and LANDFIRE tiles.')
@@ -60,12 +60,9 @@ logger::log_info('Finished setting up parameters, beginning operation to create 
 # load list of raster tiles
 load(paste0(tiledir, '/tiles.RDA'))
 
-tiles[[1]][[1]]
-
 logger::log_info('Successfully loaded list of CDl and LANDFIRE tile pairs.')
 
 #turn on parallel processing for furrr package
-library(future)
 future::plan(multisession)
 
 tictoc::tic()

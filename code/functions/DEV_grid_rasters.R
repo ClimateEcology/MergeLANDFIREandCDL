@@ -106,14 +106,14 @@ DEV_grid_rasters <- function(rasterpath, rasterID,
 
   # split raster1 into tiles using a regular grid
   cdl_tiles <- SpaDES.tools::splitRaster(r=region_cdl, nx=div[1], ny=div[2],
-                                         buffer=buffercells) #, cl=cl)
+                                         buffer=buffercells, cl=cl)
 
   ######################################################################################################
   ##### Part 4: If raster2 file path is provided, split raster2 into tiles
   logger::log_info('Splitting second raster.')
   
   nvc_tiles <- SpaDES.tools::splitRaster(r=region_nvc, nx=div[1], ny=div[2],
-                                         buffer=buffercells) #, cl=cl)
+                                         buffer=buffercells, cl=cl)
 
   ######################################################################################################
   ##### Part 5: Handle background tiles that are all NA

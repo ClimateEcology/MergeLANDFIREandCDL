@@ -6,7 +6,7 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
   logger::log_info('Got to line 6 of merge raster.')
   
   # specify allow_classes is a global variable (necessary for futures package to work)
-  #allow_classes
+  allow_classes
   
   # load table of LANDFIRE vegetation classes
   if (veglayer == 'evt') {
@@ -58,6 +58,13 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
   cdl <- terra::rast(tiles[[1]])
   nvc <- terra::rast(tiles[[2]])
   
+  # check if projections of raster tiles are the same. If not, re-project them to match.
+  
+  if (terra::crs(cdl) != terra::crs(nvc)) {
+    cdl <- terra::project(x=cdl, y=nvc)
+  }
+  
+  
   habitat_groups <- c('orchard', 'berries', 'vineyard', 'row_crop', 'close_grown_crop', 'wheat')
 
   logger::log_info('Made it to line 61.')
@@ -79,11 +86,15 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
       veglayer_copy <- nvc
     }
 
-    logger::log_info('Made it to line 80.')
+    logger::log_info('Made it to line 82.')
     
     # create binary layer indicating landfire and cdl match
     both_orchard <- (cdl %in% cdl_toadd & veglayer_copy %in% as.numeric(nvc_tochange))
-
+    
+    logger::log_info('Made it to line 87.')
+    message(paste0("Projection match =", terra::crs(both_orchard) == terra::crs(veglayer_copy)))
+    message(paste0("Extent match =", terra::ext(both_orchard) == terra::ext(veglayer_copy)))
+    
     remove <- (!both_orchard) * veglayer_copy
     add <- both_orchard * (-cdl)
     veglayer_copy <- remove + add
