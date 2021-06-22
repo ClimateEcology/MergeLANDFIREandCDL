@@ -3,8 +3,6 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
   
   ##### Step 0: Setup and load data
   
-  logger::log_info('Got to line 6 of merge raster.')
-  
   # specify allow_classes is a global variable (necessary for futures package to work)
   allow_classes
   
@@ -67,8 +65,6 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
   
   habitat_groups <- c('orchard', 'berries', 'vineyard', 'row_crop', 'close_grown_crop', 'wheat')
 
-  logger::log_info('Made it to line 61.')
-  
   # For each habitat group, replace LANDFIRE class with CDL pixel class (but only if CDL class matches)
   for (habitat_name in habitat_groups) {
     
@@ -85,13 +81,10 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
     if (habitat_name == habitat_groups[[1]]) {
       veglayer_copy <- nvc
     }
-
-    logger::log_info('Made it to line 82.')
     
     # create binary layer indicating landfire and cdl match
     both_orchard <- (cdl %in% cdl_toadd & veglayer_copy %in% as.numeric(nvc_tochange))
     
-    logger::log_info('Made it to line 87.')
     message(paste0("Projection match =", terra::crs(both_orchard) == terra::crs(veglayer_copy)))
     message(paste0("Extent match =", terra::ext(both_orchard) == terra::ext(veglayer_copy)))
     
