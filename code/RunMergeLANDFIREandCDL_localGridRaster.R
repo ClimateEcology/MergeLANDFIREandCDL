@@ -44,15 +44,15 @@ logger::log_info('Finished setting up parameters, beginning operation to create 
 
 # run function to grid NE CDL and LANDFIRE into tiles (using parameters above)
 
-# tiles <- DEV_grid_rasters(rasterpath=c(cdl_path, nvc_path),
-#                             rasterID=c(paste0('CDL', CDLYear), 'NVC'),
-#                             regionalextent=regionalextent, tiledir=tiledir,
-#                             div=div, buffercells=buffercells,
-#                             NAvalue=c(0,-9999), writetiles=writetiles)
-# 
-# save(tiles, file=paste0(tiledir, '/tiles.RDA'))
-# 
-# logger::log_info('LANDFIRE and CDL tiles saved.')
+tiles <- DEV_grid_rasters(rasterpath=c(cdl_path, nvc_path),
+                            rasterID=c(paste0('CDL', CDLYear), 'NVC'),
+                            regionalextent=regionalextent, tiledir=tiledir,
+                            div=div, buffercells=buffercells,
+                            NAvalue=c(0,-9999), writetiles=writetiles)
+
+save(tiles, file=paste0(tiledir, '/tiles.RDA'))
+
+logger::log_info('LANDFIRE and CDL tiles saved.')
 
 ######################################################################################################
 ##### Part 2: Merge Individual CDL and NVC Tiles
@@ -60,7 +60,7 @@ logger::log_info('Finished setting up parameters, beginning operation to create 
 # load list of raster tiles
 load(paste0(tiledir, '/tiles.RDA'))
 
-logger::log_info('Successfully loaded list of CDl and LANDFIRE tile pairs.')
+logger::log_info('Successfully loaded list of CDL and LANDFIRE tile pairs.')
 
 #turn on parallel processing for furrr package
 future::plan(multisession)
@@ -79,8 +79,7 @@ furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
 # stop parallel processing
 future::plan(sequential)
 
-logger::log_info('Made it to line 73.')
-
+logger::log_info('Made it to line 82.')
 
 # read in tiles created by furrr
 toread <- list.files(paste0(tiledir, "/MergedCDLNVC"), full.names=T)
