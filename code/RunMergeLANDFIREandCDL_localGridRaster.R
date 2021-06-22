@@ -44,15 +44,15 @@ logger::log_info('Finished setting up parameters, beginning operation to create 
 
 # run function to grid NE CDL and LANDFIRE into tiles (using parameters above)
 
-# tiles <- DEV_grid_rasters(rasterpath=c(cdl_path, nvc_path),
-#                             rasterID=c(paste0('CDL', CDLYear), 'NVC'),
-#                             regionalextent=regionalextent, tiledir=tiledir,
-#                             div=div, buffercells=buffercells,
-#                             NAvalue=c(0,-9999), writetiles=writetiles)
-# 
-# save(tiles, file=paste0(tiledir, '/tiles.RDA'))
-# 
-# logger::log_info('LANDFIRE and CDL tiles saved.')
+tiles <- DEV_grid_rasters(rasterpath=c(cdl_path, nvc_path),
+                            rasterID=c(paste0('CDL', CDLYear), 'NVC'),
+                            regionalextent=regionalextent, tiledir=tiledir,
+                            div=div, buffercells=buffercells,
+                            NAvalue=c(0,-9999), writetiles=writetiles)
+
+save(tiles, file=paste0(tiledir, '/tiles.RDA'))
+
+logger::log_info('LANDFIRE and CDL tiles saved.')
 
 ######################################################################################################
 ##### Part 2: Merge Individual CDL and NVC Tiles
