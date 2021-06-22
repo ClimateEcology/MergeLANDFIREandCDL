@@ -60,8 +60,9 @@ logger::log_info('Finished setting up parameters, beginning operation to create 
 # load list of raster tiles
 load(paste0(tiledir, '/tiles.RDA'))
 
-logger::log_info('Successfully loaded list of CDl and LANDFIRE tile pairs.')
+tiles[[1]][[1]]
 
+logger::log_info('Successfully loaded list of CDl and LANDFIRE tile pairs.')
 
 #turn on parallel processing for furrr package
 library(future)
@@ -77,6 +78,8 @@ logger::log_info('Made it to line 72, starting furrr section.')
 furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
                    datadir=datadir, tiledir=tiledir, veglayer='nvc', CDLYear=CDLYear,
                    window_size=window_size, .options=furrr::furrr_options(seed = TRUE))
+
+# stop parallel processing
 future::plan(sequential)
 
 logger::log_info('Made it to line 73.')
