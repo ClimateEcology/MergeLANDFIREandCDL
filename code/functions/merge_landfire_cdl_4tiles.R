@@ -6,7 +6,7 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
   logger::log_info('Got to line 6 of merge raster.')
   
   # specify allow_classes is a global variable (necessary for futures package to work)
-  allow_classes
+  #allow_classes
   
   # load table of LANDFIRE vegetation classes
   if (veglayer == 'evt') {
