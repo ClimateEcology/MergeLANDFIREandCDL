@@ -1,5 +1,5 @@
 
-merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, window_size) {
+merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, window_size, verbose) {
   
   ##### Step 0: Setup and load data
   
@@ -85,13 +85,15 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
     # create binary layer indicating landfire and cdl match
     both_orchard <- (cdl %in% cdl_toadd & veglayer_copy %in% as.numeric(nvc_tochange))
     
-    message(paste0("Projection match =", terra::crs(both_orchard) == terra::crs(veglayer_copy)))
-    message(paste0("Extent match =", terra::ext(both_orchard) == terra::ext(veglayer_copy)))
+    if (verbose == T) {
+      logger::log_info(paste0("Projection match =", terra::crs(both_orchard) == terra::crs(veglayer_copy)))
+      logger::log_info(paste0("Extent match =", terra::ext(both_orchard) == terra::ext(veglayer_copy)))
+    }
     
     remove <- (!both_orchard) * veglayer_copy
     add <- both_orchard * (-cdl)
     veglayer_copy <- remove + add
-    print(paste0('finished ', habitat_name))
+    if (verbose == T) { logger::log_info(paste0('finished ', habitat_name)) }
   }
   
   logger::log_info('Step 1 complete.')

@@ -96,7 +96,7 @@ logger::log_info('Starting furrr section, parallel execution of merge_landfire_c
 # so, we use furrr:walk to generate the files, then read them again
 furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
                    datadir=datadir, tiledir=tiledir, veglayer='nvc', CDLYear=CDLYear,
-                   window_size=window_size, .options=furrr::furrr_options(seed = TRUE))
+                   window_size=window_size, verbose=F, .options=furrr::furrr_options(seed = TRUE))
 
 # stop parallel processing
 future::plan(sequential)
