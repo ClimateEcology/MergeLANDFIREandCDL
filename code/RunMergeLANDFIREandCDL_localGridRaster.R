@@ -155,5 +155,5 @@ for (stateName in states) {
    terra::writeRaster(MT1, filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T) 
   }
 
-  logger::log_info(paste0('Mosaic of ', stateName, 'full raster is complete!'))
+  logger::log_info(paste0('Mosaic of ', stateName, ' rasters are complete!'))
 }
