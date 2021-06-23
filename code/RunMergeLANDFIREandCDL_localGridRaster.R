@@ -89,7 +89,7 @@ future::plan(multisession)
 
 tictoc::tic()
 
-logger::log_info('Made it to line 72, starting furrr section.')
+logger::log_info('Starting furrr section, parallel execution of merge_landfire_cdl function.')
 
 # loop through list of tiles in parallel with furrr::future_walk function
 # for some reason, furrr:future_map doesn't return the list of rasters
@@ -100,8 +100,6 @@ furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
 
 # stop parallel processing
 future::plan(sequential)
-
-logger::log_info('Made it to line 82.')
 
 # read in tiles created by furrr
 toread <- list.files(paste0(tiledir, "/MergedCDLNVC"), full.names=T)
@@ -116,7 +114,7 @@ for (i in 1:length(toread)) {
 
 tictoc::toc()
 
-logger::log_info('Completed processing merge for all the tiles.')
+logger::log_info('Completed merge for all tiles.')
 logger::log_info('Starting mosaic operation.')
 
 ######################################################################################################
@@ -134,8 +132,6 @@ third <- round(length(merged_tiles2)/3); whole <- length(merged_tiles2)
 args1 <- merged_tiles2[1:third]
 args2 <- merged_tiles2[(third+1):(third*2)]
 args3 <- merged_tiles2[((third*2)+1):whole]
-
-
 
 tictoc::tic()
 p1 <- rlang::exec("mosaic", !!!args1, fun='mean',
