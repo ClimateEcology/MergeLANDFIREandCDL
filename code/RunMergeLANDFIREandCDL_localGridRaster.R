@@ -2,7 +2,6 @@ rm(list=ls())
 
 # import function to merge together CDL and LANDFIRE tiles
 source('./code/functions/merge_landfire_cdl_4tiles.R')
-source('./code/functions/DEV_grid_rasters.R')
 
 library(dplyr);  library(terra); library(sf); library(logger); library(future)
 
@@ -68,7 +67,7 @@ for (stateName in states) {
   
   # run function to grid NE CDL and LANDFIRE into tiles (using parameters above)
   
-  tiles <- DEV_grid_rasters(rasterpath=c(cdl_path, nvc_path),
+  tiles <- beecoSp::grid_rasters(rasterpath=c(cdl_path, nvc_path),
                               rasterID=c(paste0('CDL', CDLYear), 'NVC'),
                               regionalextent=regionalextent, tiledir=tiledir,
                               div=c(xdiv, ydiv), buffercells=buffercells,
