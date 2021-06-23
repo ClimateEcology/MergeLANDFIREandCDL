@@ -11,14 +11,17 @@ library(dplyr);  library(terra); library(logger); library(future)
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 CDLYear <- '2016' # year of NASS Cropland Data Layer
-regionalextent <- sf::st_read(paste0(datadir, '/SpatialData/DE.shp')); regionName <- 'DE'
+
+regionName <- 'PA'
+regionalextent <- sf::st_read(paste0(datadir, '/SpatialData/', regionName, '.shp'))
 #regionalextent <- sf::st_read('./data/SpatialData/NE_region.shp'); regionName <- 'NorthEast'
 writetiles <- T
-div <- c(12,12) # divide regional raster into how many pieces (in x and y directions)
+div <- c(20,12) # divide regional raster into how many pieces (in x and y directions)
+ntiles <- div[1]*div[2]
 
 ##### derived parameters 
 window_size <- (buffercells[1]*2) + 1 # diameter of neighborhood analysis window (part 2 only)
-tiledir = paste0(datadir, "/", regionName, "Tiles")
+tiledir = paste0(datadir, "/", regionName, "Tiles_", ntiles)
 evt_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_105evt/grid1/us_105evt')
 nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
 cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
