@@ -32,7 +32,7 @@ ydiv <- round(sqrt(ndiv/ratio))
 xdiv <- round(ndiv/ydiv)
 
 # what is the resulting area of tiles using these x and y division factors?
-result_area <- areabb/(ydiv*xdiv)
+ntiles <- ydiv*xdiv; result_area <- areabb/ntiles
 
 # Log division factor and tile size selected for this run.
 logger::log_info(paste0('Division factor is c(', xdiv, ',', ydiv, ') which creates tiles of approximately ', round(result_area), ' km.'))
@@ -40,7 +40,7 @@ logger::log_info(paste0('Division factor is c(', xdiv, ',', ydiv, ') which creat
 
 ##### derived parameters 
 window_size <- (buffercells[1]*2) + 1 # diameter of neighborhood analysis window (part 2 only)
-tiledir = paste0(datadir, "/", regionName, "Tiles")
+tiledir = paste0(datadir, "/", regionName, "Tiles_", ntiles)
 evt_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_105evt/grid1/us_105evt')
 nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
 cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
