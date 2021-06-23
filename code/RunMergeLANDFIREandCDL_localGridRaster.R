@@ -11,14 +11,16 @@ datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 CDLYear <- '2016' # year of NASS Cropland Data Layer
 writetiles <- T
+regionName <- 'NorthEast'
 states <- c('DE', 'MD') # states/region to run
 target_area <- 900 # desired size (in km2) of each tile
 
 
-for (regionName in states) {
+for (stateName in states) {
   
   # load shapefile for state/region 
-  regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp')) 
+  regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))  %>%
+    dplyr::filter(NAME %in% stateName)
   
   # decide how many tiles to create based on extent of shapefile
   boundary_box <- sf::st_as_sfc(sf::st_bbox((regionalextent))) # save bounding box as a polygon
@@ -42,7 +44,7 @@ for (regionName in states) {
   
   ##### derived parameters 
   window_size <- (buffercells[1]*2) + 1 # diameter of neighborhood analysis window (part 2 only)
-  tiledir = paste0(datadir, "/", regionName, "Tiles_", ntiles)
+  tiledir = paste0(datadir, "/", stateName, "Tiles_", ntiles)
   evt_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_105evt/grid1/us_105evt')
   nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
   cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
@@ -137,17 +139,17 @@ for (regionName in states) {
   
   tictoc::tic()
   p1 <- rlang::exec("mosaic", !!!args1, fun='mean',
-                    filename=paste0(tiledir, '/', regionName, '_CDLNVCMerge1.tif'), overwrite=T)
+                    filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge1.tif'), overwrite=T)
   p2 <- rlang::exec("mosaic", !!!args2, fun='mean',
-                    filename=paste0(tiledir, '/', regionName, '_CDLNVCMerge2.tif'), overwrite=T)
+                    filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge2.tif'), overwrite=T)
   p3 <- rlang::exec("mosaic", !!!args3, fun='mean',
-                    filename=paste0(tiledir, '/', regionName, '_CDLNVCMerge3.tif'), overwrite=T)
+                    filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge3.tif'), overwrite=T)
   
   logger::log_info('Mosaic of mega-tiles is complete.')
   
   
   wholemap <- terra::mosaic(p1, p2, p3, fun='mean',
-    filename=paste0(tiledir, '/', regionName, '_FinalCDLNVCMerge.tif'), overwrite=T)
+    filename=paste0(tiledir, '/', stateName, '_FinalCDLNVCMerge.tif'), overwrite=T)
   tictoc::toc()
   
   logger::log_info('Mosaic of full raster is complete!')

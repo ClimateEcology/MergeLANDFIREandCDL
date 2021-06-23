@@ -4,19 +4,20 @@
 # container Dockerfile is in 'ContainerLib' repo
 library(dplyr); library(sf)
 
-regionalextent <- c('Pennsylvania'); regionName <- 'PA'
+# regionalextent <- c('Maryland')
 
-# regionalextent <- c('West Virginia', 'Pennsylvania', 'Maryland',
-#                     'Delaware', 'New Jersey', 'New York', 'New Hampshire', 'Vermont', 'Maine', 'Connecticut',
-#                     'Massachusetts', 'Rhode Island') # list of states within region OR an sf shapefile
+states <- c('West Virginia', 'Pennsylvania', 'Maryland',
+                    'Delaware', 'New Jersey', 'New York', 'New Hampshire', 'Vermont', 'Maine', 'Connecticut',
+                    'Massachusetts', 'Rhode Island') # list of states within region OR an sf shapefile
+regionName <- 'NorthEast'
 
 # download shapefile of US states
 region <- tigris::states() %>% sf::st_as_sf() %>%
-  dplyr::filter(NAME %in% regionalextent)
+  dplyr::filter(NAME %in% states)
 
-if (length(regionalextent) > 1) {
-  region <- sf::st_combine(region)
-}
-class(region)
+# if (length(regionalextent) > 1) {
+#   region <- sf::st_combine(region)
+# }
+
 
 sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), append=F)
