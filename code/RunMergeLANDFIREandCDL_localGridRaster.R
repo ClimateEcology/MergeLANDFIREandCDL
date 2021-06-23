@@ -7,21 +7,40 @@ source('./code/functions/DEV_grid_rasters.R')
 library(dplyr);  library(terra); library(logger); library(future)
 
 # specify input parameters
-
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 CDLYear <- '2016' # year of NASS Cropland Data Layer
-
-regionName <- 'PA'
-regionalextent <- sf::st_read(paste0(datadir, '/SpatialData/', regionName, '.shp'))
-#regionalextent <- sf::st_read('./data/SpatialData/NE_region.shp'); regionName <- 'NorthEast'
 writetiles <- T
-div <- c(20,12) # divide regional raster into how many pieces (in x and y directions)
-ntiles <- div[1]*div[2]
+regionName <- 'DE' # state/region to run
+target_area <- 900 # desired size (in km2) of each tile
+
+
+# load shapefile for state/region 
+regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp')) 
+
+# decide how many tiles to create based on extent of shapefile
+boundary_box <- sf::st_as_sfc(sf::st_bbox((regionalextent))) # save bounding box as a polygon
+bb <- sf::st_bbox(regionalextent) # save bounding box coordinates
+ratio <- abs(bb$xmin- bb$xmax)/abs(bb$ymin- bb$ymax) # calculate ratio between length of bbox sides (x/y)
+areabb <- sf::st_area(boundary_box) * (1/(1000*1000)) # area of the bounding box in square km
+
+# calculate division factor (area bbox/desired size of each tile) and translate to nearest even number 
+ndiv <- 2 * round((areabb/target_area)/2)
+
+# approximate division factors in x and y dimensions whose product is ndiv
+ydiv <- round(sqrt(ndiv/ratio))
+xdiv <- round(ndiv/ydiv)
+
+# what is the resulting area of tiles using these x and y division factors?
+result_area <- areabb/(ydiv*xdiv)
+
+# Log division factor and tile size selected for this run.
+logger::log_info(paste0('Division factor is c(', xdiv, ',', ydiv, ') which creates tiles of approximately ', round(result_area), ' km.'))
+
 
 ##### derived parameters 
 window_size <- (buffercells[1]*2) + 1 # diameter of neighborhood analysis window (part 2 only)
-tiledir = paste0(datadir, "/", regionName, "Tiles_", ntiles)
+tiledir = paste0(datadir, "/", regionName, "Tiles")
 evt_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_105evt/grid1/us_105evt')
 nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
 cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
@@ -106,18 +125,6 @@ logger::log_info('Starting mosaic operation.')
 # make list of arguments for mosaic function (terra rasters + 3 mosaic options)
 args <- vector("list", length(merged_tiles2))
 args[1:length(merged_tiles2)] <- merged_tiles2
-
-
-# tictoc::tic()
-# 
-# # run terra mosaic function to stitch together all raster tiles
-# bigmap <- rlang::exec("mosaic", !!!args, fun='mean',
-#    filename=paste0(tiledir, '/', regionName, '_FinalCDLNVCMerge.tif'), overwrite=T)
-# 
-# tictoc::toc()
-# 
-# plot(bigmap)
-
 
 # it is faster to mosaic in chunks, then mosaic the bigger pieces together
 # here I split into 3 pieces (2 or 3 are about the same from inital testing)
