@@ -71,7 +71,7 @@ for (regionName in states) {
   tiles <- DEV_grid_rasters(rasterpath=c(cdl_path, nvc_path),
                               rasterID=c(paste0('CDL', CDLYear), 'NVC'),
                               regionalextent=regionalextent, tiledir=tiledir,
-                              div=div, buffercells=buffercells,
+                              div=c(xdiv, ydiv), buffercells=buffercells,
                               NAvalue=c(0,-9999), writetiles=writetiles)
   
   save(tiles, file=paste0(tiledir, '/tiles.RDA'))
