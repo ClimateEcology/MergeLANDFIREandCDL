@@ -15,9 +15,4 @@ regionName <- 'NorthEast'
 region <- tigris::states() %>% sf::st_as_sf() %>%
   dplyr::filter(NAME %in% states)
 
-# if (length(regionalextent) > 1) {
-#   region <- sf::st_combine(region)
-# }
-
-
 sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), append=F)
