@@ -20,7 +20,7 @@ for (stateName in states) {
   
   # load shapefile for state/region 
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))  %>%
-    dplyr::filter(NAME %in% stateName)
+    dplyr::filter(STUSPS %in% stateName)
   
   # decide how many tiles to create based on extent of shapefile
   boundary_box <- sf::st_as_sfc(sf::st_bbox((regionalextent))) # save bounding box as a polygon
