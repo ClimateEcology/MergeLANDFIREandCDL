@@ -146,8 +146,12 @@ for (stateName in states) {
   mega_tiles <- mget(ls(pattern='MT.'))
   names(mega_tiles) <- NULL # remove names in list of mega-tiles (messes up mosaic execution for some reason)
   
-  wholemap <- rlang::exec("mosaic", !!!mega_tiles, fun='mean',
-    filename=paste0(tiledir, '/', stateName, '_Final', CDLYear,'NVCMerge.tif'), overwrite=T)
+  if (length(mega_tiles) > 1) {
+    wholemap <- rlang::exec("mosaic", !!!mega_tiles, fun='mean',
+      filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T)
+  } else {
+   terra::writeRaster(MT1, filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T) 
+  }
 
   logger::log_info('Mosaic of full raster is complete!')
 }
