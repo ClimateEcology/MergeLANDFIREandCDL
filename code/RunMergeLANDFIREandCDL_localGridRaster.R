@@ -18,6 +18,8 @@ target_area <- 900 # desired size (in km2) of each tile
 
 for (stateName in states) {
   
+  logger::log_info(paste0('Starting ', stateName, '.'))
+  
   # load shapefile for state/region 
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))  %>%
     dplyr::filter(STUSPS %in% stateName)
@@ -153,5 +155,5 @@ for (stateName in states) {
    terra::writeRaster(MT1, filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T) 
   }
 
-  logger::log_info('Mosaic of full raster is complete!')
+  logger::log_info(paste0('Mosaic of ', stateName, 'full raster is complete!'))
 }
