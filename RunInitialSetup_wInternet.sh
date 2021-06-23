@@ -1,6 +1,6 @@
 #!/bin/bash
 
 module load singularity
-singularity exec geospatial_extend_latest.sif Rscript code/InitalSetup_wInternet.R
+singularity exec geospatial_extend_latest.sif Rscript code/InitialSetup_wInternet.R
 
 

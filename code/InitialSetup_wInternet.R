@@ -4,7 +4,7 @@
 # container Dockerfile is in 'ContainerLib' repo
 library(dplyr); library(sf)
 
-regionalextent <- c('Delaware')
+regionalextent <- c('Pennsylvania'); regionName <- 'PA'
 
 # regionalextent <- c('West Virginia', 'Pennsylvania', 'Maryland',
 #                     'Delaware', 'New Jersey', 'New York', 'New Hampshire', 'Vermont', 'Maine', 'Connecticut',
@@ -19,4 +19,4 @@ if (length(regionalextent) > 1) {
 }
 class(region)
 
-sf::st_write(region, './data/SpatialData/DE.shp', append=F)
+sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), append=F)
