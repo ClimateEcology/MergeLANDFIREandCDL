@@ -12,7 +12,7 @@ buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x
 CDLYear <- '2016' # year of NASS Cropland Data Layer
 writetiles <- T
 regionName <- 'NorthEast'
-states <- c('DE', 'MD') # states/region to run
+states <- c('DE') # states/region to run
 target_area <- 900 # desired size (in km2) of each tile
 
 
@@ -73,7 +73,7 @@ for (stateName in states) {
                               regionalextent=regionalextent, tiledir=tiledir,
                               div=c(xdiv, ydiv), buffercells=buffercells,
                               NAvalue=c(0,-9999), writetiles=writetiles)
-  
+
   save(tiles, file=paste0(tiledir, '/tiles.RDA'))
   
   logger::log_info('LANDFIRE and CDL tiles saved.')
@@ -88,8 +88,6 @@ for (stateName in states) {
   
   #turn on parallel processing for furrr package
   future::plan(multisession)
-  
-  tictoc::tic()
   
   logger::log_info('Starting furrr section, parallel execution of merge_landfire_cdl function.')
   
@@ -114,48 +112,42 @@ for (stateName in states) {
     merged_tiles2[[i]] <- terra::rast(toread[i])
   }
   
-  tictoc::toc()
-  
   logger::log_info('Completed merge for all tiles.')
   logger::log_info('Starting mosaic operation.')
-  
+
   ######################################################################################################
   ##### Part 3: Stitch together all the merged tiles
-  
-  # # make list of arguments for mosaic function (terra rasters + 3 mosaic options)
-  # args <- vector("list", length(merged_tiles2))
-  # args[1:length(merged_tiles2)] <- merged_tiles2
-  
+
   # it is faster to mosaic in chunks, then mosaic the bigger pieces together
-  # here I split into 3 pieces (2 or 3 are about the same from inital testing)
-  # make list of arguments for mosaic function (terra rasters + 3 mosaic options)
-  third <- round(length(merged_tiles2)/3); end <- length(merged_tiles2)
+  # here I split into vectors of 30 tiles each, stitch these together into 'mega-tiles' then mosaic all the mega-tiles together.
+  end <- length(merged_tiles2)
   
   for (i in 1:ceiling(end/30)) {
     
-    if (i == 1) {
-      assign(x= paste0('args', i), value=merged_tiles2[1:(30*i)])
+    #  split merged_tiles data frame into lists, each with 30 tiles or fewer
+    if (i == 1 & end < 30) {
+      assign(x=paste0('args', i), value=merged_tiles2[1:end])
+    } else if (i == 1 & end >= 30) {
+      assign(x=paste0('args', i), value=merged_tiles2[1:(30*i)])
     } else if (i > 1 & i < ceiling(end/30)) {
-      assign(x= paste0('args', i), value=merged_tiles2[(30*(i-1)+1):(30*i)])
+      assign(x=paste0('args', i), value=merged_tiles2[(30*(i-1)+1):(30*i)])
     } else {
-      assign(x= paste0('args', i), value=merged_tiles2[(30*(i-1)+1):end])
+      assign(x=paste0('args', i), value=merged_tiles2[(30*(i-1)+1):end])
     }
+    
+    # for the list of 30 or fewer tiles, execute mosaic to create a mega-tile
+    assign(x=paste0('MT', i), value=rlang::exec("mosaic", !!!get(paste0('args', i)), fun='mean',
+      filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge', i, '.tif'), overwrite=T)
+      )
   }
-  
-  tictoc::tic()
-  p1 <- rlang::exec("mosaic", !!!args1, fun='mean',
-                    filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge1.tif'), overwrite=T)
-  p2 <- rlang::exec("mosaic", !!!args2, fun='mean',
-                    filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge2.tif'), overwrite=T)
-  p3 <- rlang::exec("mosaic", !!!args3, fun='mean',
-                    filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge3.tif'), overwrite=T)
   
   logger::log_info('Mosaic of mega-tiles is complete.')
   
+  mega_tiles <- mget(ls(pattern='MT.'))
+  names(mega_tiles) <- NULL # remove names in list of mega-tiles (messes up mosaic execution for some reason)
   
-  wholemap <- terra::mosaic(p1, p2, p3, fun='mean',
+  wholemap <- rlang::exec("mosaic", !!!mega_tiles, fun='mean',
     filename=paste0(tiledir, '/', stateName, '_Final', CDLYear,'NVCMerge.tif'), overwrite=T)
-  tictoc::toc()
-  
+
   logger::log_info('Mosaic of full raster is complete!')
 }
