@@ -61,8 +61,6 @@ for (stateName in states) {
   allow_classes <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
   
   #set up logger to write status updates
-  logger::log_threshold(DEBUG)
-  
   logger::log_info('Finished setting up parameters, beginning operation to create CDL and LANDFIRE tiles.')
   
   #####################################################################################################
@@ -124,18 +122,25 @@ for (stateName in states) {
   ######################################################################################################
   ##### Part 3: Stitch together all the merged tiles
   
-  # make list of arguments for mosaic function (terra rasters + 3 mosaic options)
-  args <- vector("list", length(merged_tiles2))
-  args[1:length(merged_tiles2)] <- merged_tiles2
+  # # make list of arguments for mosaic function (terra rasters + 3 mosaic options)
+  # args <- vector("list", length(merged_tiles2))
+  # args[1:length(merged_tiles2)] <- merged_tiles2
   
   # it is faster to mosaic in chunks, then mosaic the bigger pieces together
   # here I split into 3 pieces (2 or 3 are about the same from inital testing)
   # make list of arguments for mosaic function (terra rasters + 3 mosaic options)
-  third <- round(length(merged_tiles2)/3); whole <- length(merged_tiles2)
+  third <- round(length(merged_tiles2)/3); end <- length(merged_tiles2)
   
-  args1 <- merged_tiles2[1:third]
-  args2 <- merged_tiles2[(third+1):(third*2)]
-  args3 <- merged_tiles2[((third*2)+1):whole]
+  for (i in 1:ceiling(end/30)) {
+    
+    if (i == 1) {
+      assign(x= paste0('args', i), value=merged_tiles2[1:(30*i)])
+    } else if (i > 1 & i < ceiling(end/30)) {
+      assign(x= paste0('args', i), value=merged_tiles2[(30*(i-1)+1):(30*i)])
+    } else {
+      assign(x= paste0('args', i), value=merged_tiles2[(30*(i-1)+1):end])
+    }
+  }
   
   tictoc::tic()
   p1 <- rlang::exec("mosaic", !!!args1, fun='mean',
@@ -149,7 +154,7 @@ for (stateName in states) {
   
   
   wholemap <- terra::mosaic(p1, p2, p3, fun='mean',
-    filename=paste0(tiledir, '/', stateName, '_FinalCDLNVCMerge.tif'), overwrite=T)
+    filename=paste0(tiledir, '/', stateName, '_Final', CDLYear,'NVCMerge.tif'), overwrite=T)
   tictoc::toc()
   
   logger::log_info('Mosaic of full raster is complete!')
