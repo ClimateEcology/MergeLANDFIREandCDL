@@ -128,19 +128,28 @@ for (stateName in states) {
     
     #  split merged_tiles data frame into lists, each with 30 tiles or fewer
     if (i == 1 & end < 30) {
-      assign(x=paste0('args', i), value=merged_tiles2[1:end])
+      assign(x=paste0('args', i), value=merged_tiles2[1:end]) # if there are less than 30 tiles, args 1:max
     } else if (i == 1 & end >= 30) {
-      assign(x=paste0('args', i), value=merged_tiles2[1:(30*i)])
+      assign(x=paste0('args', i), value=merged_tiles2[1:(30*i)]) # if there are more than 30 tiles, args1 = 1:30
     } else if (i > 1 & i < ceiling(end/30)) {
-      assign(x=paste0('args', i), value=merged_tiles2[(30*(i-1)+1):(30*i)])
+      assign(x=paste0('args', i), value=merged_tiles2[(30*(i-1)+1):(30*i)]) # middle args list = end of previous + 1:next increment of 30
     } else {
-      assign(x=paste0('args', i), value=merged_tiles2[(30*(i-1)+1):end])
+      assign(x=paste0('args', i), value=merged_tiles2[(30*(i-1)+1):end]) # last args list = end of previous + 1:end
     }
+    
+    # if the last list is only 1 tile, join this tile with the previous mega-tile
+    if (length(get(paste0('args', i))) < 2) {
+      assign(x=paste0('args', i-1), value=merged_tiles2[(30*(i-2)+1):end]) # add orphan tile to the previous list
+      
+      # re-do the previous mega-tile to add in the last orphaned small tile
+      assign(x=paste0('MT', i-1), value=rlang::exec("mosaic", !!!get(paste0('args', i-1)), fun='mean',
+                                                  filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge', i-1, '.tif'), overwrite=T))
+    } else {
     
     # for the list of 30 or fewer tiles, execute mosaic to create a mega-tile
     assign(x=paste0('MT', i), value=rlang::exec("mosaic", !!!get(paste0('args', i)), fun='mean',
-      filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge', i, '.tif'), overwrite=T)
-      )
+      filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge', i, '.tif'), overwrite=T))
+    }
   }
   
   logger::log_info('Mosaic of mega-tiles is complete.')
@@ -148,12 +157,43 @@ for (stateName in states) {
   mega_tiles <- mget(ls(pattern='MT.'))
   names(mega_tiles) <- NULL # remove names in list of mega-tiles (messes up mosaic execution for some reason)
   
-  if (length(mega_tiles) > 1) {
+  # mosaic mega-tiles to make one big raster!
+  if (length(mega_tiles) > 1 & length(mega_tiles) < 10) {
     wholemap <- rlang::exec("mosaic", !!!mega_tiles, fun='mean',
       filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T)
-  } else {
+    # if only one mega-tile, just write this one
+  } else if (length(mega_tiles) == 1) {
    terra::writeRaster(MT1, filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T) 
-  }
-
+    # if there are lots of mega-tile (> 10), put some of these together before doing final merge
+  } else {
+    end2 <- length(mega_tiles)
+    
+    # split the list of mega-tiles into groups of 5 tiles
+    for (i in 1:ceiling(end2/5)) {
+      
+      #  split merged_tiles data frame into lists, each with 5 tiles or fewer
+      if (i == 1 & end2 < 5) {
+        assign(x=paste0('args2', i), value=merged_tiles2[1:end2]) # if there are less than 5 tiles, argsMT 1:max
+      } else if (i == 1 & end2 >= 5) {
+        assign(x=paste0('args2', i), value=merged_tiles2[1:(5*i)]) # if there are more than 5 tiles, argsMT1 = 1:5
+      } else if (i > 1 & i < ceiling(end2/5)) {
+        assign(x=paste0('args2', i), value=merged_tiles2[(5*(i-1)+1):(5*i)]) # middle argsMT list = end2 of previous + 1:next increment of 5
+      } else {
+        assign(x=paste0('args2', i), value=merged_tiles2[(5*(i-1)+1):end2]) # last argsMT list = end2 of previous + 1:end2
+      }
+      
+      # for the list of 30 or fewer tiles, execute mosaic to create a mega-tile
+      assign(x=paste0('M2T', i), value=rlang::exec("mosaic", !!!get(paste0('args2', i)), fun='mean',
+                                                  filename=paste0(tiledir, '/', stateName, '_CDLNVCMergeM2T', i, '.tif'), overwrite=T))
+    }
+    
+    # make a list of the mega-mega tiles
+    mega2_tiles <- mget(ls(pattern='M2T.'))
+    names(mega2_tiles) <- NULL # remove names in list of mega-tiles (messes up mosaic execution for some reason)
+    
+    # mosaic together mega-mega tiles
+    wholemap <- rlang::exec("mosaic", !!!mega2_tiles, fun='mean',
+                            filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T)
+}
   logger::log_info(paste0('Mosaic of ', stateName, ' rasters are complete!'))
 }
