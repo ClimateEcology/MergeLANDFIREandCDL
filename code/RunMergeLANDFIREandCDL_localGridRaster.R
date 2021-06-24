@@ -11,7 +11,9 @@ buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x
 CDLYear <- '2016' # year of NASS Cropland Data Layer
 writetiles <- T
 regionName <- 'NorthEast'
-states <- c('WV', 'PA', 'MD','DE', 'NJ', 'NY', 'NH', 
+# states <- c('WV', 'PA', 'MD','DE', 'NJ', 'NY', 'NH', 
+#             'VT', 'ME', 'CT', 'MA', 'RI') # states/region to run
+states <- c('NY', 'NH', 
             'VT', 'ME', 'CT', 'MA', 'RI') # states/region to run
 target_area <- 900 # desired size (in km2) of each tile
 
