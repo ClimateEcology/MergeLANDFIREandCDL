@@ -10,7 +10,7 @@ datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 CDLYear <- '2016' # year of NASS Cropland Data Layer
 writetiles <- T
-regionName <- 'NorthEast'
+regionName <- 'Northeast'
 # states <- c('WV', 'PA', 'MD','DE', 'NJ', 'NY', 'NH', 
 #             'VT', 'ME', 'CT', 'MA', 'RI') # states/region to run
 states <- c('NY', 'NH', 

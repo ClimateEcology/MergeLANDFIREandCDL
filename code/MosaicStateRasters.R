@@ -1,6 +1,6 @@
 rm(list=ls())
 
-library(dplyr); library(terra)
+library(dplyr)
 CDLYear <- 2016
 
 # save list of directories w/ finished state maps

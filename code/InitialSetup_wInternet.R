@@ -1,18 +1,25 @@
 # steps of grid/merge workflow that require internet connection.
+# includes downloading state shapefile to clip national rasters
 
-# necessary packages are part of 'geospatial_extend' container, adding to rocker project geospatial image
-# container Dockerfile is in 'ContainerLib' repo
 library(dplyr); library(sf)
 
-# regionalextent <- c('Maryland')
-
+bystate <- T
 states <- c('West Virginia', 'Pennsylvania', 'Maryland',
                     'Delaware', 'New Jersey', 'New York', 'New Hampshire', 'Vermont', 'Maine', 'Connecticut',
-                    'Massachusetts', 'Rhode Island') # list of states within region OR an sf shapefile
-regionName <- 'NorthEast'
+                    'Massachusetts', 'Rhode Island') # list of states within region
+regionName <- 'Northeast'
 
-# download shapefile of US states
-region <- tigris::states() %>% sf::st_as_sf() %>%
-  dplyr::filter(NAME %in% states)
-
-sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), append=F)
+if (bystate == T) {
+  # download shapefile of US states
+  region <- tigris::states() %>% sf::st_as_sf() %>%
+    dplyr::filter(NAME %in% states) # filter to only selected states
+  
+  sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), append=F)
+} else if (bystate == F) {
+  # download shapefile of US states
+  region <- tigris::states() %>% sf::st_as_sf() %>%
+    dplyr::filter(NAME %in% states) %>% # filter to only selected states
+    sf::st_union()  
+  
+  sf::st_write(region, paste0('./data/SpatialData/', regionName, '_OnePoly.shp'), append=F)
+}
