@@ -29,5 +29,8 @@ for (i in 1:length(allrasters)) {
   allstates[[i]] <- terra::rast(allrasters[i])
 }
 
+logger::log_info(allrasters)
+
+
 # execute mosaic function
 allstates_map <- rlang::exec("mosaic", !!!allstates, fun='mean', filename=paste0('./data/NationalMergedRaster', CDLYear, '.tif'), overwrite=T)

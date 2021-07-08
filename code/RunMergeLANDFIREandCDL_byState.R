@@ -145,12 +145,12 @@ for (stateName in states) {
       
       # re-do the previous mega-tile to add in the last orphaned small tile
       assign(x=paste0('MT', i-1), value=rlang::exec("mosaic", !!!get(paste0('args', i-1)), fun='mean',
-                                                  filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge', i-1, '.tif'), overwrite=T))
+                                                  filename=paste0(tiledir, '/', stateName, '_CDLNVC_MegaTile', i-1, '.tif'), overwrite=T))
     } else {
     
     # for the list of 30 or fewer tiles, execute mosaic to create a mega-tile
     assign(x=paste0('MT', i), value=rlang::exec("mosaic", !!!get(paste0('args', i)), fun='mean',
-      filename=paste0(tiledir, '/', stateName, '_CDLNVCMerge', i, '.tif'), overwrite=T))
+      filename=paste0(tiledir, '/', stateName, '_CDLNVC_MegaTile', i, '.tif'), overwrite=T))
     }
   }
   
@@ -167,7 +167,7 @@ for (stateName in states) {
   } else if (length(mega_tiles) == 1) {
    terra::writeRaster(MT1, filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T) 
     # if there are lots of mega-tile (> 10), put some of these together before doing final merge
-  } else {
+  } else if (length(mega_tiles) >= 10){
     end2 <- length(mega_tiles)
     
     # split the list of mega-tiles into groups of 5 tiles
@@ -186,7 +186,7 @@ for (stateName in states) {
       
       # for the list of 30 or fewer tiles, execute mosaic to create a mega-tile
       assign(x=paste0('M2T', i), value=rlang::exec("mosaic", !!!get(paste0('args2', i)), fun='mean',
-                                                  filename=paste0(tiledir, '/', stateName, '_CDLNVCMergeM2T', i, '.tif'), overwrite=T))
+                                                  filename=paste0(tiledir, '/', stateName, '_CDLNVC_MegaMegaTile', i, '.tif'), overwrite=T))
     }
     
     # make a list of the mega-mega tiles
