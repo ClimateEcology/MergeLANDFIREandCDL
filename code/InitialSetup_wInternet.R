@@ -3,7 +3,7 @@
 
 library(dplyr); library(sf)
 
-bystate <- T
+bystate <- F
 states <- c('West Virginia', 'Pennsylvania', 'Maryland',
                     'Delaware', 'New Jersey', 'New York', 'New Hampshire', 'Vermont', 'Maine', 'Connecticut',
                     'Massachusetts', 'Rhode Island') # list of states within region
