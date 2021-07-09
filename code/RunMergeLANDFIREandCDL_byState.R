@@ -142,7 +142,7 @@ for (stateName in states) {
       assign(x=paste0('args', i-1), value=merged_tiles2[(30*(i-2)+1):end]) # add orphan tile to the previous list
       
       # re-do the previous mega-tile to add in the last orphaned small tile
-      assign(x=paste0('MT', i-1), value=rlang::exec("terra::mosaic", !!!get(paste0('args', i-1)), fun='mean',
+      assign(x=paste0('MT', i-1), value=rlang::exec("mosaic", !!!get(paste0('args', i-1)), fun='mean',
                                                   filename=paste0(tiledir, '/', stateName, '_CDLNVC_MegaTile', i-1, '.tif'), overwrite=T))
     } else {
     
