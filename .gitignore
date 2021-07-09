@@ -11,10 +11,12 @@
 # singularity images
 **/*.sif
 
+# ppt slides
+**/*.pptx
+
 # raster data folders
 **/data/*
 **/SpatialData
-
 
 # 'project' folder (has necessary R packages)
 **project/*
