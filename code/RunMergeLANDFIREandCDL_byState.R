@@ -11,9 +11,7 @@ buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x
 CDLYear <- '2016' # year of NASS Cropland Data Layer
 writetiles <- T
 regionName <- 'Northeast'
-# states <- c('WV', 'PA', 'MD','DE', 'NJ', 'NY', 'NH', 
-#             'VT', 'ME', 'CT', 'MA', 'RI') # states/region to run
-states <- c('NY', 'NH', 
+states <- c('WV', 'PA', 'MD','DE', 'NJ', 'NY', 'NH',
             'VT', 'ME', 'CT', 'MA', 'RI') # states/region to run
 target_area <- 900 # desired size (in km2) of each tile
 
@@ -144,7 +142,7 @@ for (stateName in states) {
       assign(x=paste0('args', i-1), value=merged_tiles2[(30*(i-2)+1):end]) # add orphan tile to the previous list
       
       # re-do the previous mega-tile to add in the last orphaned small tile
-      assign(x=paste0('MT', i-1), value=rlang::exec("mosaic", !!!get(paste0('args', i-1)), fun='mean',
+      assign(x=paste0('MT', i-1), value=rlang::exec("terra::mosaic", !!!get(paste0('args', i-1)), fun='mean',
                                                   filename=paste0(tiledir, '/', stateName, '_CDLNVC_MegaTile', i-1, '.tif'), overwrite=T))
     } else {
     
@@ -156,16 +154,20 @@ for (stateName in states) {
   
   logger::log_info('Mosaic of mega-tiles is complete.')
   
-  mega_tiles <- mget(ls(pattern='MT.'))
+  mega_tiles <- mget(gtools::mixedsort(ls(pattern='MT.'))) # include function to sort mega-tile objects so the mega-mega tiles are contiguous blocks
   names(mega_tiles) <- NULL # remove names in list of mega-tiles (messes up mosaic execution for some reason)
   
   # mosaic mega-tiles to make one big raster!
+  
+  # if there are multiple, but less than 10 mega-tiles, mosaic them all together
   if (length(mega_tiles) > 1 & length(mega_tiles) < 10) {
     wholemap <- rlang::exec("mosaic", !!!mega_tiles, fun='mean',
       filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T)
+    
     # if only one mega-tile, just write this one
   } else if (length(mega_tiles) == 1) {
    terra::writeRaster(MT1, filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T) 
+    
     # if there are lots of mega-tile (> 10), put some of these together before doing final merge
   } else if (length(mega_tiles) >= 10){
     end2 <- length(mega_tiles)
@@ -175,13 +177,13 @@ for (stateName in states) {
       
       #  split merged_tiles data frame into lists, each with 5 tiles or fewer
       if (i == 1 & end2 < 5) {
-        assign(x=paste0('args2', i), value=merged_tiles2[1:end2]) # if there are less than 5 tiles, argsMT 1:max
+        assign(x=paste0('args2', i), value=mega_tiles[1:end2]) # if there are less than 5 tiles, argsMT 1:max
       } else if (i == 1 & end2 >= 5) {
-        assign(x=paste0('args2', i), value=merged_tiles2[1:(5*i)]) # if there are more than 5 tiles, argsMT1 = 1:5
+        assign(x=paste0('args2', i), value=mega_tiles[1:(5*i)]) # if there are more than 5 tiles, argsMT1 = 1:5
       } else if (i > 1 & i < ceiling(end2/5)) {
-        assign(x=paste0('args2', i), value=merged_tiles2[(5*(i-1)+1):(5*i)]) # middle argsMT list = end2 of previous + 1:next increment of 5
+        assign(x=paste0('args2', i), value=mega_tiles[(5*(i-1)+1):(5*i)]) # middle argsMT list = end2 of previous + 1:next increment of 5
       } else {
-        assign(x=paste0('args2', i), value=merged_tiles2[(5*(i-1)+1):end2]) # last argsMT list = end2 of previous + 1:end2
+        assign(x=paste0('args2', i), value=mega_tiles[(5*(i-1)+1):end2]) # last argsMT list = end2 of previous + 1:end2
       }
       
       # for the list of 30 or fewer tiles, execute mosaic to create a mega-tile
@@ -190,7 +192,7 @@ for (stateName in states) {
     }
     
     # make a list of the mega-mega tiles
-    mega2_tiles <- mget(ls(pattern='M2T.'))
+    mega2_tiles <- mget(gtools::mixedsort(ls(pattern='M2T.')))
     names(mega2_tiles) <- NULL # remove names in list of mega-tiles (messes up mosaic execution for some reason)
     
     # mosaic together mega-mega tiles
