@@ -1,6 +1,6 @@
 rm(list=ls())
 
-library(dplyr)
+library(dplyr); library(terra)
 CDLYear <- 2016
 
 # save list of directories w/ finished state maps
@@ -29,7 +29,7 @@ for (i in 1:length(allrasters)) {
   allstates[[i]] <- terra::rast(allrasters[i])
 }
 
-logger::log_info(allrasters)
+logger::log_info(paste0(allrasters, collapse=', '))
 
 
 # execute mosaic function
