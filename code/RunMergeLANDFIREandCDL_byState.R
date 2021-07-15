@@ -20,6 +20,7 @@ target_area <- 1000 # desired size (in km2) of each tile
 for (stateName in states) {
   
   logger::log_info(paste0('Starting ', stateName, '.'))
+  logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), "B."))
   
   # load shapefile for state/region 
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))  %>%
@@ -75,7 +76,7 @@ for (stateName in states) {
                               rasterID=c(paste0('CDL', CDLYear), 'NVC'),
                               regionalextent=regionalextent, tiledir=tiledir,
                               div=c(xdiv, ydiv), buffercells=buffercells,
-                              NAvalue=c(0,-9999), writetiles=writetiles)
+                              NAvalues=c(0,-9999), writetiles=writetiles)
 
   save(tiles, file=paste0(tiledir, '/tiles.RDA'))
   
@@ -201,4 +202,6 @@ for (stateName in states) {
                             filename=paste0(tiledir, '/', stateName, '_FinalCDL', CDLYear,'NVCMerge.tif'), overwrite=T)
 }
   logger::log_info(paste0('Mosaic of ', stateName, ' rasters are complete!'))
+  logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), "B."))
+  
 }
