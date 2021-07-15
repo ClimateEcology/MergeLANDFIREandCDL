@@ -14,7 +14,7 @@ regionName <- 'Northeast'
 states <- c('WV', 'PA', 'MD','DE', 'NJ', 'NY', 'NH',
             'VT', 'ME', 'CT', 'MA', 'RI') # states/region to run
 
-target_area <- 550 # desired size (in km2) of each tile
+target_area <- 1000 # desired size (in km2) of each tile
 
 
 for (stateName in states) {
