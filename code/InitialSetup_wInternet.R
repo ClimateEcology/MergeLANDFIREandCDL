@@ -14,21 +14,23 @@ if (bystate == T) {
   region <- tigris::states() %>% sf::st_as_sf() %>%
     dplyr::filter(NAME %in% states) # filter to only selected states
   
-  # identify closest state to small states (RI causes code to crash for some reason...)
-  state_points <- sf::st_centroid(region)
-  distance <- sf::st_distance(state_points) %>%
-    as.data.frame() %>%
-    dplyr::mutate_at(vars(1:nrow(state_points)), as.numeric)
+  # DO I NEED THIS PART???
   
-  distance[distance == 0] <- NA
-  
-  states_to_merge <- which(state_points$ALAND < 20000000000)
-
-  merge_pair <- c(states_to_merge[1], which(distance[,states_to_merge[1]] == min(distance[,states_to_merge[1]], na.rm=T)))
-  
-  melting_pot <- dplyr::slice(region, merge_pair) %>%
-    sf::st_union()
-  
+  # # identify closest state to small states (RI causes code to crash for some reason...)
+  # state_points <- sf::st_centroid(region)
+  # distance <- sf::st_distance(state_points) %>%
+  #   as.data.frame() %>%
+  #   dplyr::mutate_at(vars(1:nrow(state_points)), as.numeric)
+  # 
+  # distance[distance == 0] <- NA
+  # 
+  # states_to_merge <- which(state_points$ALAND < 20000000000)
+  # 
+  # merge_pair <- c(states_to_merge[1], which(distance[,states_to_merge[1]] == min(distance[,states_to_merge[1]], na.rm=T)))
+  # 
+  # melting_pot <- dplyr::slice(region, merge_pair) %>%
+  #   sf::st_union()
+  # 
   
   sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), append=F)
 } else if (bystate == F) {
