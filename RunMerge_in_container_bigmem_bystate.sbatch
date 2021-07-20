@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name="RScript_in_container" #name of the job submitted
+#SBATCH --job-name="MergeRasters" #name of the job submitted
 #SBATCH -p bigmem #partition to use
 #SBATCH -N 1 #number of nodes in this job
 #SBATCH --cpus-per-task=24 #number of cpus to use for each task
@@ -10,6 +10,7 @@
 #SBATCH --mail-user=melanie.kammerer@usda.gov #enter your email address to receive emails
 #SBATCH --mail-type=BEGIN,END,FAIL #will receive an email when job starts, ends or fails
 
+export OPENBLAS_NUM_THREADS=1
 module load singularity
 singularity exec geospatial_extend_latest.sif Rscript code/RunMergeLANDFIREandCDL_byState.R
 
