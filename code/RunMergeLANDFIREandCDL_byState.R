@@ -13,6 +13,7 @@ writetiles <- T
 regionName <- 'Northeast'
 states <- c('WV', 'PA', 'MD','DE', 'NJ', 'NY', 'NH',
             'VT', 'ME', 'CT', 'MA', 'RI') # states/region to run
+states <- c('ME')
 
 target_area <- 1000 # desired size (in km2) of each tile
 
@@ -47,7 +48,6 @@ for (stateName in states) {
   
   
   ##### derived parameters 
-  window_size <- (buffercells[1]*2) + 1 # diameter of neighborhood analysis window (part 2 only)
   tiledir = paste0(datadir, "/", stateName, "Tiles_", ntiles)
   evt_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_105evt/grid1/us_105evt')
   nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
@@ -100,7 +100,7 @@ for (stateName in states) {
   # so, we use furrr:walk to generate the files, then read them again
   furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
                      datadir=datadir, tiledir=tiledir, veglayer='nvc', CDLYear=CDLYear,
-                     window_size=window_size, verbose=F, .options=furrr::furrr_options(seed = TRUE))
+                     buffercells=buffercells, verbose=F, .options=furrr::furrr_options(seed = TRUE))
   
   # stop parallel processing
   future::plan(sequential)

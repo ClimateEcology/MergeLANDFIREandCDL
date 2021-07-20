@@ -1,5 +1,5 @@
 
-merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, window_size, verbose) {
+merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, buffercells, verbose) {
   
   ##### Step 0: Setup and load data
   
@@ -27,6 +27,11 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, windo
     logger::log_info('Loaded necessary tabular and spatial data.')
     logger::log_info('Begin step 1: re-assign pixels where broad land-use class matches (e.g. CDL ag = LANDFIRE ag).')
   }
+  
+  # create derived parameter of window_size
+  window_size <- (buffercells[1]*2) + 1 # diameter of neighborhood analysis window (part 2 only)
+  
+  
   ##### Step 1: Assign pixels that exactly match
   
   # create vectors listing which CDL classes match LANDFIRE wheat, orchard, vineyard, row crop, and close-grown crop
