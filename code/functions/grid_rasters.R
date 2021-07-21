@@ -81,15 +81,11 @@ grid_rasters <- function(rasterpath, rasterID,
     region_sf <- sf::st_transform(regionalextent, crs = sf::st_crs(cdl))
 
     region_cdl <- raster::raster(cdl_path) %>%
-      raster::crop(y=region_sf) %>%
-      raster::raster()   # convert to a raster object so the SpaDES package works
-
+      raster::crop(y=region_sf)
 
     if (!is.na(veg_path)) {
       region_nvc <- raster::raster(nvc_path) %>%
-        raster::crop(y=region_cdl) #%>%
-        #raster::raster()   # convert to a raster object so the SpaDES package works
-
+        raster::crop(y=region_cdl) 
     }
 
       tictoc::toc()
