@@ -6,7 +6,7 @@ source('./code/functions/grid_rasters.R')
 
 library(dplyr);  library(raster); library(sf); library(logger); library(future)
 
-args <- commandArgs(trailingOnly = F)
+args <- commandArgs(trailingOnly = T)
 
 # specify input parameters
 logger::log_info(paste0('arg 1 is ', args[1]))

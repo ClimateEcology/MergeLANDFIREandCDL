@@ -9,8 +9,8 @@ library(dplyr);  library(raster); library(sf); library(logger); library(future)
 args <- commandArgs(trailingOnly = T)
 
 # specify input parameters
-CDLYear <- args[1] # year of NASS Cropland Data Layer
-regionName <- args[2] # region to process
+CDLYear <- args[2] # year of NASS Cropland Data Layer
+regionName <- args[3] # region to process
 
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
