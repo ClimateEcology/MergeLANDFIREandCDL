@@ -7,10 +7,6 @@ bystate <- T
 wholecountry <- F
 regionName <- 'Northeast'
 
-# states <- c('West Virginia', 'Pennsylvania', 'Maryland',
-#                     'Delaware', 'New Jersey', 'New York', 'New Hampshire', 'Vermont', 'Maine', 'Connecticut',
-#                     'Massachusetts', 'Rhode Island', 'District of Columbia') # list of states within region
-
 national <- tigris::states() %>% sf::st_as_sf() %>%
   dplyr::filter(!NAME %in% c('Alaska', 'American Samoa', 'Commonwealth of the Northern Mariana Islands', 
                              'Guam', 'Hawaii', 'Puerto Rico', 'United States Virgin Islands'))
