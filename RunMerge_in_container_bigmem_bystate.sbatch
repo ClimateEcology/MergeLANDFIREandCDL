@@ -12,6 +12,6 @@
 
 export OPENBLAS_NUM_THREADS=1
 module load singularity
-singularity exec geospatial_extend_latest.sif Rscript code/RunMergeLANDFIREandCDL_byState.R --args 2016 Southeast
+singularity exec geospatial_extend_latest.sif Rscript code/TestCommandArgs.R --args 2016 Southeast
 
 
