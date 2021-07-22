@@ -5,7 +5,7 @@ library(dplyr); library(sf)
 
 bystate <- T
 wholecountry <- F
-regionName <- 'West'
+regionName <- 'Southeast'
 
 national <- tigris::states() %>% sf::st_as_sf() %>%
   dplyr::filter(!NAME %in% c('Alaska', 'American Samoa', 'Commonwealth of the Northern Mariana Islands', 
@@ -13,9 +13,9 @@ national <- tigris::states() %>% sf::st_as_sf() %>%
 
 if (regionName == 'Northeast') {
   states <- national$NAME[national$REGION == 1]
-} else if (regionName == 'Southeast') {
-  states <- national$NAME[national$REGION == 2]
 } else if (regionName == 'Midwest') {
+  states <- national$NAME[national$REGION == 2]
+} else if (regionName == 'Southeast') {
   states <- national$NAME[national$REGION == 3]
 } else if (regionName == 'West') {
   states <- national$NAME[national$REGION == 4]
