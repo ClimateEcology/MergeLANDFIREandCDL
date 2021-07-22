@@ -11,10 +11,19 @@ datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 CDLYear <- '2016' # year of NASS Cropland Data Layer
 writetiles <- T
-regionName <- 'Northeast'
-states <- c('WV', 'PA', 'MD','DE', 'NJ', 'NY', 'NH',
-            'VT', 'ME', 'CT', 'MA', 'RI') # states/region to run
-states <- c('ME')
+regionName <- 'National'
+allstates <- T
+
+# make list of states to run (either all in shapefile or manually defined)
+if (allstates <- T) {
+  # load shapefile for state/region 
+  regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
+  states <- regionalextent$STUSPS
+} else {
+  states <- c('WV', 'PA', 'MD','DE', 'NJ', 'NY', 'NH',
+              'VT', 'ME', 'CT', 'MA', 'RI') # states/region to run
+}
+
 
 target_area <- 1000 # desired size (in km2) of each tile
 

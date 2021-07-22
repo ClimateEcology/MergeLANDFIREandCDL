@@ -99,7 +99,7 @@ grid_rasters <- function(rasterpath, rasterID,
 
   cdl_tiles <- tryCatch({
     # set up parallel processing cluster (will be used by splitRaster function)
-    cl <- parallel::makeCluster(parallel::detectCores())  # use all cores
+    cl <- parallel::makeCluster(parallel::detectCores()-2)  # use all but two cores
 
     tictoc::tic()
 
@@ -124,7 +124,7 @@ grid_rasters <- function(rasterpath, rasterID,
 
   nvc_tiles <- tryCatch({
     # set up parallel processing cluster (will be used by splitRaster function)
-    cl <- parallel::makeCluster(parallel::detectCores())  # use all cores
+    cl <- parallel::makeCluster(parallel::detectCores()-2)  # use all cores
 
     tictoc::tic()
 
@@ -203,7 +203,7 @@ grid_rasters <- function(rasterpath, rasterID,
     logger::log_info('Writing output tiles.')
 
     # set up parallel processing cluster
-    cl <- parallel::makeCluster(parallel::detectCores())  # use all but 2 cores
+    cl <- parallel::makeCluster(parallel::detectCores()-2)  # use all but 2 cores
     parallel::clusterExport(cl=cl, envir=environment(),
                       varlist=c('cdl_tiles', 'nvc_tiles', 'tiledir', 'rasterID'))
 
