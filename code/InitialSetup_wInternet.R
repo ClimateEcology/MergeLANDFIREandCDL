@@ -12,13 +12,13 @@ national <- tigris::states() %>% sf::st_as_sf() %>%
                              'Guam', 'Hawaii', 'Puerto Rico', 'United States Virgin Islands'))
 
 if (regionName == 'Northeast') {
-  states <- national$NAME[national$region == 1]
+  states <- national$NAME[national$REGION == 1]
 } else if (regionName == 'Southeast') {
-  states <- national$NAME[national$region == 2]
+  states <- national$NAME[national$REGION == 2]
 } else if (regionName == 'MidWest') {
-  states <- national$NAME[national$region == 3]
+  states <- national$NAME[national$REGION == 3]
 } else if (regionName == 'West') {
-  states <- national$NAME[national$region == 4]
+  states <- national$NAME[national$REGION == 4]
 }
 
 
