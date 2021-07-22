@@ -1,5 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name="MergeRasters" #name of the job submitted
 #SBATCH -p bigmem #partition to use
 #SBATCH -N 1 #number of nodes in this job
 #SBATCH --cpus-per-task=24 #number of cpus to use for each task
@@ -12,6 +11,6 @@
 
 export OPENBLAS_NUM_THREADS=1
 module load singularity
-singularity exec geospatial_extend_latest.sif Rscript code/RunMergeLANDFIREandCDL_byState.R --args 2016 Southeast
+singularity exec geospatial_extend_latest.sif Rscript code/RunMergeLANDFIREandCDL_byState.R --args ${cdlyear} ${region}
 
 
