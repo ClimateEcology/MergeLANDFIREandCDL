@@ -6,15 +6,12 @@ source('./code/functions/grid_rasters.R')
 
 library(dplyr);  library(raster); library(sf); library(logger); library(future)
 
-args <- commandArgs(trailingOnly = T)
-
 # specify input parameters
-CDLYear <- args[1] # year of NASS Cropland Data Layer
-regionName <- args[2] # region to process
-
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
+CDLYear <- '2016' # year of NASS Cropland Data Layer
 writetiles <- T
+regionName <- 'Southeast'
 allstates <- T # run all states within a region. 
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
 
