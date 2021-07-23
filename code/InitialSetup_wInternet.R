@@ -10,6 +10,34 @@ national <- tigris::states() %>% sf::st_as_sf() %>%
   dplyr::filter(!NAME %in% c('Alaska', 'American Samoa', 'Commonwealth of the Northern Mariana Islands', 
                              'Guam', 'Hawaii', 'Puerto Rico', 'United States Virgin Islands'))
 
+# split Texas in half. Code crashes trying to write so many tiles.
+
+texas_counties <- tigris::counties(state='TX')
+
+# calculate county centroids and use these to filter counties into east/west split
+county_centroids <- sf::st_centroid(texas_counties) 
+county_centroids$lat <- sf::st_coordinates(county_centroids)[,2]
+county_centroids$long <- sf::st_coordinates(county_centroids)[,1]
+
+west_counties <- dplyr::filter(county_centroids, long <= -99)
+east_counties <- dplyr::filter(county_centroids, long > -99)
+
+west <- dplyr::filter(texas_counties, GEOID %in% west_counties$GEOID) %>%
+  sf::st_union() %>%
+  sf::st_sf() %>%
+  dplyr::mutate(REGION = 3, DIVISION=7, STATEFP=48, GEOID=48, STUSPS='TX_West', NAME='Texas, west')
+
+east <- dplyr::filter(texas_counties, GEOID %in% east_counties$GEOID) %>%
+  sf::st_union() %>%
+  sf::st_sf() %>%
+  dplyr::mutate(REGION = 3, DIVISION=7, STATEFP=48, GEOID=48, STUSPS='TX_East', NAME='Texas, east')
+
+# Add East and West Texas to national map in place of whole Texas
+national <- dplyr::filter(national, STUSPS != 'TX') %>%
+  dplyr::select(-STATENS, -LSAD, -MTFCC, -FUNCSTAT, -ALAND, -AWATER, -INTPTLAT, -INTPTLON) %>%
+  rbind(west) %>%
+  rbind(east)
+
 
 for (regionName in c('Northeast', 'Southeast', 'Midwest', 'West')) {
   if (regionName == 'Northeast') {
