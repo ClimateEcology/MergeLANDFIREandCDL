@@ -54,7 +54,7 @@ for (stateName in states) {
   ydiv <- round(sqrt(ndiv/ratio))
   xdiv <- round(ndiv/ydiv)
   
-  if (is.na(xdiv)| xdiv == 0) {
+  if (is.na(xdiv)| as.numeric(xdiv) == 0) {
     xdiv <- 1
   }
   if (is.na(ydiv) | as.numeric(ydiv) == 0) {
