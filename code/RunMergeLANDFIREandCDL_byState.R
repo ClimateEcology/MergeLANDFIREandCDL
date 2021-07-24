@@ -7,13 +7,16 @@ source('./code/functions/mosaic_tiles.R')
 
 library(dplyr);  library(raster); library(sf); library(logger); library(future)
 
+args <- commandArgs(trailingOnly = T)
+
 # specify input parameters
+CDLYear <- args[2] # year of NASS Cropland Data Layer
+regionName <- args[3] # region to process
+
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
-CDLYear <- '2016' # year of NASS Cropland Data Layer
 writetiles <- T
-regionName <- 'Northeast'
-allstates <- F # run all states within a region. 
+allstates <- T # run all states within a region. 
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
 
 # make list of states to run (either all in shapefile or manually defined)
