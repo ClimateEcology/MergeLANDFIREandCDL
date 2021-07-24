@@ -16,7 +16,7 @@ regionName <- args[3] # region to process
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 writetiles <- T
-allstates <- T # run all states within a region. 
+allstates <- F # run all states within a region. 
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
 
 # make list of states to run (either all in shapefile or manually defined)
@@ -25,7 +25,7 @@ if (allstates <- T) {
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
   states <- regionalextent$STUSPS
 } else {
-  states <- c('DC') # states/region to run
+  states <- c('DC', 'TX_West', 'TX_East') # states/region to run
 }
 
 
