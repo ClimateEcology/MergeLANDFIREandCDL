@@ -54,6 +54,12 @@ for (stateName in states) {
   ydiv <- round(sqrt(ndiv/ratio))
   xdiv <- round(ndiv/ydiv)
   
+  if (is.na(xdiv)| xdiv == 0) {
+    xdiv <- 1
+  }
+  if (is.na(ydiv) | as.numeric(ydiv) == 0) {
+    ydiv <- 1
+  }
   # what is the resulting area of tiles using these x and y division factors?
   ntiles <- ydiv*xdiv; result_area <- areabb/ntiles
   
