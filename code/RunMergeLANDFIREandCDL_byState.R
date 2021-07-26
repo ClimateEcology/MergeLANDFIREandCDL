@@ -28,7 +28,7 @@ if (allstates == T) {
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
   states <- regionalextent$STUSPS
 } else {
-  states <- c('TX_West', 'TX_East') # states/region to run
+  states <- c('TX_West')#, 'TX_East') # states/region to run
 }
 
 
@@ -145,9 +145,9 @@ for (stateName in states) {
   ID <- paste0(stateName, '_CDL', CDLYear,'NVC')
   
   # run function to mosaic tile into one larger
-  mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=30, chunksize2=5, ID=ID)
+  mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=40, chunksize2=5, ID=ID)
   
-  logger::log_info(paste0('Mosaic of ', stateName, ' rasters are complete!'))
+  logger::log_info(paste0('Mosaic of ', stateName, ' tiles are complete!'))
   logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), "B."))
   
 }

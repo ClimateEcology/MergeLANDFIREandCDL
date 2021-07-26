@@ -46,7 +46,7 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID) {
       }
     }
     
-    logger::log_info('Mosaic of mega-tiles is complete.')
+    logger::log_info('Finished creating mega-tiles.')
     
     mega_tiles <- mget(gtools::mixedsort(ls(pattern='MT.'))) # include function to sort mega-tile objects so the mega-mega tiles are contiguous blocks
     names(mega_tiles) <- NULL # remove names in list of mega-tiles (messes up mosaic execution for some reason)
@@ -83,14 +83,20 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID) {
         # for the list of chunksize1 or fewer tiles, execute mosaic to create a mega-tile
         assign(x=paste0('M2T', i), value=rlang::exec("mosaic", !!!get(paste0('args2', i)), fun='mean',
                                                      filename=paste0(tiledir, '/', ID,"_MegaMegaTile", i, '.tif'), overwrite=T))
+        logger::log_info('Finished creating mega-mega-tiles.')
+        
       }
       
       # make a list of the mega-mega tiles
       mega2_tiles <- mget(gtools::mixedsort(ls(pattern='M2T.')))
       names(mega2_tiles) <- NULL # remove names in list of mega-tiles (messes up mosaic execution for some reason)
       
+      logger::log_info('Putting together mega-tiles to make final raster.')
+      
       # mosaic together mega-mega tiles
       wholemap <- rlang::exec("mosaic", !!!mega2_tiles, fun='mean', filename=paste0(tiledir, '/', ID, 'FinalRaster.tif'), overwrite=T)
+      logger::log_info('Final raster is complete.')
+      
     }
   } else if (length(tile_paths) ==1) {
     singletile <- terra::rast(tile_paths)
