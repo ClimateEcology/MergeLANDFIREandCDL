@@ -1,5 +1,7 @@
 mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID) {
   
+  library(terra)
+  
   tile_paths <- list.files(tiledir, full.names=T)
   
   # exclude any extra files
@@ -88,8 +90,7 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID) {
       names(mega2_tiles) <- NULL # remove names in list of mega-tiles (messes up mosaic execution for some reason)
       
       # mosaic together mega-mega tiles
-      wholemap <- rlang::exec("mosaic", !!!mega2_tiles, fun='mean',
-                              filename=paste0(tiledir, '/', ID, 'FinalRaster.tif'), overwrite=T)
+      wholemap <- rlang::exec("mosaic", !!!mega2_tiles, fun='mean', filename=paste0(tiledir, '/', ID, 'FinalRaster.tif'), overwrite=T)
     }
   } else if (length(tile_paths) ==1) {
     singletile <- terra::rast(tile_paths)

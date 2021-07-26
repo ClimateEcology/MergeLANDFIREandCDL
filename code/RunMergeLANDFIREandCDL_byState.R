@@ -12,6 +12,9 @@ args <- commandArgs(trailingOnly = T)
 # specify input parameters
 CDLYear <- args[2] # year of NASS Cropland Data Layer
 regionName <- args[3] # region to process
+mktiles <- args[4]
+runmerge <- args[5]
+
 
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
@@ -25,7 +28,7 @@ if (allstates == T) {
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
   states <- regionalextent$STUSPS
 } else {
-  states <- c('DC', 'TX_West', 'TX_East') # states/region to run
+  states <- c('TX_West', 'TX_East') # states/region to run
 }
 
 
@@ -91,17 +94,17 @@ for (stateName in states) {
   ##### Part 1: Create Raster Tiles
   
   # run function to grid NE CDL and LANDFIRE into tiles (using parameters above)
+  if (mktiles == T) {
+    tiles <- grid_rasters(rasterpath=c(cdl_path, nvc_path),
+                                rasterID=c(paste0('CDL', CDLYear), 'NVC'),
+                                regionalextent=regionalextent, tiledir=tiledir,
+                                div=c(xdiv, ydiv), buffercells=buffercells,
+                                NAvalues=c(0,-9999), writetiles=writetiles)
   
-  tiles <- grid_rasters(rasterpath=c(cdl_path, nvc_path),
-                              rasterID=c(paste0('CDL', CDLYear), 'NVC'),
-                              regionalextent=regionalextent, tiledir=tiledir,
-                              div=c(xdiv, ydiv), buffercells=buffercells,
-                              NAvalues=c(0,-9999), writetiles=writetiles)
-
-  save(tiles, file=paste0(tiledir, '/tiles.RDA'))
-  
-  logger::log_info('LANDFIRE and CDL tiles saved.')
-  
+    save(tiles, file=paste0(tiledir, '/tiles.RDA'))
+    
+    logger::log_info('LANDFIRE and CDL tiles saved.')
+  }
   ######################################################################################################
   ##### Part 2: Merge Individual CDL and NVC Tiles
   
@@ -110,24 +113,25 @@ for (stateName in states) {
   
   logger::log_info('Successfully loaded list of CDL and LANDFIRE tile pairs.')
   
-  #turn on parallel processing for furrr package
-  future::plan(multisession)
+  if (runmerge == T) {
+    #turn on parallel processing for furrr package
+    future::plan(multisession)
+    
+    logger::log_info('Starting furrr section, parallel execution of merge_landfire_cdl function.')
+    
+    # loop through list of tiles in parallel with furrr::future_walk function
+    # for some reason, furrr:future_map doesn't return the list of rasters
+    # so, we use furrr:walk to generate the files, then read them again
+    furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
+                       datadir=datadir, tiledir=tiledir, veglayer='nvc', CDLYear=CDLYear,
+                       buffercells=buffercells, verbose=F, .options=furrr::furrr_options(seed = TRUE))
+    
+    # stop parallel processing
+    future::plan(sequential)
+    
+    logger::log_info('Completed merge for all tiles.')
+  }
   
-  logger::log_info('Starting furrr section, parallel execution of merge_landfire_cdl function.')
-  
-  # loop through list of tiles in parallel with furrr::future_walk function
-  # for some reason, furrr:future_map doesn't return the list of rasters
-  # so, we use furrr:walk to generate the files, then read them again
-  furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
-                     datadir=datadir, tiledir=tiledir, veglayer='nvc', CDLYear=CDLYear,
-                     buffercells=buffercells, verbose=F, .options=furrr::furrr_options(seed = TRUE))
-  
-  # stop parallel processing
-  future::plan(sequential)
-  
-
-  
-  logger::log_info('Completed merge for all tiles.')
   logger::log_info('Starting mosaic operation.')
 
   ######################################################################################################
