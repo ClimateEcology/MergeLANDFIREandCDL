@@ -38,7 +38,7 @@ target_area <- 1000 # desired size (in km2) of each tile
 for (stateName in states) {
   
   logger::log_info(paste0('Starting ', stateName, '.'))
-  logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), "B."))
+  logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), " B."))
   
   # load shapefile for state/region 
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))  %>%
@@ -148,6 +148,6 @@ for (stateName in states) {
   mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=40, chunksize2=5, ID=ID)
   
   logger::log_info(paste0('Mosaic of ', stateName, ' tiles are complete!'))
-  logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), "B."))
+  logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), " B."))
   
 }
