@@ -28,7 +28,7 @@ if (allstates == T) {
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
   states <- regionalextent$STUSPS
 } else {
-  states <- c('TX_West')#, 'TX_East') # states/region to run
+  states <- c('TX_West', 'TX_East') # states/region to run
 }
 
 

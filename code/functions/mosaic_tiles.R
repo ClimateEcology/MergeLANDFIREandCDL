@@ -1,4 +1,4 @@
-mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID) {
+mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, season=NA) {
   
   library(terra)
   
@@ -8,6 +8,10 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID) {
   tile_paths <- tile_paths[!grepl(tile_paths, pattern= ".tif.aux")]
   tile_paths <- tile_paths[!grepl(tile_paths, pattern= "MegaTile")]
   tile_paths <- tile_paths[!grepl(tile_paths, pattern= "Final")]
+  
+  if (!is.na(season)) {
+    tile_paths <- tile_paths[grepl(tile_paths, pattern=season)]
+  }
   
   if (length(tile_paths) > 1) {
     tile_list <- vector("list", length(tile_paths))
@@ -56,11 +60,11 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID) {
     # if there are multiple, but less than 10 mega-tiles, mosaic them all together
     if (length(mega_tiles) > 1 & length(mega_tiles) < 10) {
       wholemap <- rlang::exec("mosaic", !!!mega_tiles, fun='mean',
-                              filename=paste0(tiledir, '/', ID, 'FinalRaster.tif'), overwrite=T)
+                              filename=paste0(tiledir, '/', ID, '_FinalRaster.tif'), overwrite=T)
       
       # if only one mega-tile, just write this one
     } else if (length(mega_tiles) == 1) {
-      terra::writeRaster(MT1, filename=paste0(tiledir, '/', ID, 'FinalRaster.tif'), overwrite=T)
+      terra::writeRaster(MT1, filename=paste0(tiledir, '/', ID, '_FinalRaster.tif'), overwrite=T)
       
       # if there are lots of mega-tile (> 10), put some of these together before doing final merge
     } else if (length(mega_tiles) >= 10){
@@ -94,13 +98,13 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID) {
       logger::log_info('Putting together mega-tiles to make final raster.')
       
       # mosaic together mega-mega tiles
-      wholemap <- rlang::exec("mosaic", !!!mega2_tiles, fun='mean', filename=paste0(tiledir, '/', ID, 'FinalRaster.tif'), overwrite=T)
+      wholemap <- rlang::exec("mosaic", !!!mega2_tiles, fun='mean', filename=paste0(tiledir, '/', ID, '_FinalRaster.tif'), overwrite=T)
       logger::log_info('Final raster is complete.')
       
     }
   } else if (length(tile_paths) ==1) {
     singletile <- terra::rast(tile_paths)
-    terra::writeRaster(singletile, filename=paste0(tiledir, '/', ID, 'FinalRaster.tif'), overwrite=T)
+    terra::writeRaster(singletile, filename=paste0(tiledir, '/', ID, '_FinalRaster.tif'), overwrite=T)
   }
   
 }
