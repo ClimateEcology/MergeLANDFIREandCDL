@@ -3,7 +3,7 @@
 
 library(dplyr); library(sf)
 
-bystate <- F
+bystate <- T
 wholecountry <- F
 
 national <- tigris::states() %>% sf::st_as_sf() %>%
