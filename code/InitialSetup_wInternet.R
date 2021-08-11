@@ -37,9 +37,7 @@ texas <- dplyr::filter(national, STUSPS == 'TX')
 texas <- rbind(texas %>% mutate(STUSPS='TX_West', NAME='Texas, west', geometry = west$geometry),
                texas %>% mutate(STUSPS='TX_East', NAME='Texas, east', geometry = east$geometry))
 
-national <- dplyr::filter(national, STUSPS != 'TX') %>%
-  dplyr::select(-STATENS, -LSAD, -MTFCC, -FUNCSTAT, -ALAND, -AWATER, -INTPTLAT, -INTPTLON) %>%
-  rbind(texas) 
+national <- dplyr::filter(national, STUSPS != 'TX') %>% rbind(texas)
 
 
 for (regionName in c('Northeast', 'Southeast', 'Midwest', 'West')) {
