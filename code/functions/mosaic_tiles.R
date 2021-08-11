@@ -39,7 +39,7 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, season=NA) {
       if (length(get(paste0('args', i))) < 2) {
         assign(x=paste0('args', i-1), value=tile_list[(chunksize1*(i-2)+1):end]) # add orphan tile to the previous list
         
-        # re-do the previous mega-tile to add in the last orphaned small tile
+        # re-do the previous mega-tile to add in the last orphaned tile
         assign(x=paste0('MT', i-1), value=rlang::exec("mosaic", !!!get(paste0('args', i-1)), fun='mean',
                                                       filename=paste0(tiledir, '/', ID, "_MegaTile", i-1, '.tif'), overwrite=T))
       } else {
@@ -84,9 +84,19 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, season=NA) {
           assign(x=paste0('args2', i), value=mega_tiles[(chunksize2*(i-1)+1):end2]) # last argsMT list = end2 of previous + 1:end2
         }
         
-        # for the list of chunksize1 or fewer tiles, execute mosaic to create a mega-tile
-        assign(x=paste0('M2T', i), value=rlang::exec("mosaic", !!!get(paste0('args2', i)), fun='mean',
-                                                     filename=paste0(tiledir, '/', ID,"_MegaMegaTile", i, '.tif'), overwrite=T))
+        # if the last list is only 1 tile, join this tile with the previous mega-mega-tile
+        if (length(get(paste0('args2', i))) < 2) {
+          assign(x=paste0('args2', i-1), value=tile_list[(chunksize1*(i-2)+1):end2]) # add orphan tile to the previous list
+          
+          # re-do the previous mega-tile to add in the last orphaned tile
+          assign(x=paste0('M2T', i-1), value=rlang::exec("mosaic", !!!get(paste0('args2', i-1)), fun='mean',
+                                                        filename=paste0(tiledir, '/', ID, "_MegaMegaTile", i-1, '.tif'), overwrite=T))
+        } else {
+          
+          # for the list of chunksize1 or fewer tiles, execute mosaic to create a mega-tile
+          assign(x=paste0('M2T', i), value=rlang::exec("mosaic", !!!get(paste0('args2', i)), fun='mean',
+                                                       filename=paste0(tiledir, '/', ID,"_MegaMegaTile", i, '.tif'), overwrite=T))
+        }
         logger::log_info('Finished creating mega-mega-tiles.')
         
       }
