@@ -19,7 +19,7 @@ runmerge <- args[5]
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 writetiles <- T
-allstates <- F # run all states within a region. 
+allstates <- T # run all states within a region. 
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
 
 # make list of states to run (either all in shapefile or manually defined)
