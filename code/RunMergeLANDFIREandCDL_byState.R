@@ -16,10 +16,11 @@ mktiles <- args[4]
 runmerge <- args[5]
 
 
-datadir <- './data' # directory where tabular and spatial data are stored
+outdir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory where tabular and spatial data are stored
+datadir <- './data'
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 writetiles <- T
-allstates <- T # run all states within a region. 
+allstates <- F # run all states within a region. 
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
 
 # make list of states to run (either all in shapefile or manually defined)
@@ -28,7 +29,7 @@ if (allstates == T) {
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
   states <- regionalextent$STUSPS
 } else {
-  states <- c('TX_West', 'TX_East') # states/region to run
+  states <- c('PA') # states/region to run
 }
 
 
@@ -71,7 +72,7 @@ for (stateName in states) {
   
   
   ##### derived parameters 
-  tiledir = paste0(datadir, "/", stateName, "Tiles_", ntiles)
+  tiledir = paste0(outdir, "/", stateName, "Tiles_", ntiles)
   evt_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_105evt/grid1/us_105evt')
   nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
   cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
@@ -145,7 +146,7 @@ for (stateName in states) {
   ID <- paste0(stateName, '_CDL', CDLYear,'NVC')
   
   # run function to mosaic tile into one larger
-  mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=40, chunksize2=5, ID=ID)
+  mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=40, chunksize2=5, ID=ID, outdir=tiledir)
   
   logger::log_info(paste0('Mosaic of ', stateName, ' tiles are complete!'))
   logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), " B."))
