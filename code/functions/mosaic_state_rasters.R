@@ -64,19 +64,22 @@ mosaic_state_rasters <- function(CDLYear, parentdir='./data',
     }
   }
   
-  ID <- gsub(basename(allrasters[1]), pattern='_FinalRaster.tif', replacement = '')
-  # make list of actual raster objects (not file paths),
-  allstates <- vector("list", length(allrasters))
-  
-  for (i in 1:length(allrasters)) {
-    allstates[[i]] <- terra::rast(allrasters[i])
+  if (length(allrasters) > 0) {
+    ID <- gsub(basename(allrasters[1]), pattern='_FinalRaster.tif', replacement = '')
+    # make list of actual raster objects (not file paths),
+    allstates <- vector("list", length(allrasters))
+    
+    for (i in 1:length(allrasters)) {
+      allstates[[i]] <- terra::rast(allrasters[i])
+    }
+    
+    logger::log_info(paste0(allrasters, collapse=', '))
+    
+    
+    # execute mosaic function
+    allstates_map <- rlang::exec("mosaic", !!!allstates, fun='mean', 
+      filename=paste0(outdir, '/National_', ID, '.tif'), overwrite=T)
+  } else if (length(allrasters == 0)) {
+    warn("There are no rasters that match the IDstring(s) and CDLYear ", CDLYear, ". No mosaic operation performed.")
   }
-  
-  logger::log_info(paste0(allrasters, collapse=', '))
-  
-  
-  # execute mosaic function
-  allstates_map <- rlang::exec("mosaic", !!!allstates, fun='mean', 
-    filename=paste0(outdir, '/National_', ID, '.tif'), overwrite=T)
-
 }

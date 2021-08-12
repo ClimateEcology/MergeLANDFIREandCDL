@@ -13,8 +13,8 @@ if (laptop == T) {
 }
 
 # Stitch together merged state rasters
-
-for (CDLYear in c(2016, 2017)) {
+# provide all CDL year we might possibly want. Mosaic function will skip those with no available rasters.
+for (CDLYear in c(2012:2020)) { 
   mosaic_state_rasters(CDLYear=CDLYear, parentdir=intermediate_dir,
     tilestring=tilestring, IDstring1=index,
     IDstring2=distance, season=season, outdir=outdir)
