@@ -16,8 +16,8 @@ mktiles <- args[4]
 runmerge <- args[5]
 
 
-outdir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory where tabular and spatial data are stored
-datadir <- './data'
+intermediate_dir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
+datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 writetiles <- T
 allstates <- F # run all states within a region. 
@@ -72,7 +72,7 @@ for (stateName in states) {
   
   
   ##### derived parameters 
-  tiledir = paste0(outdir, "/", stateName, "Tiles_", ntiles)
+  tiledir = paste0(intermediate_dir, "/", stateName, "Tiles_", ntiles)
   evt_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_105evt/grid1/us_105evt')
   nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
   cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')

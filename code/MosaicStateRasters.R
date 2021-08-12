@@ -1,36 +1,21 @@
+# join together state rasters for Beescape indices to create national maps
 rm(list=ls())
+laptop <- F
 
-library(dplyr); library(terra)
-CDLYear <- 2016
+intermediate_dir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL'
+tilestring <- '(..)Tiles'
+outdir <- './data/NationalMaps'
 
-# save list of directories w/ finished state maps
-is_tile_dir <- list.dirs('./data', full.names = T, recursive = F) %>%
-  stringr::str_detect(pattern='(..)Tiles')
-
-dirs_tomerge <- list.dirs('./data', full.names = T, recursive = F)[is_tile_dir]
-
-# save list of file paths to state rasters
-for (i in 1:length(dirs_tomerge)) {
-  temp <- list.files(dirs_tomerge[i], full.names = T)
-  oneraster <- temp[grepl(temp, pattern='Final') & 
-    grepl(temp, pattern=as.character(get('CDLYear')))] # only process rasters that match the CDL year specified above
-  
-  if (i == 1) {
-    allrasters <- oneraster
-  } else {
-    allrasters <- c(allrasters, oneraster)
-  }
+if (laptop == T) {
+  source('Z:/SCINetPostDoc/MergeLANDFIREandCDL/code/functions/mosaic_state_rasters.R')
+} else if (laptop == F) {
+  source('../MergeLANDFIREandCDL/code/functions/mosaic_state_rasters.R')
 }
 
-# make list of actual raster objects (not file paths)
-allstates <- vector("list", length(allrasters))
+# Stitch together merged state rasters
 
-for (i in 1:length(allrasters)) {
-  allstates[[i]] <- terra::rast(allrasters[i])
+for (CDLYear in c(2016, 2017)) {
+  mosaic_state_rasters(CDLYear=CDLYear, parentdir=intermediate_dir,
+    tilestring=tilestring, IDstring1=index,
+    IDstring2=distance, season=season, outdir=outdir)
 }
-
-logger::log_info(paste0(allrasters, collapse=', '))
-
-
-# execute mosaic function
-allstates_map <- rlang::exec("mosaic", !!!allstates, fun='mean', filename=paste0('./data/NationalMergedRaster', CDLYear, '.tif'), overwrite=T)

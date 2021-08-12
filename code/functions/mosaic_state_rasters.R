@@ -3,7 +3,8 @@ mosaic_state_rasters <- function(CDLYear, parentdir='./data',
                                  IDstring1=NA,
                                  IDstring2=NA,
                                  IDstring3=NA,
-                                 season=NA) {
+                                 season=NA,
+                                 outdir) {
     
   library(dplyr); library(terra)
   
@@ -76,6 +77,6 @@ mosaic_state_rasters <- function(CDLYear, parentdir='./data',
   
   # execute mosaic function
   allstates_map <- rlang::exec("mosaic", !!!allstates, fun='mean', 
-    filename=paste0(parentdir, '/National_', ID, '.tif'), overwrite=T)
+    filename=paste0(outdir, '/National_', ID, '.tif'), overwrite=T)
 
 }
