@@ -66,8 +66,8 @@ mosaic_states_to_regions <- function(CDLYear, parentdir='./data',
   }
   
   # filter file paths to only states in the specified region (if supplied)
-  if (!is.na(state_region)) {
-    allrasters <- allrasters[grepl(allrasters, pattern=state_region)]
+  if (!is.na(region_states)) {
+    allrasters <- allrasters[grepl(allrasters, pattern=region_states)]
   }
   
   # make list of actual raster objects (not file paths),
