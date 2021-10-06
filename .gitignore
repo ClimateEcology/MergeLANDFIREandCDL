@@ -17,9 +17,15 @@
 # raster data folders
 **/data/*
 **/SpatialData
+**/LANDFIRE_AutoKeyReports/*
+AKReports.zip
 
 # 'project' folder (has necessary R packages)
 **project/*
+
+#writing
+**/writing/*
+**/presentations/*
 
 # output from sbatch runs
 **/stderr*
