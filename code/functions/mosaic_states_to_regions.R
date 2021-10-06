@@ -1,4 +1,4 @@
-mosaic_state_rasters <- function(CDLYear, parentdir='./data', 
+mosaic_states_to_regions <- function(CDLYear, parentdir='./data', 
                                  tilestring='(..)Tiles',
                                  region_states=NA,
                                  IDstring1=NA,
