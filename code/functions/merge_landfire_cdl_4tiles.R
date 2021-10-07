@@ -1,5 +1,5 @@
 
-merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, buffercells, verbose) {
+merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tiles, buffercells, verbose) {
   
   ##### Step 0: Setup and load data
   
@@ -58,7 +58,7 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, buffe
                                       grepl(NVC_Match3, pattern= 'Close Grown Crop')) %>%
     dplyr::pull(CLASS_NAME)
   
-  # Load spatial layers (EVT, NVC, and CDL rasters)
+  # Load spatial layers (NVC and CDL rasters)
   cdl <- terra::rast(tiles[[1]])
   nvc <- terra::rast(tiles[[2]])
   
@@ -137,6 +137,27 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, buffe
   # crop tile to original extent (without buffer pixels)
   nvc_gapsfilled <- terra::crop(nvc_gapsfilled, original_extent)
   
+  # extent of cropped tile (will use later to name files)
+  merged_ext <- terra::ext(nvc_gapsfilled)
+  
+  # cropped version of output from step 1
+  output_step1 <- terra::crop(veglayer_copy, original_extent)
+  
+  # generate list of mismatched pixels (for technical validation)
+  mismatch_points <- raster::rasterToPoints(raster::raster(output_step1), 
+                                            fun=function(x){x %in% c(7970, 7971, 7972, 7973, 7974, 7975, 7978)})
+  mismatch_points <- data.frame(mismatch_points)
+  
+  # add NVC and CDL classes for mis-matched pixels
+  mismatch_points$NVC_Class <- mismatch_points[,3]
+  mismatch_points$CDL_Class <- terra::extract(cdl, mismatch_points[,1:2], df=T)
+  mismatch_points <- mismatch_points[,-3]
+  
+  # save mismatch pixels results as a csv file
+  stateName <- substr(basename(tiledir), start=1, stop=2)
+  mismatch_out <- dplyr::mutate(mismatch_points, CDLYear=CDLYear, State=stateName)
+  write.csv(paste0(valdir, '/MismatchPixels_', stateName, '_CDL', CDLYear, '_', merged_ext[1], "_", merged_ext[3], ".csv"), overwrite=T)
+  
   if (verbose == T) {
     logger::log_info('Step 2 complete.')
     logger::log_info('Save merged raster tiles.')
@@ -146,7 +167,6 @@ merge_landfire_cdl <- function(datadir, tiledir, veglayer, CDLYear, tiles, buffe
     dir.create(paste0(tiledir, "/MergedCDL", toupper(veglayer), "/"))
   }
   
-  merged_ext <- terra::ext(nvc_gapsfilled)
   
   terra::writeRaster(nvc_gapsfilled, 
     paste0(tiledir, "/MergedCDL", toupper(veglayer), "/", 

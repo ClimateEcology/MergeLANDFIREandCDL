@@ -2,7 +2,6 @@ rm(list=ls())
 
 # import function to merge together CDL and LANDFIRE tiles
 source('./code/functions/merge_landfire_cdl_4tiles.R')
-source('./code/functions/grid_rasters.R')
 source('./code/functions/mosaic_tiles.R')
 
 library(dplyr);  library(raster); library(sf); library(logger); library(future)
@@ -17,6 +16,7 @@ runmerge <- args[5]
 
 
 intermediate_dir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
+valdir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData' # directory to store validation results (.txt files)
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 writetiles <- T
@@ -74,7 +74,6 @@ for (stateName in states) {
   
   ##### derived parameters 
   tiledir <- paste0(intermediate_dir, "/", stateName, "Tiles_", ntiles)
-  evt_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_105evt/grid1/us_105evt')
   nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
   cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
   
@@ -97,7 +96,7 @@ for (stateName in states) {
   
   # run function to grid NE CDL and LANDFIRE into tiles (using parameters above)
   if (mktiles == T) {
-    tiles <- grid_rasters(rasterpath=c(cdl_path, nvc_path),
+    tiles <- beecoSp::grid_rasters(rasterpath=c(cdl_path, nvc_path),
                                 rasterID=c(paste0('CDL', CDLYear), 'NVC'),
                                 regionalextent=regionalextent, tiledir=tiledir,
                                 div=c(xdiv, ydiv), buffercells=buffercells,
@@ -125,7 +124,7 @@ for (stateName in states) {
     # for some reason, furrr:future_map doesn't return the list of rasters
     # so, we use furrr:walk to generate the files, then read them again
     furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
-                       datadir=datadir, tiledir=tiledir, veglayer='nvc', CDLYear=CDLYear,
+                       datadir=datadir, tiledir=tiledir, valdir=valdir, veglayer='nvc', CDLYear=CDLYear,
                        buffercells=buffercells, verbose=F, .options=furrr::furrr_options(seed = TRUE))
     
     # stop parallel processing
