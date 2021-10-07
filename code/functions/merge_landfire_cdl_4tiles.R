@@ -157,7 +157,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
   stateName <- substr(basename(tiledir), start=1, stop=2)
   
   # add other necessary meta-data (state, CDL year, ncells in whole tile)
-  ncell <- terra::global(!is.na(traster), fun=sum)
+  ncell <- terra::global(!is.na(output_step1), fun=sum)
   mismatch_out <- dplyr::mutate(mismatch_points, CDLYear=CDLYear, State=stateName, ncells_tile = ncell$sum)
   # save mismatched pixel list as csv
   write.csv(paste0(valdir, '/MismatchPixels_', stateName,'_', merged_ext[1], "_", merged_ext[3], ".csv"), overwrite=T)
