@@ -102,7 +102,7 @@ for (stateName in states) {
                                 div=c(xdiv, ydiv), buffercells=buffercells,
                                 NAvalues=c(0,-9999), writetiles=writetiles)
   
-    save(tiles, file=paste0(tiledir, '/tiles.RDA'))
+    save(tiles, file=paste0(tiledir,'/tiles_CDL', CDLYear, '.RDA'))
     
     logger::log_info('LANDFIRE and CDL tiles saved.')
   }
@@ -110,7 +110,7 @@ for (stateName in states) {
   ##### Part 2: Merge Individual CDL and NVC Tiles
   
   # load list of raster tiles
-  load(paste0(tiledir, '/tiles.RDA'))
+  load(paste0(tiledir,'/tiles_CDL', CDLYear, '.RDA'))
   
   logger::log_info('Successfully loaded list of CDL and LANDFIRE tile pairs.')
   
