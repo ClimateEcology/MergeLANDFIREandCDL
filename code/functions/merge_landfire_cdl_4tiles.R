@@ -153,7 +153,9 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
       
     # add NVC and CDL classes for mis-matched pixels
     mismatch_points$NVC_Class <- mismatch_points[,3]
-    mismatch_points$CDL_Class <- terra::extract(cdl, mismatch_points[,1:2], df=T)
+    cdl_ext <- terra::extract(cdl, mismatch_points[,1:2], df=F)
+    names(cdl_ext) <- 'CDL_Class'
+    mismatch_points <- cbind(mismatch_points, cdl_ext)
     mismatch_points <- mismatch_points[,-3]
     
     # save mismatch pixels results as a csv file
@@ -163,7 +165,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
     ncell <- terra::global(!is.na(output_step1), fun=sum)
     mismatch_out <- dplyr::mutate(mismatch_points, CDLYear=CDLYear, State=stateName, ncells_tile = ncell$sum)
     # save mismatched pixel list as csv
-    write.csv(mismatch_out, paste0(valdir, '/MismatchPixels_', stateName,'_', merged_ext[1], "_", merged_ext[3], ".csv"))
+    write.csv(mismatch_out, paste0(valdir, '/MismatchPixels_', stateName,'_', merged_ext[1], "_", merged_ext[3], ".csv"), row.names = F)
   }
   
   if (verbose == T) {
