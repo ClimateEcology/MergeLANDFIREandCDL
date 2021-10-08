@@ -31,7 +31,6 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
   # create derived parameter of window_size
   window_size <- (buffercells[1]*2) + 1 # diameter of neighborhood analysis window (part 2 only)
   
-  
   ##### Step 1: Assign pixels that exactly match
   
   # create vectors listing which CDL classes match LANDFIRE wheat, orchard, vineyard, row crop, and close-grown crop
@@ -107,7 +106,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
     logger::log_info('Begin step 2: assign mis-matched pixel via neighborhood analysis.')
   }
   ##### Step 2: Assign mismatched pixels based on neighborhood
-  
+
   # When possible, reassign remaining NVC ag classes by looking at surrounding cells
   temp <- veglayer_copy
   
@@ -148,19 +147,24 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
                                             fun=function(x){x %in% c(7970, 7971, 7972, 7973, 7974, 7975, 7978)})
   mismatch_points <- data.frame(mismatch_points)
   
-  # add NVC and CDL classes for mis-matched pixels
-  mismatch_points$NVC_Class <- mismatch_points[,3]
-  mismatch_points$CDL_Class <- terra::extract(cdl, mismatch_points[,1:2], df=T)
-  mismatch_points <- mismatch_points[,-3]
+  logger::log_info(paste0('This tile has ', length(mismatch_points[,1]), ' mis-matched cells.'))
   
-  # save mismatch pixels results as a csv file
-  stateName <- substr(basename(tiledir), start=1, stop=2)
-  
-  # add other necessary meta-data (state, CDL year, ncells in whole tile)
-  ncell <- terra::global(!is.na(output_step1), fun=sum)
-  mismatch_out <- dplyr::mutate(mismatch_points, CDLYear=CDLYear, State=stateName, ncells_tile = ncell$sum)
-  # save mismatched pixel list as csv
-  write.csv(mismatch_out, paste0(valdir, '/MismatchPixels_', stateName,'_', merged_ext[1], "_", merged_ext[3], ".csv"))
+  if (length(mismatch_points[,1]) > 0) { # some tiles don't have any mismatched cells, so we skip this part
+      
+    # add NVC and CDL classes for mis-matched pixels
+    mismatch_points$NVC_Class <- mismatch_points[,3]
+    mismatch_points$CDL_Class <- terra::extract(cdl, mismatch_points[,1:2], df=T)
+    mismatch_points <- mismatch_points[,-3]
+    
+    # save mismatch pixels results as a csv file
+    stateName <- substr(basename(tiledir), start=1, stop=2)
+    
+    # add other necessary meta-data (state, CDL year, ncells in whole tile)
+    ncell <- terra::global(!is.na(output_step1), fun=sum)
+    mismatch_out <- dplyr::mutate(mismatch_points, CDLYear=CDLYear, State=stateName, ncells_tile = ncell$sum)
+    # save mismatched pixel list as csv
+    write.csv(mismatch_out, paste0(valdir, '/MismatchPixels_', stateName,'_', merged_ext[1], "_", merged_ext[3], ".csv"))
+  }
   
   if (verbose == T) {
     logger::log_info('Step 2 complete.')
@@ -170,7 +174,6 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
   if (!dir.exists(paste0(tiledir, "/MergedCDL", toupper(veglayer), "/"))) {
     dir.create(paste0(tiledir, "/MergedCDL", toupper(veglayer), "/"))
   }
-  
   
   terra::writeRaster(nvc_gapsfilled, 
     paste0(tiledir, "/MergedCDL", toupper(veglayer), "/", 
