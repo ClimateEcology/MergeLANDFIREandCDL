@@ -59,12 +59,21 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
     
     # if there are multiple, but less than 10 mega-tiles, mosaic them all together
     if (length(mega_tiles) > 1 & length(mega_tiles) < 10) {
+      if (compress == T) {
       wholemap <- base::eval(rlang::call2("mosaic", !!!mega_tiles, .ns="terra", fun='mean',
-                              filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T))
+                              filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, gdal=c("COMPRESS=DEFLATE")))
+      } else {
+      wholemap <- base::eval(rlang::call2("mosaic", !!!mega_tiles, .ns="terra", fun='mean',
+                                            filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T))
+      }
       
       # if only one mega-tile, just write this one
     } else if (length(mega_tiles) == 1) {
-      terra::writeRaster(MT1, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
+      if (compress == T) {
+      terra::writeRaster(MT1, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T, gdal=c("COMPRESS=DEFLATE"))
+      } else {
+        terra::writeRaster(MT1, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
+      }
       
       # if there are lots of mega-tile (> 10), put some of these together before doing final merge
     } else if (length(mega_tiles) >= 10){
