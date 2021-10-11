@@ -1,4 +1,4 @@
-mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA) {
+mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress) {
   
   library(terra)
   
@@ -40,13 +40,13 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA)
         assign(x=paste0('args', i-1), value=tile_list[(chunksize1*(i-2)+1):end]) # add orphan tile to the previous list
         
         # re-do the previous mega-tile to add in the last orphaned tile
-        assign(x=paste0('MT', i-1), value=rlang::exec("mosaic", !!!get(paste0('args', i-1)), fun='mean',
-                                                      filename=paste0(tiledir, '/', ID, "_MegaTile", i-1, '.tif'), overwrite=T))
+        assign(x=paste0('MT', i-1), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args', i-1)), .ns="terra", fun='mean',
+                                                      filename=paste0(tiledir, '/', ID, "_MegaTile", i-1, '.tif'), overwrite=T)))
       } else {
         
         # for the list of chunksize1 or fewer tiles, execute mosaic to create a mega-tile
-        assign(x=paste0('MT', i), value=rlang::exec("mosaic", !!!get(paste0('args', i)), fun='mean',
-                                                    filename=paste0(tiledir, '/', ID,"_MegaTile", i, '.tif'), overwrite=T))
+        assign(x=paste0('MT', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean',
+                                                    filename=paste0(tiledir, '/', ID,"_MegaTile", i, '.tif'), overwrite=T)))
       }
     }
     
@@ -59,8 +59,8 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA)
     
     # if there are multiple, but less than 10 mega-tiles, mosaic them all together
     if (length(mega_tiles) > 1 & length(mega_tiles) < 10) {
-      wholemap <- rlang::exec("mosaic", !!!mega_tiles, fun='mean',
-                              filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
+      wholemap <- base::eval(rlang::call2("mosaic", !!!mega_tiles, .ns="terra", fun='mean',
+                              filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T))
       
       # if only one mega-tile, just write this one
     } else if (length(mega_tiles) == 1) {
@@ -89,13 +89,13 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA)
           assign(x=paste0('args2', i-1), value=tile_list[(chunksize1*(i-2)+1):end2]) # add orphan tile to the previous list
           
           # re-do the previous mega-tile to add in the last orphaned tile
-          assign(x=paste0('M2T', i-1), value=rlang::exec("mosaic", !!!get(paste0('args2', i-1)), fun='mean',
-                                                        filename=paste0(tiledir, '/', ID, "_MegaMegaTile", i-1, '.tif'), overwrite=T))
+          assign(x=paste0('M2T', i-1), value=base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i-1)), .ns="terra", fun='mean',
+                                                        filename=paste0(tiledir, '/', ID, "_MegaMegaTile", i-1, '.tif'), overwrite=T)))
         } else {
           
           # for the list of chunksize1 or fewer tiles, execute mosaic to create a mega-tile
-          assign(x=paste0('M2T', i), value=rlang::exec("mosaic", !!!get(paste0('args2', i)), fun='mean',
-                                                       filename=paste0(tiledir, '/', ID,"_MegaMegaTile", i, '.tif'), overwrite=T))
+          assign(x=paste0('M2T', i), value=base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean',
+                                                       filename=paste0(tiledir, '/', ID,"_MegaMegaTile", i, '.tif'), overwrite=T)))
         }
         logger::log_info('Finished creating mega-mega-tiles.')
         
@@ -107,10 +107,18 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA)
       
       logger::log_info('Putting together mega-tiles to make final raster.')
       
-      # mosaic together mega-mega tiles
-      wholemap <- rlang::exec("mosaic", !!!mega2_tiles, fun='mean', 
-                              filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T,
-                              options="COMPRESS=DEFLATE")
+      
+      if (compress == T) {
+        # mosaic together mega-mega tiles
+        wholemap <- base::eval(rlang::call2("mosaic", !!!mega2_tiles, .ns="terra", fun='mean', 
+                                filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T,
+                                gdal=c("COMPRESS=DEFLATE")))
+      } else {
+        # mosaic together mega-mega tiles
+        wholemap <- base::eval(rlang::call2("mosaic", !!!mega2_tiles, .ns="terra", fun='mean', 
+                                            filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T))
+      }
+      
       logger::log_info('Final raster is complete.')
       
     }
