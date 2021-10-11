@@ -1,4 +1,4 @@
-mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress) {
+mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress=T) {
   
   library(terra)
   
@@ -70,7 +70,7 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
       # if only one mega-tile, just write this one
     } else if (length(mega_tiles) == 1) {
       if (compress == T) {
-      terra::writeRaster(MT1, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T, gdal=c("COMPRESS=DEFLATE"))
+      terra::writeRaster(MT1, filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, gdal=c("COMPRESS=DEFLATE"))
       } else {
         terra::writeRaster(MT1, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
       }
