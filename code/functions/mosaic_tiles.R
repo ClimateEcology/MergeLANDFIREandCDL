@@ -108,13 +108,15 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA)
       logger::log_info('Putting together mega-tiles to make final raster.')
       
       # mosaic together mega-mega tiles
-      wholemap <- rlang::exec("mosaic", !!!mega2_tiles, fun='mean', filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
+      wholemap <- rlang::exec("mosaic", !!!mega2_tiles, fun='mean', 
+                              filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T,
+                              options="COMPRESS=DEFLATE")
       logger::log_info('Final raster is complete.')
       
     }
   } else if (length(tile_paths) ==1) {
     singletile <- terra::rast(tile_paths)
-    terra::writeRaster(singletile, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
+    terra::writeRaster(singletile, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T, gdal=c("COMPRESS=DEFLATE"))
   }
   
 }
