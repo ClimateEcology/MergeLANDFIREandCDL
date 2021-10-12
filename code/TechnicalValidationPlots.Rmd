@@ -1,0 +1,50 @@
+---
+title: "Technical Validation Plots"
+author: "Melanie Kammerer"
+date: "10/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Plots of technical validation results
+
+```{r plot_validation}
+library(dplyr); library(ggplot2)
+
+freq <- read.csv('./data/TechnicalValidation/Mismatched_Cells.csv')
+
+nvc <- dplyr::group_by(freq, NVC_Class) %>%
+  dplyr::summarise(NCells = sum(Mismatch_NCells))
+
+cdl <- dplyr::group_by(freq, CDL_Class) %>%
+  dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
+  dplyr::filter(NCells > 9000) %>%
+  dplyr::mutate(CDL_Class = as.factor(CDL_Class))
+head(cdl)
+
+ggplot(data=cdl) + geom_bar(aes(x=CDL_Class, y=NCells), stat="identity") +
+  theme_classic(base_size=14) +
+  ylab('Number of mis-matched pixels')
+
+year <- dplyr::group_by(freq, CDLYear) %>%
+  dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
+  dplyr::mutate(CDLYear = as.factor(CDLYear))
+
+ggplot(data=year) + geom_bar(aes(x=CDLYear, y=NCells), stat="identity") +
+  theme_classic(base_size=14) +
+  ylab('Number of mis-matched pixels')
+
+
+state <- dplyr::group_by(freq, State) %>%
+  dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
+  dplyr::mutate(State = as.factor(State))
+
+ggplot(data=state) + geom_bar(aes(x=State, y=NCells), stat="identity") +
+  theme_classic(base_size=14) +
+  ylab('Number of mis-matched pixels')
+
+```
+

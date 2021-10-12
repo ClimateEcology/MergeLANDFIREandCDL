@@ -1,4 +1,44 @@
 # technical validation looking at the distribution of mis-matched pixels in merge CDL and LANDFIRE workflow
+library(dplyr)
 
-# load example data (mis-matched pixels from one tile in Texas)
-ex <- read.csv('./MismatchPixels_TX_-318315_1173885.csv')
+valdir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
+
+tiles <- list.files(valdir, full.names = T)
+increment <- 50
+
+h <- seq(from=1, to=length(tiles), by=increment)
+
+for (j in h) {
+torun <- c(j:(j+ (increment-1)))
+
+  for (i in torun) {
+    # load csv of mismatch pixel data for one tile
+    ex <- read.csv(tiles[i])
+    
+    if (i == torun[1]) {
+      all <- ex
+    } else {
+      assign(x=paste0('group', j), value=rbind(all, ex)) # combine info for all tiles into one file
+    }
+  }
+}
+
+for (i in 1:length(h)) {
+
+  # paste together results
+  one <- get(paste0('group', h[i]))
+
+  if (i == 1) {
+    all <- one
+  } else {
+    all <- rbind(all, one) # combine info for all tiles into one file
+  }
+}
+
+freq <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
+  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
+  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
+
+write.csv(freq, './data/Mismatched_Cells.csv')
+write.csv(all, './data/Mismatch_ByCell.csv')
+

@@ -61,7 +61,8 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
     if (length(mega_tiles) > 1 & length(mega_tiles) < 10) {
       if (compress == T) {
       wholemap <- base::eval(rlang::call2("mosaic", !!!mega_tiles, .ns="terra", fun='mean',
-                              filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, gdal=c("COMPRESS=DEFLATE")))
+                              filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, 
+                              wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
       } else {
       wholemap <- base::eval(rlang::call2("mosaic", !!!mega_tiles, .ns="terra", fun='mean',
                                             filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T))
@@ -70,7 +71,8 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
       # if only one mega-tile, just write this one
     } else if (length(mega_tiles) == 1) {
       if (compress == T) {
-      terra::writeRaster(MT1, filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, gdal=c("COMPRESS=DEFLATE"))
+      terra::writeRaster(MT1, filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, 
+                         wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3")))
       } else {
         terra::writeRaster(MT1, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
       }
@@ -121,7 +123,7 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
         # mosaic together mega-mega tiles
         wholemap <- base::eval(rlang::call2("mosaic", !!!mega2_tiles, .ns="terra", fun='mean', 
                                 filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T,
-                                gdal=c("COMPRESS=DEFLATE")))
+                                wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
       } else {
         # mosaic together mega-mega tiles
         wholemap <- base::eval(rlang::call2("mosaic", !!!mega2_tiles, .ns="terra", fun='mean', 
@@ -133,7 +135,8 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
     }
   } else if (length(tile_paths) ==1) {
     singletile <- terra::rast(tile_paths)
-    terra::writeRaster(singletile, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T, gdal=c("COMPRESS=DEFLATE"))
+    terra::writeRaster(singletile, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T, 
+                       wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3")))
   }
   
 }
