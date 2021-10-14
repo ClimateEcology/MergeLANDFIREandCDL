@@ -58,8 +58,8 @@ mosaic_regions_to_national <- function(CDLYear, regionaldir='./data',
     
     
     # execute mosaic function
-    allregions_map <- rlang::exec("mosaic", !!!allregions, fun='mean', 
-      filename=paste0(outdir, '/National_', ID, '.tif'), overwrite=T)
+    allregions_map <- base::eval(rlang::call2("mosaic", !!!allregions, .ns="terra", fun='mean', 
+      filename=paste0(outdir, '/National_', ID, '.tif'), overwrite=T, wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
   } else if (length(files_tomerge == 0)) {
     warn("There are no rasters that match the IDstring(s) and CDLYear ", CDLYear, ". No mosaic operation performed.")
   }

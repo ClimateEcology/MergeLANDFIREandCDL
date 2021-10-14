@@ -82,11 +82,13 @@ mosaic_states_to_regions <- function(CDLYear, parentdir='./data',
     # output copy of the raster file paths included
     logger::log_info(paste0(allrasters, collapse=', '))
     
-    
     # execute mosaic function
-    allstates_map <- rlang::exec("mosaic", !!!allstates, fun='mean', 
-      filename=paste0(outdir, '/', regionName, '_', ID, '.tif'), overwrite=T, gdal=c("COMPRESS=DEFLATE"))
+    allstates_map <- base::eval(rlang::call2("mosaic", !!!allstates, .ns="terra", fun='mean', 
+      filename=paste0(outdir, '/', regionName, '_', ID, '.tif'), overwrite=T, wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
+    
   } else if (length(allrasters == 0)) {
     warn("There are no rasters that match the IDstring(s) and CDLYear ", CDLYear, ". No mosaic operation performed.")
   }
+  
+  
 }
