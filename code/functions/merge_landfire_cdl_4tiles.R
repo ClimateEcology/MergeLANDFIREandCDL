@@ -41,7 +41,8 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
     dplyr::select(VALUE, CLASS_NAME, GROUP, NVC_Match1, NVC_Match3)
   
   
-  wheat <- dplyr::filter(agclass_match, NVC_Match1 == 'Wheat') %>% dplyr::pull(CLASS_NAME)
+  wheat <- dplyr::filter(agclass_match, NVC_Match1 == 'Wheat'| NVC_Match2 == 'Wheat'|
+                         NVC_Match3 == 'Wheat') %>% dplyr::pull(CLASS_NAME)
   
   orchard <- dplyr::filter(agclass_match, NVC_Match1 == 'Orchard') %>% dplyr::pull(CLASS_NAME)
   
@@ -50,11 +51,11 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
   vineyard <- dplyr::filter(agclass_match, NVC_Match1 == 'Vineyard') %>% dplyr::pull(CLASS_NAME)
   
   row_crop <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Row Crop') | 
-                              grepl(NVC_Match3, pattern= 'Row Crop')) %>%
+                              grepl(NVC_Match2, pattern= 'Row Crop')) %>%
     dplyr::pull(CLASS_NAME)
   
   close_grown_crop <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Close Grown Crop') | 
-                                      grepl(NVC_Match3, pattern= 'Close Grown Crop')) %>%
+                                      grepl(NVC_Match2, pattern= 'Close Grown Crop')) %>%
     dplyr::pull(CLASS_NAME)
   
   # Load spatial layers (NVC and CDL rasters)
