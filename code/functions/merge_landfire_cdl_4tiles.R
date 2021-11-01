@@ -38,7 +38,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
   
   agclass_match <- read.csv(paste0(datadir, '/TabularData/CDL_NVC_AgClassMatch.csv')) %>%
     dplyr::filter(GROUP == 'A') %>%
-    dplyr::select(VALUE, CLASS_NAME, GROUP, NVC_Match1, NVC_Match3)
+    dplyr::select(VALUE, CLASS_NAME, GROUP, NVC_Match1, NVC_Match2, NVC_Match3)
   
   
   wheat <- dplyr::filter(agclass_match, NVC_Match1 == 'Wheat'| NVC_Match2 == 'Wheat'|
