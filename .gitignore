@@ -16,7 +16,7 @@
 
 # raster data folders
 **/data/*
-**/SpatialData
+!data/TabularData
 **/LANDFIRE_AutoKeyReports/*
 AKReports.zip
 
