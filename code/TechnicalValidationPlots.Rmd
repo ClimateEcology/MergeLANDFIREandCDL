@@ -14,16 +14,25 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r plot_validation}
 library(dplyr); library(ggplot2)
 
-freq <- read.csv('./data/TechnicalValidation/Mismatched_Cells.csv')
-#all <- data.table::fread('./data/TechnicalValidation/Mismatch_ByCell.csv')
+# read LANDFIRE and CDL keys
+lf_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
+cdl_key <- read.csv('D:/SpatialData/NASS_CDL/NASS_classes_simple.csv')
+
+freq <- read.csv('./data/TechnicalValidation/Mismatched_Cells.csv') %>%
+  dplyr::select(-X) %>%
+  dplyr::left_join(cdl_key, by=c('CDL_Class' = 'VALUE')) %>%
+  dplyr::rename(CDL_Name = CLASS_NAME) %>%
+  dplyr::left_join(select(lf_key, VALUE, NVC_Name), by=c('NVC_Class' = 'VALUE'))
+#all <- data.table::fread('./data/TechnicalValidation/Mismatch_ByCell.csv') # this file is not updated from Atlas. # it is too large to version control. 
 
 # nvc <- dplyr::group_by(freq, NVC_Class) %>%
 #   dplyr::summarise(NCells = sum(Mismatch_NCells))
 
-cdl_nvc <- dplyr::group_by(freq, CDL_Class, NVC_Class, CDLYear) %>%
+cdl_nvc <- dplyr::group_by(freq, CDL_Class, CDL_Name, NVC_Class, NVC_Name, CDLYear) %>%
   dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
   dplyr::filter(NCells > 9000) %>%
-  dplyr::mutate(CDL_Class = as.factor(CDL_Class), NVC_CDL= paste0(NVC_Class, "_", CDL_Class))
+  dplyr::mutate(CDL_Class = as.factor(CDL_Class), NVC_CDL= paste0(NVC_Class, "_", CDL_Class),
+                NVC_CDL_Named=paste0(NVC_Name, "_", CDL_Name))
 head(cdl_nvc)
 
 
@@ -32,10 +41,13 @@ ggplot(data=cdl_nvc) + geom_bar(aes(x=CDL_Class, y=NCells), stat="identity") +
   ylab('Number of mis-matched pixels') +
   theme(axis.text.x = element_text(angle = 90))
 
-ggplot(data=cdl_nvc) + geom_bar(aes(x=CDL_NVC, y=NCells), stat="identity") +
+ggplot(data=cdl_nvc) + geom_bar(aes(x=NVC_CDL_Named, y=NCells, fill=NVC_Name), stat="identity") +
   theme_classic(base_size=14) +
   ylab('Number of mis-matched pixels') +
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) +
+  coord_flip() +
+  theme(legend.position="bottom") +
+  guides(fill=guide_legend(nrow=2,byrow=TRUE))
 
 
 year <- dplyr::group_by(freq, CDLYear) %>%
@@ -47,13 +59,13 @@ ggplot(data=year) + geom_bar(aes(x=CDLYear, y=NCells), stat="identity") +
   ylab('Number of mis-matched pixels')
 
 
-state <- dplyr::group_by(freq, State) %>%
-  dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
-  dplyr::mutate(State = as.factor(State))
-
-ggplot(data=state) + geom_bar(aes(x=State, y=NCells), stat="identity") +
-  theme_classic(base_size=14) +
-  ylab('Number of mis-matched pixels')
+# state <- dplyr::group_by(freq, State) %>%
+#   dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
+#   dplyr::mutate(State = as.factor(State))
+# 
+# ggplot(data=state) + geom_bar(aes(x=State, y=NCells), stat="identity") +
+#   theme_classic(base_size=14) +
+#   ylab('Number of mis-matched pixels')
 
 ```
 

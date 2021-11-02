@@ -41,8 +41,8 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
     dplyr::select(VALUE, CLASS_NAME, GROUP, NVC_Match1, NVC_Match2, NVC_Match3)
   
   
-  wheat <- dplyr::filter(agclass_match, NVC_Match1 == 'Wheat'| NVC_Match2 == 'Wheat'|
-                         NVC_Match3 == 'Wheat') %>% dplyr::pull(CLASS_NAME)
+  wheat <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern = 'Wheat')| grepl(NVC_Match2, pattern= 'Wheat')|
+            grepl(NVC_Match3, pattern= 'Wheat')) %>% dplyr::pull(CLASS_NAME)
   
   orchard <- dplyr::filter(agclass_match, NVC_Match1 == 'Orchard') %>% dplyr::pull(CLASS_NAME)
   
