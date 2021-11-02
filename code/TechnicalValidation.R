@@ -25,7 +25,7 @@ if (any(torun > length(tiles))) {
     } else {
       assign(x=paste0('group', j), value=rbind(all, ex)) # combine info for all tiles into one file
     }
-  }mk
+  }
 logger::log_info(paste0(j,' files out of ', max(h), ' are finished.'))
 }
 
