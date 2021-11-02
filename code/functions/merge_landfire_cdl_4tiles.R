@@ -1,7 +1,7 @@
 
-merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tiles, buffercells, verbose) {
-  
-  ##### Step 0: Setup and load data
+merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, 
+                               tiles, buffercells, verbose, nvc_ag) {
+    ##### Step 0: Setup and load data
   
   # specify allow_classes is a global variable (necessary for futures package to work)
   allow_classes
@@ -34,7 +34,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
   ##### Step 1: Assign pixels that exactly match
   
   # create vectors listing which CDL classes match LANDFIRE wheat, orchard, vineyard, row crop, and close-grown crop
-  if (veglayer == 'nvc') {nvc_ag <- dplyr::filter(vegclasses_key, VALUE %in% c(7960:7999)) }
+  if (veglayer == 'nvc') {nvc_ag <- dplyr::filter(vegclasses_key, VALUE %in% nvc_ag) }
   
   agclass_match <- read.csv(paste0(datadir, '/TabularData/CDL_NVC_AgClassMatch.csv')) %>%
     dplyr::filter(GROUP == 'A') %>%
@@ -112,7 +112,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
   # When possible, reassign remaining NVC ag classes by looking at surrounding cells
   temp <- veglayer_copy
   
-  reclass <- data.frame(agveg=c(7970, 7971, 7972, 7973, 7974, 7975, 7978), to=NA)
+  reclass <- data.frame(agveg=nvc_ag, to=NA)
   temp2 <- terra::classify(temp, rcl=reclass)
 
   #crops <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
@@ -146,7 +146,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, tile
   
   # generate list of mismatched pixels (for technical validation)
   mismatch_points <- raster::rasterToPoints(raster::raster(output_step1), 
-                                            fun=function(x){x %in% c(7970, 7971, 7972, 7973, 7974, 7975, 7978)})
+                                            fun=function(x){x %in% nvc_ag})
   mismatch_points <- data.frame(mismatch_points)
   
   logger::log_info(paste0('This tile has ', length(mismatch_points[,1]), ' mis-matched cells.'))
