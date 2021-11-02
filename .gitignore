@@ -17,6 +17,8 @@
 # raster data folders
 **/data/*
 !data/TabularData
+!data/TechnicalValidation
+**/Mismatch_ByCell.csv
 **/LANDFIRE_AutoKeyReports/*
 AKReports.zip
 

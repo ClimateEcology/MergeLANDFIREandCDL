@@ -25,7 +25,7 @@ if (any(torun > length(tiles))) {
     } else {
       assign(x=paste0('group', j), value=rbind(all, ex)) # combine info for all tiles into one file
     }
-  }
+  }mk
 logger::log_info(paste0(j,' files out of ', max(h), ' are finished.'))
 }
 
@@ -45,6 +45,6 @@ freq <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>%
   dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
   dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
 
-write.csv(freq, './data/Mismatched_Cells.csv')
-write.csv(all, './data/Mismatch_ByCell.csv')
+write.csv(freq, './data/TechnicalValidation/Mismatched_Cells.csv')
+write.csv(all, './data/TechnicalValidation/Mismatch_ByCell.csv')
 

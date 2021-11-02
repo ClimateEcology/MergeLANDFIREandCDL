@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr); library(ggplot2)
 
 freq <- read.csv('./data/TechnicalValidation/Mismatched_Cells.csv')
-all <- data.table::fread('./data/TechnicalValidation/Mismatch_ByCell.csv')
+#all <- data.table::fread('./data/TechnicalValidation/Mismatch_ByCell.csv')
 
 # nvc <- dplyr::group_by(freq, NVC_Class) %>%
 #   dplyr::summarise(NCells = sum(Mismatch_NCells))
