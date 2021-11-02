@@ -11,6 +11,11 @@ h <- seq(from=1, to=length(tiles), by=increment)
 for (j in h) {
 torun <- c(j:(j+ (increment-1)))
 
+# if the last group exceed the number of files, shorten the list
+if (any(torun > length(tiles))) {
+  torun <- torun[1]:length(tiles)
+}
+
   for (i in torun) {
     # load csv of mismatch pixel data for one tile
     ex <- read.csv(tiles[i])
@@ -21,6 +26,7 @@ torun <- c(j:(j+ (increment-1)))
       assign(x=paste0('group', j), value=rbind(all, ex)) # combine info for all tiles into one file
     }
   }
+logger::log_info(paste0(j,' files out of ', max(h), ' are finished.'))
 }
 
 for (i in 1:length(h)) {
