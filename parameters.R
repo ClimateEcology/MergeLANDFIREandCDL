@@ -1,9 +1,9 @@
 CDLYear <- '2016'
-regionName <- 'Northeast'
+regionName <- 'Southeast'
 mktiles <- T
 runmerge <- T
 
-stateName <- 'RI'
+stateName <- 'DE'
 veglayer='nvc'
 verbose=F
 
