@@ -126,7 +126,8 @@ for (stateName in states) {
     # so, we use furrr:walk to generate the files, then read them again
     furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
                        datadir=datadir, tiledir=tiledir, valdir=valdir, veglayer='nvc', CDLYear=CDLYear,
-                       buffercells=buffercells, verbose=F, .options=furrr::furrr_options(seed = T))
+                       buffercells=buffercells, verbose=F, nvc_ag=nvc_ag,
+                       .options=furrr::furrr_options(seed = T))
     
     # stop parallel processing
     future::plan(sequential)

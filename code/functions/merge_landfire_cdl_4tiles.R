@@ -1,7 +1,8 @@
 
 merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, 
                                tiles, buffercells, verbose, nvc_ag) {
-    ##### Step 0: Setup and load data
+  
+  ##### Step 0: Setup and load data
   
   # specify allow_classes is a global variable (necessary for futures package to work)
   allow_classes
