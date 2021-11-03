@@ -21,7 +21,7 @@ datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 writetiles <- T
 target_area <- 1000 # desired size (in km2) of each tile
-nvc_ag <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
+nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
 
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
 allstates <- T # run all states within a region. 
@@ -126,7 +126,7 @@ for (stateName in states) {
     # so, we use furrr:walk to generate the files, then read them again
     furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
                        datadir=datadir, tiledir=tiledir, valdir=valdir, veglayer='nvc', CDLYear=CDLYear,
-                       buffercells=buffercells, verbose=F, nvc_ag=nvc_ag,
+                       buffercells=buffercells, verbose=F, nvc_agclasses=nvc_agclasses,
                        .options=furrr::furrr_options(seed = T))
     
     # stop parallel processing

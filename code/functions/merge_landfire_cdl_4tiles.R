@@ -1,6 +1,6 @@
 
 merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, 
-                               tiles, buffercells, verbose, nvc_ag) {
+                               tiles, buffercells, verbose, nvc_agclasses) {
   
   ##### Step 0: Setup and load data
   
@@ -35,7 +35,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   ##### Step 1: Assign pixels that exactly match
   
   # create vectors listing which CDL classes match LANDFIRE wheat, orchard, vineyard, row crop, and close-grown crop
-  if (veglayer == 'nvc') {nvc_ag <- dplyr::filter(vegclasses_key, VALUE %in% nvc_ag) }
+  if (veglayer == 'nvc') {nvc_ag <- dplyr::filter(vegclasses_key, VALUE %in% nvc_agclasses) }
   
   agclass_match <- read.csv(paste0(datadir, '/TabularData/CDL_NVC_AgClassMatch.csv')) %>%
     dplyr::filter(GROUP == 'A') %>%
@@ -113,7 +113,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   # When possible, reassign remaining NVC ag classes by looking at surrounding cells
   temp <- veglayer_copy
   
-  reclass <- data.frame(agveg=nvc_ag, to=NA)
+  reclass <- data.frame(agveg=nvc_agclasses, to=NA)
   temp2 <- terra::classify(temp, rcl=reclass)
 
   #crops <- as.numeric(cdl_classes$VALUE[cdl_classes$GROUP == 'A'])
@@ -147,7 +147,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   
   # generate list of mismatched pixels (for technical validation)
   mismatch_points <- raster::rasterToPoints(raster::raster(output_step1), 
-                                            fun=function(x){x %in% nvc_ag})
+                                            fun=function(x){x %in% nvc_agclasses})
   mismatch_points <- data.frame(mismatch_points)
   
   logger::log_info(paste0('This tile has ', length(mismatch_points[,1]), ' mis-matched cells.'))
