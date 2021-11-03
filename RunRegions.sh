@@ -1,7 +1,7 @@
 #!/bin/bash
 
 year=2017
-tiles=TRUE
+tiles=FALSE
 merge=TRUE
 sbatch --job-name=MergeSoutheast --export=ALL,cdlyear=$year,region='Southeast',mktiles=$tiles,runmerge=$merge RunMerge_in_container_bigmem_bystate.sbatch
 sleep 1s

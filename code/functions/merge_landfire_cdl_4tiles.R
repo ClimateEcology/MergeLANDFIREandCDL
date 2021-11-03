@@ -169,13 +169,11 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
     mismatch_out <- dplyr::mutate(mismatch_points, CDLYear=CDLYear, State=stateName, ncells_tile = ncell$sum)
     
     # save mismatched pixel list as csv
-    tilefile <- paste0(valdir, '/MismatchPixels_', stateName,'_', merged_ext[1], "_", merged_ext[3], ".csv")
+    tilefile <- paste0(valdir, '/MismatchPixels_', stateName,'_CDL', CDLYear, "_", 
+                       merged_ext[1], "_", merged_ext[3], ".csv")
     
-    if (file.exists(tilefile)) {
-      write.csv(mismatch_out, tilefile, row.names = F, append = T)
-    } else {
-      write.csv(mismatch_out, tilefile, row.names = F)
-    }
+    write.csv(mismatch_out, tilefile, row.names = F)
+
   }
   
   if (verbose == T) {
