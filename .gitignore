@@ -13,6 +13,7 @@
 
 # ppt slides
 **/*.pptx
+**/*.xlsx
 
 # raster data folders
 **/data/*
