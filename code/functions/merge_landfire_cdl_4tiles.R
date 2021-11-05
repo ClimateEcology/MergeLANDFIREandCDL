@@ -34,7 +34,8 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   
   ##### Step 1: Assign pixels that exactly match
   
-  # create vectors listing which CDL classes match LANDFIRE wheat, orchard, vineyard, row crop, and close-grown crop
+  # create vectors listing which CDL classes match LANDFIRE groups 
+  # groups are: wheat, orchard, berries, vineyard, row crop, close-grown crop, aquaculture, pasture and hayland, and fallow/idle
   if (veglayer == 'nvc') {nvc_ag <- dplyr::filter(vegclasses_key, VALUE %in% nvc_agclasses) }
   
   agclass_match <- read.csv(paste0(datadir, '/TabularData/CDL_NVC_AgClassMatch.csv')) %>%
@@ -43,22 +44,41 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   
   
   wheat <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern = 'Wheat')| 
-                           grepl(NVC_Match2, pattern= 'Wheat')|
-            grepl(NVC_Match3, pattern= 'Wheat')) %>% dplyr::pull(CLASS_NAME)
+                              grepl(NVC_Match2, pattern= 'Wheat')|
+                              grepl(NVC_Match3, pattern= 'Wheat')) %>% 
+                              dplyr::pull(CLASS_NAME)
   
-  orchard <- dplyr::filter(agclass_match, NVC_Match1 == 'Orchard') %>% dplyr::pull(CLASS_NAME)
+  orchard <- dplyr::filter(agclass_match, NVC_Match1 == 'Orchard') %>% 
+                              dplyr::pull(CLASS_NAME)
   
   berries <- dplyr::filter(agclass_match, NVC_Match1 == "Bush fruit and berries") %>% dplyr::pull(CLASS_NAME)
   
   vineyard <- dplyr::filter(agclass_match, NVC_Match1 == 'Vineyard') %>% dplyr::pull(CLASS_NAME)
   
   row_crop <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Row Crop') | 
-                              grepl(NVC_Match2, pattern= 'Row Crop')) %>%
-    dplyr::pull(CLASS_NAME)
+                             grepl(NVC_Match2, pattern= 'Row Crop') |
+                             grepl(NVC_Match3, pattern= 'Row Crop')) %>%
+                             dplyr::pull(CLASS_NAME)
   
   close_grown_crop <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Close Grown Crop') | 
-                                      grepl(NVC_Match2, pattern= 'Close Grown Crop')) %>%
-    dplyr::pull(CLASS_NAME)
+                             grepl(NVC_Match2, pattern= 'Close Grown Crop') |
+                             grepl(NVC_Match3, pattern= 'Close Grown Crop')) %>%
+                             dplyr::pull(CLASS_NAME)
+  
+  aquaculture <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Aquaculture') | 
+                             grepl(NVC_Match2, pattern= 'Aquaculture') |
+                             grepl(NVC_Match3, pattern= 'Aquaculture')) %>%
+                             dplyr::pull(CLASS_NAME)
+  
+  pasture <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Pasture') | 
+                             grepl(NVC_Match2, pattern= 'Pasture') |
+                             grepl(NVC_Match3, pattern= 'Pasture')) %>%
+                             dplyr::pull(CLASS_NAME)
+  
+  fallow <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Fallow') | 
+                             grepl(NVC_Match2, pattern= 'Fallow') |
+                             grepl(NVC_Match3, pattern= 'Fallow')) %>%
+                             dplyr::pull(CLASS_NAME)
   
   # Load spatial layers (NVC and CDL rasters)
   cdl <- terra::rast(tiles[[1]])
@@ -71,7 +91,8 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   }
   
   
-  habitat_groups <- c('orchard', 'berries', 'vineyard', 'row_crop', 'close_grown_crop', 'wheat')
+  habitat_groups <- c('wheat', 'orchard', 'berries', 'vineyard', 'row_crop', 'close_grown_crop',
+                      'aquaculture', 'pasture', 'fallow')
 
   # For each habitat group, replace LANDFIRE class with CDL pixel class (but only if CDL class matches)
   for (habitat_name in habitat_groups) {
