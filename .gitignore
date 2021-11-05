@@ -19,6 +19,8 @@
 **/data/*
 !data/TabularData
 !data/TechnicalValidation
+!**/NVC_StatePixelFreq.csv
+
 **/Mismatch_ByCell.csv
 **/LANDFIRE_AutoKeyReports/*
 AKReports.zip
