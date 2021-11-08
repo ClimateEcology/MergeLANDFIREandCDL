@@ -69,7 +69,7 @@ VALUE,CLASS_NAME,GROUP,NVC_Match1,NVC_Match2,NVC_Match3,NVC_Classes
 83,Water,O,,,,
 87,Wetlands,N,,,,
 88,Nonag/Undefined,O,,,,
-92,Aquaculture,O,Aquaculture,,,
+92,Aquaculture,A,Aquaculture,,,
 111,Open Water,O,,,,
 112,Perennial Ice/Snow,O,,,,
 121,Developed/Open Space,D,,,,
