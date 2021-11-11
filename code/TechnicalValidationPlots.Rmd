@@ -36,8 +36,6 @@ nvc_per_state <- read.csv('./data/NVC_StatePixelFreq.csv') %>%
   dplyr::select(-geometry) %>%
   dplyr::rename(NCells_Class = NCells)
 
-head(cdl_nvc)
-
 # summarize mis-matched pixels by cdl-nvc pairs & state
 cdl_nvc_bystate <- dplyr::group_by(freq, CDL_Class, CDL_Name, NVC_Class, NVC_Name, CDLYear, State) %>%
   dplyr::summarise(NCells_Mismatch = sum(Mismatch_NCells)) %>%
@@ -54,14 +52,8 @@ cdl_nvc_national_byYear <- dplyr::group_by(cdl_nvc_bystate, CDL_Name, CDL_Class,
   NVC_Name, NVC_Class, NVC_CDL_Named, CDLYear) %>%
   dplyr::summarise(NCells_Mismatch = sum(NCells_Mismatch), NCells_Class = sum(NCells_Class)) %>%
   dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells_Class)*100) %>%
-  dplyr::filter(Pct_Mismatch < 1 & Pct_Mismatch > 0.5)
+  dplyr::filter(NCells_Mismatch > 1000 & Pct_Mismatch > 0.15)
 
-
-
-ggplot(data=cdl_nvc) + geom_bar(aes(x=CDL_Class, y=NCells_Mismatch), stat="identity") +
-  theme_classic(base_size=14) +
-  ylab('Number of mis-matched pixels') +
-  theme(axis.text.x = element_text(angle = 90))
 
 ggplot(data=cdl_nvc_national_byYear) + geom_bar(aes(x=NVC_CDL_Named, y=Pct_Mismatch, fill=NVC_Name), stat="identity") +
   theme_classic(base_size=14) +

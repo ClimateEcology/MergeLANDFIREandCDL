@@ -14,7 +14,7 @@ CDLYear <- args[2] # year of NASS Cropland Data Layer
 regionName <- args[3] # region to process
 mktiles <- args[4]
 runmerge <- args[5]
-
+allstates <- args[6]
 
 intermediate_dir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
 valdir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData' # directory to store validation results (.txt files)
@@ -25,7 +25,7 @@ target_area <- 1000 # desired size (in km2) of each tile
 nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
 
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
-allstates <- T # run all states within a region. 
+allstates <- F # run all states within a region. 
 
 # make list of states to run (either all in shapefile or manually defined)
 if (allstates == T) {
@@ -33,7 +33,7 @@ if (allstates == T) {
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
   states <- regionalextent$STUSPS
 } else {
-  states <- c('OH') # states/region to run
+  states <- c('TX_West', 'TX_East') # states/region to run
 }
 
 
