@@ -25,7 +25,6 @@ target_area <- 1000 # desired size (in km2) of each tile
 nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
 
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
-allstates <- F # run all states within a region. 
 
 # make list of states to run (either all in shapefile or manually defined)
 if (allstates == T) {
