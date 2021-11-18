@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -p bigmem #partition to use
 #SBATCH -N 1 #number of nodes in this job
-#SBATCH --cpus-per-task=10 #number of cpus to use for each task
+#SBATCH --cpus-per-task=4 #number of cpus to use for each task
 #SBATCH -t 72:00:00 #time allocated for this job hours:mins:seconds
 #SBATCH -A geoecoservices  #substitute with the name of your project
 #SBATCH -o "stdout.%j.%N" # standard out %j adds job number to outputfile name and %N adds the node name
