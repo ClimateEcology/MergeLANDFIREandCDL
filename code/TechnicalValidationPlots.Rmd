@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = F)
 ```
 
 ## Plots of technical validation results
@@ -76,7 +76,7 @@ cdl_nvc_national_byYear$CDL_Name_N <- if_else(cdl_nvc_national_byYear$CDL_PctN <
 ```
 
 #Plot nvc group-cdl mismatch over time
-```{r graphs}
+```{r graphs, fig.width=9, fig.height=7}
 # percent mis-match
 cdl_nvc_national_byYear %>%
 ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=Pct_Mismatch, fill=CDL_Name_Pct), 
@@ -117,8 +117,7 @@ ggplot(data=year) + geom_bar(aes(x=CDLYear, y=NCells), stat="identity") +
 
 # region and temperature
 region <- dplyr::group_by(freq, Region, Temperature) %>%
-  dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
-  dplyr::mutate(CDLYear = as.factor(CDLYear))
+  dplyr::summarise(NCells = sum(Mismatch_NCells))
 
 ggplot(data=region) + geom_bar(aes(x=Region, y=NCells, fill=Temperature), stat="identity") +
   theme_classic(base_size=14) +
@@ -126,7 +125,7 @@ ggplot(data=region) + geom_bar(aes(x=Region, y=NCells, fill=Temperature), stat="
 
 ```
 #Plot nvc group-cdl mismatch over space
-```{r map}
+```{r map, fig.width=9, fig.height=7}
 library(ggplot2); library(viridis)
 load('../PollinatorVegetation/data/SpatialData/politicalLL.RDA')
 states1 <- sf::st_read('D:/SpatialData/state_boundaries/cb_2016_us_state_500k.shp') %>%
@@ -149,7 +148,7 @@ toplot <- dplyr::left_join(states_bc, testyear, by=c('STUSPS'='State')) %>%
 
 ##### Total number of mis-matched cells (by state)
 ncells_map <- ggplot() + geom_sf(data=toplot, aes(fill=NCells_Mismatch)) +  
-  guides(fill=guide_legend(title='Number of mis-matched pixels')) +
+  guides(fill=guide_legend(title='Number of \nmis-matched pixels')) +
   theme_classic() + 
   scale_fill_viridis(n.breaks=6) +
   facet_wrap(~CDLYear)
@@ -158,7 +157,7 @@ ncells_map
 
 ##### Percent mis-matched cells (by state)
 pct_map <- ggplot() + geom_sf(data=toplot, aes(fill=Pct_Mismatch)) +  
-  guides(fill=guide_legend(title='Percent mis-matched pixels')) +
+  guides(fill=guide_legend(title='Percent \nmis-matched pixels')) +
   theme_classic() + 
   scale_fill_viridis(n.breaks=6) +
   facet_wrap(~CDLYear)
