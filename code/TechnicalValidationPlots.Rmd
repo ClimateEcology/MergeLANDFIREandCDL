@@ -11,58 +11,100 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Plots of technical validation results
 
-```{r plot_validation}
+```{r tabulate_validation}
 library(dplyr); library(ggplot2)
 
 # read LANDFIRE and CDL keys
 lf_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
 cdl_key <- read.csv('D:/SpatialData/NASS_CDL/NASS_classes_simple.csv')
-states <- sf::st_read('D:/SpatialData/state_boundaries/cb_2016_us_state_500k.shp') 
+states1 <- sf::st_read('D:/SpatialData/state_boundaries/cb_2016_us_state_500k.shp') 
 
 freq <- read.csv('./data/TechnicalValidation/Mismatched_Cells.csv') %>%
   dplyr::select(-X) %>%
   dplyr::left_join(cdl_key, by=c('CDL_Class' = 'VALUE')) %>%
   dplyr::rename(CDL_Name = CLASS_NAME) %>%
-  dplyr::left_join(dplyr::select(lf_key, VALUE, NVC_Name), by=c('NVC_Class' = 'VALUE'))
+  dplyr::left_join(dplyr::select(lf_key, VALUE, NVC_Name), by=c('NVC_Class' = 'VALUE')) %>%
+  tidyr::separate(NVC_Name, sep=" ", into=c("Region", "Temperature", "Biome", "NVC_SpecificClass"), remove=F, extra='merge')
+
+
 #all <- data.table::fread('./data/TechnicalValidation/Mismatch_ByCell.csv') # this file is not updated from Atlas. # it is too large to version control. 
 
-# nvc <- dplyr::group_by(freq, NVC_Class) %>%
-#   dplyr::summarise(NCells = sum(Mismatch_NCells))
 
-# load data on nvc pixels per class per state
+##### load data on # nvc pixels per class per state
 nvc_per_state <- read.csv('./data/NVC_StatePixelFreq.csv') %>%
   dplyr::select(-X) %>%
-  dplyr::left_join(dplyr::select(states, STUSPS, NAME), by = c('State'='NAME')) %>%
+  dplyr::left_join(dplyr::select(states1, STUSPS, NAME), by = c('State'='NAME')) %>%
   dplyr::select(-geometry) %>%
-  dplyr::rename(NCells_Class = NCells)
+  dplyr::rename(NCells_Class = NCells) %>%
+  dplyr::left_join(dplyr::select(lf_key, VALUE, NVC_Name), by= c('NVC_Class'= 'VALUE')) %>% # add landfire class names
+  dplyr::filter(NVC_Class %in% freq$NVC_Class) %>% # filter to only agriculture classes
+  tidyr::separate(NVC_Name, sep=" ", into=c("Region", "Temperature", "Biome", "NVC_SpecificClass"), remove=F, extra='merge') %>% # create grouped NVC name (removes east/west and warm/cool designations)
+  dplyr::group_by(NVC_SpecificClass, State, STUSPS) %>%
+  dplyr::summarise(NCells_Class= sum(NCells_Class)) %>%
+  dplyr::ungroup()
 
-# summarize mis-matched pixels by cdl-nvc pairs & state
-cdl_nvc_bystate <- dplyr::group_by(freq, CDL_Class, CDL_Name, NVC_Class, NVC_Name, CDLYear, State) %>%
+# summarize number of cells in each NVC grouping nationally (exclude region and temperature)
+nvc_national <- dplyr::group_by(nvc_per_state, NVC_SpecificClass) %>%
+    dplyr::summarise(NCells_Class= sum(NCells_Class))
+
+
+##### summarize mis-matched pixels by cdl-nvc pairs & state
+cdl_nvc_bystate <- dplyr::group_by(freq, CDL_Class, CDL_Name, NVC_SpecificClass, CDLYear, State) %>%
   dplyr::summarise(NCells_Mismatch = sum(Mismatch_NCells)) %>%
-  #dplyr::filter(NCells_Mismatch > 9000) %>%
-  dplyr::mutate(CDL_Class = as.factor(CDL_Class), NVC_CDL= paste0(NVC_Class, "_", CDL_Class),
-                NVC_CDL_Named=paste0(NVC_Name, "_", CDL_Name))
-
-# for agricultural classes, add data on nvc pixels per class per state
-cdl_nvc_bystate <- dplyr::left_join(cdl_nvc_bystate, 
-  dplyr::select(nvc_per_state, NVC_Class, NCells_Class, STUSPS), by=c('NVC_Class', 'State'='STUSPS')) %>%
+  dplyr::ungroup() %>%
+  left_join(dplyr::select(nvc_per_state, NVC_SpecificClass, NCells_Class, STUSPS), by=c('NVC_SpecificClass', 'State'='STUSPS')) %>%
+  dplyr::mutate(CDL_Class = as.factor(CDL_Class), NVC_CDL_Named=paste0(NVC_SpecificClass, "_", CDL_Name)) %>%
   dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells_Class)*100)
 
-cdl_nvc_national_byYear <- dplyr::group_by(cdl_nvc_bystate, CDL_Name, CDL_Class, 
-  NVC_Name, NVC_Class, NVC_CDL_Named, CDLYear) %>%
-  dplyr::summarise(NCells_Mismatch = sum(NCells_Mismatch), NCells_Class = sum(NCells_Class)) %>%
-  dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells_Class)*100) %>%
-  dplyr::filter(NCells_Mismatch > 1000 & Pct_Mismatch > 0.15)
+
+##### summarize mis-matched pixels by cdl-nvc pairs for entire country
+cdl_nvc_national_byYear <- dplyr::group_by(freq, CDL_Class, CDL_Name, NVC_SpecificClass, CDLYear) %>%
+  dplyr::summarise(NCells_Mismatch = sum(Mismatch_NCells)) %>%
+  dplyr::ungroup() %>%
+  left_join(nvc_national) %>%
+  dplyr::mutate(CDL_Class = as.factor(CDL_Class), NVC_CDL_Named=paste0(NVC_SpecificClass, "_", CDL_Name)) %>%
+  dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells_Class)*100)
 
 
-ggplot(data=cdl_nvc_national_byYear) + geom_bar(aes(x=NVC_CDL_Named, y=Pct_Mismatch, fill=NVC_Name), stat="identity") +
+cdl_nvc_national_byYear <- dplyr::group_by(cdl_nvc_national_byYear, NVC_SpecificClass, CDLYear) %>%
+  dplyr::mutate(CDL_PctPct = Pct_Mismatch/sum(Pct_Mismatch), CDL_PctN = NCells_Mismatch/sum(NCells_Mismatch))
+
+# make variant of CDL names with fewer classes
+cdl_nvc_national_byYear$CDL_Name_Pct <- if_else(cdl_nvc_national_byYear$CDL_PctPct < 0.1, 'Other', cdl_nvc_national_byYear$CDL_Name)
+
+cdl_nvc_national_byYear$CDL_Name_N <- if_else(cdl_nvc_national_byYear$CDL_PctN < 0.1, 'Other', cdl_nvc_national_byYear$CDL_Name)
+```
+
+#Plot nvc group-cdl mismatch over time
+```{r graphs}
+# percent mis-match
+cdl_nvc_national_byYear %>%
+ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=Pct_Mismatch, fill=CDL_Name_Pct), 
+                    position="stack", stat="identity") +
   theme_classic(base_size=14) +
   ylab('Percent mis-matched pixels') +
-  theme(axis.text.x = element_text(angle = 90)) +
+  xlab('NVC Class (grouped)') +
+  #theme(axis.text.x = element_text(angle = 90)) +
   coord_flip() +
   theme(legend.position="bottom") +
   guides(fill=guide_legend(nrow=4,byrow=TRUE)) +
-  facet_wrap(~CDLYear)
+  facet_wrap(~CDLYear) +
+  scale_fill_manual(values=c("#32964d", "#de0ca3", "#abd533", "#4443b4", "#38f0ac", "#0b5313", "#8dbcf9", "#304866", "#94e4ca", "#871550", "#6cf04d", "#6c3920", "#faa566", "#a51409", "#ebd469", "#5010c8", "#daa7e7", "#738a69", "#fd5925", "#ae56ff", "#5cb206", "#5826a6", "#14c197", "#fd048f", "#8bd0eb", "#20502e", "#09f54c", "#83366b", "#4289c0"), name='CDL Class')
+
+# n mis-matched cells
+cdl_nvc_national_byYear %>%
+ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=NCells_Mismatch, fill=CDL_Name_N), 
+                    position="stack", stat="identity") +
+  theme_classic(base_size=14) +
+  ylab('Number of mis-matched pixels') +
+  xlab('NVC Class (grouped)') +
+  #theme(axis.text.x = element_text(angle = 90)) +
+  coord_flip() +
+  theme(legend.position="bottom") +
+  guides(fill=guide_legend(nrow=4,byrow=TRUE)) +
+  facet_wrap(~CDLYear) +
+  scale_fill_manual(values=c("#32964d", "#de0ca3", "#abd533", "#4443b4", "#38f0ac", "#0b5313", "#8dbcf9", "#304866", "#94e4ca", "#871550", "#6cf04d", "#6c3920", "#faa566", "#a51409", "#ebd469", "#5010c8", "#daa7e7", "#738a69", "#fd5925", "#ae56ff", "#5cb206", "#5826a6", "#14c197", "#fd048f", "#8bd0eb", "#20502e", "#09f54c", "#83366b", "#4289c0"), name='CDL Class')
+
 
 
 year <- dplyr::group_by(freq, CDLYear) %>%
@@ -73,14 +115,53 @@ ggplot(data=year) + geom_bar(aes(x=CDLYear, y=NCells), stat="identity") +
   theme_classic(base_size=14) +
   ylab('Number of mis-matched pixels')
 
+# region and temperature
+region <- dplyr::group_by(freq, Region, Temperature) %>%
+  dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
+  dplyr::mutate(CDLYear = as.factor(CDLYear))
 
-# state <- dplyr::group_by(freq, State) %>%
-#   dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
-#   dplyr::mutate(State = as.factor(State))
-# 
-# ggplot(data=state) + geom_bar(aes(x=State, y=NCells), stat="identity") +
-#   theme_classic(base_size=14) +
-#   ylab('Number of mis-matched pixels')
+ggplot(data=region) + geom_bar(aes(x=Region, y=NCells, fill=Temperature), stat="identity") +
+  theme_classic(base_size=14) +
+  ylab('Number of mis-matched pixels')
 
 ```
+#Plot nvc group-cdl mismatch over space
+```{r map}
+library(ggplot2); library(viridis)
+load('../PollinatorVegetation/data/SpatialData/politicalLL.RDA')
+states1 <- sf::st_read('D:/SpatialData/state_boundaries/cb_2016_us_state_500k.shp') %>%
+  sf::st_drop_geometry()
 
+states_bc <- sf::st_as_sf(states) %>%
+  dplyr::left_join( dplyr::select(states1, STUSPS, NAME), by=c('STATE'='NAME'))
+  
+# combine all nvc-cdl pairings to map total mis-matched cells per state
+testyear <- dplyr::filter(cdl_nvc_bystate) %>%
+  dplyr::group_by(State, CDLYear) %>%
+  dplyr::summarise(NCells_Mismatch = sum(NCells_Mismatch))
+
+nvc_ncells <- dplyr::group_by(nvc_per_state, State, STUSPS) %>%
+  dplyr::summarise(NCells = sum(NCells_Class))
+
+toplot <- dplyr::left_join(states_bc, testyear, by=c('STUSPS'='State')) %>%
+  dplyr::left_join(nvc_ncells) %>%
+  dplyr::mutate(Pct_Mismatch = NCells_Mismatch/NCells)
+
+##### Total number of mis-matched cells (by state)
+ncells_map <- ggplot() + geom_sf(data=toplot, aes(fill=NCells_Mismatch)) +  
+  guides(fill=guide_legend(title='Number of mis-matched pixels')) +
+  theme_classic() + 
+  scale_fill_viridis(n.breaks=6) +
+  facet_wrap(~CDLYear)
+ncells_map
+
+
+##### Percent mis-matched cells (by state)
+pct_map <- ggplot() + geom_sf(data=toplot, aes(fill=Pct_Mismatch)) +  
+  guides(fill=guide_legend(title='Percent mis-matched pixels')) +
+  theme_classic() + 
+  scale_fill_viridis(n.breaks=6) +
+  facet_wrap(~CDLYear)
+pct_map
+
+```
