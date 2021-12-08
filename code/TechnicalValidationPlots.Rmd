@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = F)
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
 ```
 
 ## Plots of technical validation results
@@ -75,8 +75,8 @@ cdl_nvc_national_byYear$CDL_Name_Pct <- if_else(cdl_nvc_national_byYear$CDL_PctP
 cdl_nvc_national_byYear$CDL_Name_N <- if_else(cdl_nvc_national_byYear$CDL_PctN < 0.1, 'Other', cdl_nvc_national_byYear$CDL_Name)
 ```
 
-#Plot nvc group-cdl mismatch over time
-```{r graphs, fig.width=9, fig.height=7}
+## Plot nvc group-cdl mismatch over time
+```{r graphs, fig.width=10, fig.height=8}
 # percent mis-match
 cdl_nvc_national_byYear %>%
 ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=Pct_Mismatch, fill=CDL_Name_Pct), 
@@ -87,7 +87,7 @@ ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=Pct_Mismatch, fill=CDL_Name_Pct),
   #theme(axis.text.x = element_text(angle = 90)) +
   coord_flip() +
   theme(legend.position="bottom") +
-  guides(fill=guide_legend(nrow=4,byrow=TRUE)) +
+  guides(fill=guide_legend(nrow=7,byrow=TRUE)) +
   facet_wrap(~CDLYear) +
   scale_fill_manual(values=c("#32964d", "#de0ca3", "#abd533", "#4443b4", "#38f0ac", "#0b5313", "#8dbcf9", "#304866", "#94e4ca", "#871550", "#6cf04d", "#6c3920", "#faa566", "#a51409", "#ebd469", "#5010c8", "#daa7e7", "#738a69", "#fd5925", "#ae56ff", "#5cb206", "#5826a6", "#14c197", "#fd048f", "#8bd0eb", "#20502e", "#09f54c", "#83366b", "#4289c0"), name='CDL Class')
 
@@ -101,9 +101,12 @@ ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=NCells_Mismatch, fill=CDL_Name_N)
   #theme(axis.text.x = element_text(angle = 90)) +
   coord_flip() +
   theme(legend.position="bottom") +
-  guides(fill=guide_legend(nrow=4,byrow=TRUE)) +
+  guides(fill=guide_legend(nrow=7,byrow=TRUE)) +
   facet_wrap(~CDLYear) +
   scale_fill_manual(values=c("#32964d", "#de0ca3", "#abd533", "#4443b4", "#38f0ac", "#0b5313", "#8dbcf9", "#304866", "#94e4ca", "#871550", "#6cf04d", "#6c3920", "#faa566", "#a51409", "#ebd469", "#5010c8", "#daa7e7", "#738a69", "#fd5925", "#ae56ff", "#5cb206", "#5826a6", "#14c197", "#fd048f", "#8bd0eb", "#20502e", "#09f54c", "#83366b", "#4289c0"), name='CDL Class')
+```
+
+```{r graphs2, fig.width=4, fig.height=4}
 
 
 
@@ -124,8 +127,9 @@ ggplot(data=region) + geom_bar(aes(x=Region, y=NCells, fill=Temperature), stat="
   ylab('Number of mis-matched pixels')
 
 ```
-#Plot nvc group-cdl mismatch over space
-```{r map, fig.width=9, fig.height=7}
+
+## Plot nvc group-cdl mismatch over space
+```{r map, fig.width=10, fig.height=8}
 library(ggplot2); library(viridis)
 load('../PollinatorVegetation/data/SpatialData/politicalLL.RDA')
 states1 <- sf::st_read('D:/SpatialData/state_boundaries/cb_2016_us_state_500k.shp') %>%
