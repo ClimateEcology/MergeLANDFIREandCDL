@@ -13,5 +13,3 @@ export OPENBLAS_NUM_THREADS=1
 module load singularity
 singularity exec geospatial_extend_latest.sif Rscript code/RunMergeLANDFIREandCDL_byState.R\
  --args ${cdlyear} ${region} ${mktiles} ${runmerge} ${allstates}
-
-
