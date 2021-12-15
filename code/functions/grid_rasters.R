@@ -37,10 +37,11 @@ grid_rasters <- function(rasterpath, rasterID,
   library(logger)
   logger::log_threshold(DEBUG)
 
-  # is 90daydata directory in the current wd?
-  ninetypresent <- any(grepl(list.files(getwd()), pattern = '90daydata'))
+  upthree <- dirname(dirname(dirname(getwd())))
   
-  logger::log_info(paste0('90day data present in working directory = ', ninetypresent))
+  logger::log_info(paste0("Three directories above wd is: ", upthree))
+  logger::log_info(paste0("Tile directory to create is: ", tiledir))
+  
   # create directories for output files if they don't already exist
   if (!dir.exists(tiledir)) {
     dir.create(tiledir, recursive=F)
