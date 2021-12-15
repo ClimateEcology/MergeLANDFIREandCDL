@@ -10,7 +10,7 @@
 #SBATCH --mail-type=BEGIN,END,FAIL #will receive an email when job starts, ends or fails
 
 export OPENBLAS_NUM_THREADS=1
-module load singularity
+module load singularity/3.5.2
 singularity exec geospatial_extend_latest.sif Rscript code/RunMergeLANDFIREandCDL_byState.R\
  --args ${cdlyear} ${region} ${mktiles} ${runmerge} ${allstates}
 
