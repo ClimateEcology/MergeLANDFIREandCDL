@@ -16,8 +16,8 @@ mktiles <- args[4]
 runmerge <- args[5]
 allstates <- args[6]
 
-intermediate_dir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
-valdir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData' # directory to store validation results (.txt files)
+intermediate_dir <- './90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
+valdir <- './90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData' # directory to store validation results (.txt files)
 datadir <- './data' # directory where tabular and spatial data are stored
 buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x and y directions)
 writetiles <- T

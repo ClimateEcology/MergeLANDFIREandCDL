@@ -37,7 +37,7 @@ grid_rasters <- function(rasterpath, rasterID,
   library(logger)
   logger::log_threshold(DEBUG)
 
-  logger::log_info(paste0('Working directory right now is: ', getwd()))
+  logger::log_info(list.files(getwd()))
   
   # create directories for output files if they don't already exist
   if (!dir.exists(tiledir)) {
