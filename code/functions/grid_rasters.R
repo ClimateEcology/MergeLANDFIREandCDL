@@ -40,6 +40,11 @@ grid_rasters <- function(rasterpath, rasterID,
   upthree <- dirname(dirname(dirname(getwd())))
   
   logger::log_info(paste0("Three directories above wd is: ", upthree))
+  
+  # is 90 day data in upthree?
+  ninetypresent <- any(grepl(list.files(upthree), pattern='90daydata')) 
+  logger::log_info(paste0("90dadata present in upthree: ", ninetypresent))
+  
   logger::log_info(paste0("Tile directory to create is: ", tiledir))
   
   # create directories for output files if they don't already exist
