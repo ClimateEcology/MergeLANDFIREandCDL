@@ -69,6 +69,13 @@ grid_rasters <- function(rasterpath, rasterID,
       terra::vect()
   }
 
+  if (!dir.exists(tiledir)) {
+    stop("Tile directory was not created. What's going on???")
+  }
+  
+  if (!dir.exists(paste0(tiledir, "/", rasterID[2])) | !dir.exists(paste0(tiledir, "/", rasterID[1])) ) {
+    stop("Tile sub-directories were not created. What's going on???")
+  }
   ######################################################################################################
   ##### Part 2: Crop national rasters to regional extent
 
