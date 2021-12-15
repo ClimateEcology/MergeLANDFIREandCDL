@@ -40,6 +40,10 @@ if (allstates == T) {
 
 for (stateName in states) {
   
+  if (stateName %in% c('TX_East', 'TX_West')) {
+    target_area <- 8000
+  }
+  
   logger::log_info(paste0('Starting ', stateName, '.'))
   logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), " B."))
   
