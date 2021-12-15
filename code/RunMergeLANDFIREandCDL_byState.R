@@ -41,7 +41,7 @@ if (allstates == T) {
 for (stateName in states) {
   
   if (stateName %in% c('TX_East', 'TX_West')) {
-    target_area <- 8000
+    target_area <- 4000
   }
   
   logger::log_info(paste0('Starting ', stateName, '.'))
