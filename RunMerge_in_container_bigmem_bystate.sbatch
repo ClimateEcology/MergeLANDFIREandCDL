@@ -2,7 +2,7 @@
 #SBATCH -p bigmem #partition to use
 #SBATCH -N 1 #number of nodes in this job
 #SBATCH --cpus-per-task=20 #number of cpus to use for each task
-#SBATCH --mem=1535GB #request all memory on a node
+#SBATCH --mem=1500GB #request all memory on a node
 #SBATCH --exclusive #request exclusive access to a node
 #SBATCH -t 72:00:00 #time allocated for this job hours:mins:seconds
 #SBATCH -A geoecoservices  #substitute with the name of your project
