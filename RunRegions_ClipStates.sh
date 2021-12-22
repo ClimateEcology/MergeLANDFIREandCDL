@@ -4,9 +4,9 @@ clipstates=TRUE
 allstates=TRUE
 
 year=2017
-#sbatch --job-name=ClipSoutheast --export=ALL,cdlyear=$year,region='Southeast',\
-#clipstates=$clipstates,allstates=$allstates ClipStateRaster_bigmem.sbatch
-#sleep 1s
+sbatch --job-name=ClipSoutheast --export=ALL,cdlyear=$year,region='Southeast',\
+clipstates=$clipstates,allstates=$allstates ClipStateRaster_bigmem.sbatch
+sleep 1s
 
 sbatch --job-name=ClipNortheast --export=ALL,cdlyear=$year,region='Northeast',\
 clipstates=$clipstates,allstates=$allstates ClipStateRaster_bigmem.sbatch
