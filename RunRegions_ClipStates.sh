@@ -16,5 +16,5 @@ sbatch --job-name=ClipMidwest --export=ALL,cdlyear=$year,region='Midwest',\
 clipstates=$clipstates,allstates=$allstates ClipStateRaster_bigmem.sbatch
 sleep 1s
 
-sbatch --job-name=CLipWest --export=ALL,cdlyear=$year,region='West',\
+sbatch --job-name=ClipWest --export=ALL,cdlyear=$year,region='West',\
 clipstates=$clipstates,allstates=$allstates ClipStateRaster_bigmem.sbatch

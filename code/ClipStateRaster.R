@@ -56,14 +56,11 @@ if (clipstates == TRUE) {
     this_state <- dplyr::filter(us_state_bounds, STATE_FIPS %in% regionalextent$GEOID[regionalextent$STUSPS == stateName])
     }
        
-    
     # make list of state's finished rasters
     files_toread <- list.files(tiledir, full.names=T)
     files_toread <- as.list(files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
     grepl(files_toread, pattern = paste0("CDL", CDLYear))])
     
-    logger::log_info(paste0(files_toread, collapse=","))
-
     for (i in 1:length(files_toread)) {
     
         fname <- gsub(basename(files_toread[[i]]), pattern="_FinalRasterCompress", replacement = "")
