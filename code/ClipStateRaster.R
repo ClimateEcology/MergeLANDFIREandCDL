@@ -1,4 +1,4 @@
-library(terra); library(dplyr)
+library(terra); library(dplyr); library(logger)
 
 args <- commandArgs(trailingOnly = T)
 
@@ -46,6 +46,7 @@ if (clipstates == TRUE) {
       stateName <- substr(basename(tiledir), start=1, stop=2)
     }
     
+      logger::log_info(paste0('Starting clip for ', stateName))
     # filter shapefile to one state
     # for DC, use regional extent as state boundary (not 'better coasts' file bc it does not have a polygon for DC)
     if (stateName == 'DC') {
