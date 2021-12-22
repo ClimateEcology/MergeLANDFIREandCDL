@@ -11,7 +11,7 @@ allstates <- args[5]
 if (clipstates == TRUE) {
   
   # specify input parameters
-  intermediate_dir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
+  intermediate_dir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
   datadir <- './data' # directory where tabular and spatial data are stored
   compress <- T # compress output rasters
   
