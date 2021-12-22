@@ -34,7 +34,7 @@ if (clipstates == TRUE) {
   
   # narrow down to directories that have tiles (pattern = stateNameTiles_ntiles) & are in specified region
   alltiledirs <- alltiledirs[grepl(alltiledirs, pattern = paste0(states, 'Tiles', collapse="|"))]
-  logger::log_info(paste0("First directory to process: ", alltiledirs[[1]]))
+  logger::log_info(paste0("First directory to process: ", alltiledirs[1]))
 
   for (tiledir in alltiledirs) {
     
