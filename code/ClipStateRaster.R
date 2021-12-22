@@ -54,41 +54,38 @@ if (clipstates == TRUE) {
     # filter shapefile to one state
     this_state <- dplyr::filter(us_state_bounds, STATE_FIPS %in% regionalextent$GEOID[regionalextent$STUSPS == stateName])
     }
-
-    for (onedir in tiledir) {
-      
-      # make list of state's finished rasters
-      files_toread <- list.files(onedir, full.names=T)
-      files_toread <- as.list(files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
-      grepl(dirs_toread, pattern = paste0("CDL", CDLYear))])
-      
-      for (i in 1:length(files_toread)) {
-        
+ 
+    # make list of state's finished rasters
+    files_toread <- list.files(tiledir, full.names=T)
+    files_toread <- as.list(files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
+    grepl(files_toread, pattern = paste0("CDL", CDLYear))])
+    
+    for (i in 1:length(files_toread)) {
+    
         fname <- gsub(basename(files_toread[[i]]), pattern="_FinalRasterCompress", replacement = "")
-        outpath <- paste0(intermediate_dir, '/StateRasters/', CDLYear, "/", stateName, "_", fname)
+        outpath <- paste0(intermediate_dir, '/StateRasters/', CDLYear, "/", fname)
         
         # create output directory if it doesn't already exist
         if (!dir.exists(paste0(intermediate_dir, '/StateRasters/', CDLYear))) {
-          dir.create(paste0(intermediate_dir, '/StateRasters/', CDLYear))
+            dir.create(paste0(intermediate_dir, '/StateRasters/', CDLYear))
         }
         
         state <- terra::rast(files_toread[[i]])
         
         if (!'SpatVector' %in% class(this_state)) {
         this_state <- sf::st_transform(this_state, crs=terra::crs(state)) %>% 
-          terra::vect()
+            terra::vect()
         }
         
         if (compress == T) {
         state_clipped <- terra::crop(state, this_state) %>%
-          terra::mask(this_state, filename=outpath, wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3")), overwrite=T)
+            terra::mask(this_state, filename=outpath, wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3")), overwrite=T)
         
         } else {
-          state_clipped <- terra::crop(state, this_state) %>%
+            state_clipped <- terra::crop(state, this_state) %>%
             terra::mask(this_state, filename=outpath, overwrite=T)
         }
         
-      }
     }
   }
 }
