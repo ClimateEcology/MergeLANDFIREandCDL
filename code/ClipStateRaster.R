@@ -68,7 +68,7 @@ if (clipstates == TRUE) {
         
         # create output directory if it doesn't already exist
         if (!dir.exists(paste0(intermediate_dir, '/StateRasters/', CDLYear))) {
-            dir.create(paste0(intermediate_dir, '/StateRasters/', CDLYear))
+            dir.create(paste0(intermediate_dir, '/StateRasters/', CDLYear), recursive=T)
         }
         
         state <- terra::rast(files_toread[[i]])
