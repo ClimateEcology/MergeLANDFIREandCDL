@@ -31,11 +31,9 @@ if (clipstates == TRUE) {
   
   # save vector of tile directories
   alltiledirs <- list.dirs(intermediate_dir, recursive = F)
-  logger::log_info(paste0(alltiledirs, collapse="|"))
 
   # narrow down to directories that have tiles (pattern = stateNameTiles_ntiles) & are in specified region
   alltiledirs <- alltiledirs[grepl(alltiledirs, pattern = paste0(states, 'Tiles', collapse="|"))]
-  logger::log_info(paste0(alltiledirs, collapse="|"))
 
   for (tiledir in alltiledirs) {
     
