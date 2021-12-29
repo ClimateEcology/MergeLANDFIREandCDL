@@ -9,7 +9,7 @@ Modified from code by: Dan Ellis 2020
 
 '''
 import os,sys,json,time
-import google_keys * # py file defining 'client_id' and 'client_secret', do not version control!
+import google_keys # py file defining 'client_id' and 'client_secret', do not version control!
 
 startTime = time.time()
 
