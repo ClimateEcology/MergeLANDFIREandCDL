@@ -4,7 +4,9 @@
 A quick python script to automate curl->googledrive interfacing
 This should require nothing more than the system python version and curl. Written for python2.7 (with 3 in mind).
 
+# original tutorial URL: https://towardsdatascience.com/uploading-files-to-google-drive-directly-from-the-terminal-using-curl-2b89db28bb06
 Modified from code by: Dan Ellis 2020
+
 '''
 import os,sys,json,time
 import google_keys * # py file defining 'client_id' and 'client_secret', do not version control!
