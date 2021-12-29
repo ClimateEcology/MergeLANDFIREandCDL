@@ -20,7 +20,7 @@
 !data/TabularData
 !data/TechnicalValidation
 !**/NVC_StatePixelFreq.csv
-**/google_keys.py
+**/google_keys*
 
 **/Mismatch_ByCell.csv
 **/LANDFIRE_AutoKeyReports/*
