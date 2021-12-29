@@ -4,7 +4,7 @@ tiles=TRUE
 merge=TRUE
 allstates=TRUE
 
-year=2012
+year=2013
 sbatch --job-name=MergeSoutheast --export=ALL,cdlyear=$year,region='Southeast',\
 mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 sleep 1s
