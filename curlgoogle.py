@@ -19,7 +19,7 @@ if sys.version[0]=='3':
 ##############################
 #Owner information goes here!#
 ##############################
-name = '2017MergeCDLLANDFIRE'
+name = '../../../../90daydata/geoecoservices/MergeLANDFIREandCDL/StateRasters/2017MergeCDLLANDFIRE'
 
 ##############################
 # zip files (or do this before running this script)
