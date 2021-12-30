@@ -3,8 +3,7 @@
 clipstates=TRUE
 allstates=TRUE
 
-#year=2020
-for year in 2012 2016 2017 2018 2019 2020
+for year in 2013 2014 2015
 do
 sbatch --job-name=ClipSoutheast --export=ALL,cdlyear=$year,region='Southeast',\
 clipstates=$clipstates,allstates=$allstates ClipStateRaster_bigmem.sbatch
