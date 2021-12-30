@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name="CalcPatchSize" #name of the job submitted
+#SBATCH --job-name="TechnicalValidation" #name of the job submitted
 #SBATCH -p bigmem #partition to use
 #SBATCH -N 1 #number of nodes in this job
 #SBATCH --cpus-per-task=24 #number of cpus to use for each task
@@ -12,6 +12,6 @@
 
 export OPENBLAS_NUM_THREADS=1
 module load singularity/3.5.2
-singularity exec geospatial_extend_latest.sif Rscript code/RegionalPatchSize.R
+singularity exec --bind /90daydata:/90daydata geospatial_extend_latest.sif Rscript code/TechnicalValidation.R
 
 
