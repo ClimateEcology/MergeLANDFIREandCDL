@@ -56,18 +56,18 @@ for (regionName in c('Northeast', 'Southeast', 'Midwest', 'West')) {
     # download shapefile of US states
     region <- dplyr::filter(national, NAME %in% states) # filter to only selected states
     
-    sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), append=F)
+    sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), delete_dsn=T, append=F)
     
   } else if (bystate == T & wholecountry == T) {
     # download shapefile of US states
     region <- national
-    sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), append=F)
+    sf::st_write(region, paste0('./data/SpatialData/', regionName, '.shp'), delete_dsn=T, append=F)
     
   } else if (bystate == F) {
     # download shapefile of US states
     region <- dplyr::filter(national, NAME %in% states) %>% # filter to only selected states
       sf::st_union()  
     
-    sf::st_write(region, paste0('./data/SpatialData/', regionName, '_OnePoly.shp'), append=F)
+    sf::st_write(region, paste0('./data/SpatialData/', regionName, '_OnePoly.shp'), delete_dsn=T, append=F)
   }
 }
