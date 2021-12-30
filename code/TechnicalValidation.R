@@ -1,7 +1,7 @@
 # technical validation looking at the distribution of mis-matched pixels in merge CDL and LANDFIRE workflow
 library(dplyr)
 
-valdir <- '../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
+valdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
 
 tiles <- list.files(valdir, full.names = T)
 increment <- 50
