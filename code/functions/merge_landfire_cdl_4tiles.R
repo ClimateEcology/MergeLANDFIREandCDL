@@ -207,7 +207,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   }
   
   terra::writeRaster(nvc_gapsfilled, 
-    paste0(tiledir, "/MergedCDL", toupper(veglayer), "/", 
+    paste0(tiledir, "/MergedCDL", toupper(veglayer), "/", ID, "_",
            merged_ext[1], "_", merged_ext[3], ".tif"), overwrite=T)
   
   return(nvc_gapsfilled)

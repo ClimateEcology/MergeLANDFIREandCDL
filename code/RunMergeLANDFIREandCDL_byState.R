@@ -32,7 +32,17 @@ if (allstates == T) {
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
   states <- regionalextent$STUSPS
 } else {
-  states <- c('KS') # states/region to run
+  if (regionName == 'Midwest') {
+    states <- c('KS') # states/region to run
+  } else if (regionName == 'Northeast') {
+    states <- c('NY')
+  } else if (regionName == 'West') {
+    states <- c('WA')
+  } else if (region == 'Southeast') {
+    states <- c('TX_West')
+  } else {
+    stop("State is not in specified region.")
+  }
 }
 
 
@@ -81,7 +91,7 @@ for (stateName in states) {
   tiledir <- paste0(intermediate_dir, "/", stateName, "Tiles_", ntiles)
   nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
   cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
-  
+  ID <- paste0(stateName, '_CDL', CDLYear,'NVC')
   
   # read in class tables necessary in part 2
   cdl_classes <- read.csv(paste0(datadir, '/TabularData/NASS_classes_simple.csv')) %>% 
@@ -130,7 +140,7 @@ for (stateName in states) {
     # so, we use furrr:walk to generate the files, then read them again
     furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
                        datadir=datadir, tiledir=tiledir, valdir=valdir, veglayer='nvc', CDLYear=CDLYear,
-                       buffercells=buffercells, verbose=F, nvc_agclasses=nvc_agclasses,
+                       buffercells=buffercells, verbose=F, nvc_agclasses=nvc_agclasses, ID=ID,
                        .options=furrr::furrr_options(seed = T))
     
     # stop parallel processing
@@ -147,9 +157,6 @@ for (stateName in states) {
   # it is faster to mosaic in chunks, then mosaic the bigger pieces together
   # here I split into vectors of 30 tiles each, stitch these together into 'mega-tiles' then mosaic all the mega-tiles together.
   # read in tiles created by furrr
-  
-
-  ID <- paste0(stateName, '_CDL', CDLYear,'NVC')
   
   # run function to mosaic tile into one larger
   mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=40, chunksize2=5, ID=ID, outdir=tiledir)

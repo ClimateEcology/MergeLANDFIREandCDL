@@ -1,4 +1,4 @@
-mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress=T) {
+mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress=T, ID=NA) {
   
   library(terra)
   
@@ -11,6 +11,11 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
   
   if (!is.na(season)) {
     tile_paths <- tile_paths[grepl(tile_paths, pattern=season)]
+  }
+  
+  # filter to correct year of CDL (or other ID variable, as necessary)
+  if (!is.na(ID)) {
+    tile_paths <- tile_paths[grepl(tile_paths, pattern=ID)]
   }
   
   if (length(tile_paths) > 1) {
