@@ -76,7 +76,11 @@ cdl_nvc_national_byYear$CDL_Name_N <- if_else(cdl_nvc_national_byYear$CDL_PctN <
 ```
 
 ## Plot nvc group-cdl mismatch over time
-```{r graphs, fig.width=10, fig.height=8}
+```{r graphs, fig.width=10, fig.height=9}
+# colors
+
+cols <- c("#52ef99", "#83366b", "#7ed4d8", "#2c457d", "#63e118", "#621da6", "#bbe272", "#ef66f0", "#155126", "#ff6b97", "#2f937a", "#f24219", "#709f0f", "#1288da", "#e9b7e3", "#8270f6", "#f8d147", "#783019", "#fd8f2f", "#4f462f", "#BEBEBE", "#808080", "#151515")
+
 # percent mis-match
 cdl_nvc_national_byYear %>%
 ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=Pct_Mismatch, fill=CDL_Name_Pct), 
@@ -87,9 +91,9 @@ ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=Pct_Mismatch, fill=CDL_Name_Pct),
   #theme(axis.text.x = element_text(angle = 90)) +
   coord_flip() +
   theme(legend.position="bottom") +
-  guides(fill=guide_legend(nrow=7,byrow=TRUE)) +
+  guides(fill=guide_legend(nrow=8,byrow=TRUE)) +
   facet_wrap(~CDLYear) +
-  scale_fill_manual(values=c("#32964d", "#de0ca3", "#abd533", "#4443b4", "#38f0ac", "#0b5313", "#8dbcf9", "#304866", "#94e4ca", "#871550", "#6cf04d", "#6c3920", "#faa566", "#a51409", "#ebd469", "#5010c8", "#daa7e7", "#738a69", "#fd5925", "#ae56ff", "#5cb206", "#5826a6", "#14c197", "#fd048f", "#8bd0eb", "#20502e", "#09f54c", "#83366b", "#4289c0"), name='CDL Class')
+  scale_fill_manual(values= cols, name='CDL Class')
 
 # n mis-matched cells
 cdl_nvc_national_byYear %>%
@@ -101,14 +105,12 @@ ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=NCells_Mismatch, fill=CDL_Name_N)
   #theme(axis.text.x = element_text(angle = 90)) +
   coord_flip() +
   theme(legend.position="bottom") +
-  guides(fill=guide_legend(nrow=7,byrow=TRUE)) +
+  guides(fill=guide_legend(nrow=8,byrow=TRUE)) +
   facet_wrap(~CDLYear) +
-  scale_fill_manual(values=c("#32964d", "#de0ca3", "#abd533", "#4443b4", "#38f0ac", "#0b5313", "#8dbcf9", "#304866", "#94e4ca", "#871550", "#6cf04d", "#6c3920", "#faa566", "#a51409", "#ebd469", "#5010c8", "#daa7e7", "#738a69", "#fd5925", "#ae56ff", "#5cb206", "#5826a6", "#14c197", "#fd048f", "#8bd0eb", "#20502e", "#09f54c", "#83366b", "#4289c0"), name='CDL Class')
+  scale_fill_manual(values=cols, name='CDL Class')
 ```
 
-```{r graphs2, fig.width=4, fig.height=4}
-
-
+```{r graphs2, fig.width=5.5, fig.height=4}
 
 year <- dplyr::group_by(freq, CDLYear) %>%
   dplyr::summarise(NCells = sum(Mismatch_NCells)) %>%
@@ -129,7 +131,7 @@ ggplot(data=region) + geom_bar(aes(x=Region, y=NCells, fill=Temperature), stat="
 ```
 
 ## Plot nvc group-cdl mismatch over space
-```{r map, fig.width=10, fig.height=8}
+```{r map, fig.width=12, fig.height=7}
 library(ggplot2); library(viridis)
 load('../PollinatorVegetation/data/SpatialData/politicalLL.RDA')
 states1 <- sf::st_read('D:/SpatialData/state_boundaries/cb_2016_us_state_500k.shp') %>%
@@ -159,12 +161,81 @@ ncells_map <- ggplot() + geom_sf(data=toplot, aes(fill=NCells_Mismatch)) +
 ncells_map
 
 
+#toplot$Pct_Mismatch <- toplot$Pct_Mismatch*100
+
 ##### Percent mis-matched cells (by state)
+library(classInt)
+
+min = min(toplot$Pct_Mismatch)
+max = max(toplot$Pct_Mismatch)
+diff <- max - min
+std = sd(toplot$Pct_Mismatch)
+
+equal.interval = seq(min, max, by = diff/8)
+quantile.interval = quantile(toplot$Pct_Mismatch, probs=seq(0, 1, by = 1/6))
+std.interval = c(seq(min, max, by=std), max)
+natural.interval = classIntervals(toplot$Pct_Mismatch, n = 6, style = 'jenks')$brks
+
+toplot$population.equal = cut(toplot$Pct_Mismatch, breaks=equal.interval, include.lowest = TRUE)
+toplot$population.quantile = cut(toplot$Pct_Mismatch, breaks=quantile.interval, include.lowest = TRUE)
+toplot$population.std = cut(toplot$Pct_Mismatch, breaks=std.interval, include.lowest = TRUE)
+toplot$population.natural = cut(toplot$Pct_Mismatch, breaks=natural.interval, include.lowest = TRUE)
+
 pct_map <- ggplot() + geom_sf(data=toplot, aes(fill=Pct_Mismatch)) +  
-  guides(fill=guide_legend(title='Percent \nmis-matched pixels')) +
+  guides(fill=guide_legend(title='Percent mis-matched \npixels')) +
   theme_classic() + 
   scale_fill_viridis(n.breaks=6) +
   facet_wrap(~CDLYear)
 pct_map
 
+pct_map_equal <- ggplot() + geom_sf(data=toplot, aes(fill=population.equal)) +  
+  guides(fill=guide_legend(title='Percent mis-matched \npixels')) +
+  theme_classic() + 
+  scale_fill_viridis(discrete=T) +
+  facet_wrap(~CDLYear)
+pct_map_equal
+
+pct_map_quan <- ggplot() + geom_sf(data=toplot, aes(fill=population.quantile)) +  
+  guides(fill=guide_legend(title='Percent mis-matched \npixels')) +
+  theme_classic() + 
+  scale_fill_viridis(discrete=T) +
+  facet_wrap(~CDLYear)
+pct_map_quan
+
+pct_map_std <- ggplot() + geom_sf(data=toplot, aes(fill=population.std)) +  
+  guides(fill=guide_legend(title='Percent mis-matched \npixels')) +
+  theme_classic() + 
+  scale_fill_viridis(discrete=T) +
+  facet_wrap(~CDLYear)
+pct_map_std
+
+pct_map_jenks <- ggplot() + geom_sf(data=toplot, aes(fill=population.natural)) +  
+  guides(fill=guide_legend(title='Percent mis-matched \npixels')) +
+  theme_classic() + 
+  scale_fill_viridis(discrete=T) +
+  facet_wrap(~CDLYear)
+pct_map_jenks
+
+```
+```{r hist, fig.width=8, fig.height=7}
+
+eq_hist <- ggplot(toplot, aes(x=Pct_Mismatch))  + geom_histogram(bins=40) + geom_vline(xintercept=equal.interval, col='blue') +
+  theme_classic(base_size = 14) +
+  ggtitle('Equal-interval breaks')
+
+quan_hist <- ggplot(toplot, aes(x=Pct_Mismatch))  + geom_histogram(bins=40) + geom_vline(xintercept=quantile.interval, col='blue') +
+  theme_classic(base_size = 14) +
+  ggtitle('Quantile breaks')
+
+std_hist <- ggplot(toplot, aes(x=Pct_Mismatch))  + geom_histogram(bins=40) + geom_vline(xintercept=std.interval, col='blue') +
+  theme_classic(base_size = 14) +
+  ggtitle('Standard deviation breaks')
+
+jenks_hist <- ggplot(toplot, aes(x=Pct_Mismatch))  + geom_histogram(bins=40) + geom_vline(xintercept=natural.interval, col='blue') +
+  theme_classic(base_size = 14) +
+  ggtitle('Jenks natural breaks')
+
+library(gridExtra)
+
+grid.arrange(eq_hist, quan_hist, std_hist, jenks_hist, ncol=2)
 ```

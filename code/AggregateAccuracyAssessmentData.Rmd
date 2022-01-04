@@ -1,0 +1,204 @@
+---
+title: "NVC Error Assessment"
+author: "Melanie Kammerer"
+date: "1/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Objective
+The goal of this script is to summarize LANDFIRE assessment of NVC accuracy. LANDFIRE defines accuracy as agreement between vegetation class assigned to a 
+field plot and the raster layer value at that location. For each lifeform (forest, shrub, herbaceous), the LANDFIRE team generated raster layers of vegetation (EVT and NVC) using CART methods with input layers of soils, topography, weather, and LANDSAT spectral indices (see [Zhu et al 2006](https://www.fs.fed.us/rm/pubs/rmrs_gtr175/rmrs_gtr175_197_215.pdf) for original method and [Picotte et al 2019](https://www.mdpi.com/2571-6255/2/2/35/htm) for ReMap methods).
+
+```{r loadfiles}
+library(dplyr); library(readxl)
+
+toread <- list.files('./data/LANDFIRE_Accuracy/CSV_AccuracyData/', full.names = T)
+
+for (i in toread) {
+  region <- read.csv(i) %>%
+    dplyr::mutate(Row.Total..pixels. = as.integer(Row.Total..pixels.),
+                  Region = substr(basename(i), start=1, stop=2))
+  
+  if ('NVC.Map.Value' %in% names(region)) {
+    region <- dplyr::mutate(region, NVC.Value = as.factor(NVC.Map.Value)) %>%
+      dplyr::select(-NVC.Map.Value)
+  }
+  
+    if ('NVC.Value' %in% names(region)) {
+    region <- dplyr::mutate(region, NVC.Value = as.factor(NVC.Value))
+  }
+  
+  if (i == toread[1]) {
+    all <- region
+  } else {
+    all <- full_join(all, region)
+  }
+}
+
+names(all) <- gsub(names(all), pattern=".", replacement = "_", fixed = T)
+
+all <- dplyr::rename(all, Pct_Row_Pixels = X__of_Row_Pixels, Row_Total_Pixels= Row_Total__pixels_)
+```
+
+```{r readcdl}
+for (year in 2012:2020) {
+    
+  if (year < 2018) {
+    files <- list.files(paste0('./data/CDL_Accuracy/CDL_', year, '_accuracy_assessments/CDL_', year,
+    '_accuracy_assessments/'), full.names = T)
+  } else if (year %in% c(2018, 2019, 2020)) {
+      files <- list.files(paste0('./data/CDL_Accuracy/CDL_', year, '_accuracy_assessments/'), full.names = T)
+  }
+  
+  files <- files[grepl(files, pattern='.xlsx')] # filter out non-excel files
+  
+  for (path in files) {
+    
+    # read correct sheet of excel file
+    AL17_accuracy <- read_excel(path, sheet = "All - Matrix")
+    
+    # create column names for some that were blank
+    names(AL17_accuracy) <- c('CDL_Name', 'CDL_Class', names(AL17_accuracy)[3:length(AL17_accuracy)])
+    
+    AL17_producer <- dplyr::filter(AL17_accuracy, CDL_Class %in% c('Producer', 'Omission', 'Kappa')) %>%
+      dplyr::select(-CDL_Name, -CDL_Class, -Total, -User, -Commission, -Kappa) %>%
+      t() %>%
+      data.frame()
+    names(AL17_producer) <- c('Producer', 'Omission', 'Kappa_Producer')
+    
+    # remove extra rows that are not data, add state and year columns from file name
+    AL17_user <- dplyr::filter(AL17_accuracy, CDL_Class %in% 1:256) %>%
+      dplyr::select(CDL_Name, CDL_Class, User, Commission, Kappa) %>%
+      dplyr::rename(Kappa_User = Kappa)
+      
+    toretain <- cbind(AL17_user, AL17_producer) %>%
+      dplyr::mutate(State = substr(basename(path), start=10, stop=11), Year = substr(basename(path), start=12, stop=13)) %>%
+      dplyr::select(Year, State, everything()) %>%
+      dplyr::filter(!(is.na(Producer) | is.na(User))) # take out rows that do not have ground truth data OR CDL class was not represented in points to compare
+    
+    if (path == files[1] & year == 2012) {
+      allstates <- toretain
+    } else {
+      allstates <- rbind(allstates, toretain)
+    }
+  }
+}
+
+write.csv(allstates, './data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv', row.names = F)
+
+```
+
+# Load NVC contingency tables
+```{r readnvc}
+library(dplyr)
+
+for (region in c('NC', 'NE', 'NW', 'SC', 'SE', 'SW')) {
+  
+  files <- list.files(paste0('./data/LANDFIRE_Accuracy/', region, '_Remap_Assessment_Package'), full.names = T)
+  files <- files[grepl(files, pattern='.xlsx') & grepl(files, pattern='NVCGroup_Contingency') & !grepl(files, pattern='Original')] # specify contingency table
+  
+  path <- files
+
+  # read correct sheet of excel file
+  oneregion_agreement <- readxl::read_excel(path, sheet = "NVC Group", skip=1) %>%
+  rename(`LANDFIRE EVT`= 1)
+  
+  oneregion_agreement <- dplyr::select(oneregion_agreement, -`Row Totals`, -`Percent Row Agreement`) %>%
+    dplyr::rename(LANDFIRE_NVC=`LANDFIRE EVT`) %>%
+    dplyr::filter(!LANDFIRE_NVC %in% c('Column Totals', 'Percent Column Agreement'))
+
+  temp <- oneregion_agreement
+  rownames(temp) <- temp$LANDFIRE_NVC
+  temp <- temp[-1]
+
+  temp <- mutate_all(temp, as.numeric)
+  
+  tab <- as.table(as.matrix(temp))
+  dimnames(tab)[[1]] <- oneregion_agreement$LANDFIRE_NVC
+  
+  
+  res <- greenbrown::AccuracyAssessment(tab)
+  
+  producer <- res[rownames(res) == 'ProducerAccuracy', !colnames(res) %in% c('Sum', 'UserAccuracy')]
+  producer_nplots <- res[rownames(res) == 'Sum', !colnames(res) %in% c('Sum', 'UserAccuracy')]
+
+  user <- res[!rownames(res) %in% c('Sum', 'ProducerAccuracy'), colnames(res) == 'UserAccuracy']
+  user_nplots <- res[!rownames(res) %in% c('Sum', 'ProducerAccuracy'), colnames(res) == 'Sum']
+
+  
+  results_nvc <- data.frame(oneregion_agreement$LANDFIRE_NVC, Region = substr(basename(path), start=1, stop=2)) %>%
+    dplyr::mutate(ProducerAccuracy = producer/100, ProducerNPlots_autokey=producer_nplots, UserAccuracy = user/100, UserNPlots_map=user_nplots) %>%
+    dplyr::rename(LANDFIRE_NVC = oneregion_agreement.LANDFIRE_NVC) %>%
+    dplyr::mutate(LANDFIRE_Class = substr(LANDFIRE_NVC, start=1, stop=4), LANDFIRE_Name = substr(LANDFIRE_NVC, start=6, stop=100)) %>%
+    dplyr::select(LANDFIRE_NVC, LANDFIRE_Class, LANDFIRE_Name, everything())
+  
+  if (region == 'NC') {
+    allregions_nvc <- results_nvc
+  } else {
+    allregions_nvc <- rbind(allregions_nvc, results_nvc)
+  }
+}
+
+
+write.csv(allregions_nvc, './data/LANDFIRE_Accuracy/NVC_Accuracy_allregions.csv', row.names = F)
+```
+
+# Load EVT Contingency Tables
+We need these because some NVC classes are directly mapped from EVT and NVC assessment skips these classes.
+
+```{r readevt}
+for (region in c('NC', 'NE', 'NW', 'SC', 'SE', 'SW')) {
+  
+  files <- list.files(paste0('./data/LANDFIRE_Accuracy/', region, '_Remap_Assessment_Package'), full.names = T)
+  files <- files[grepl(files, pattern='.xlsx') & grepl(files, pattern='EcologicalSystems_Contingency') & !grepl(files, pattern='Original')] # specify contingency table
+  
+  path <- files
+
+  # read correct sheet of excel file
+  oneregion_agreement <- readxl::read_excel(path, sheet = "Ecological_Systems", skip=1) %>%
+  rename(`LANDFIRE EVT`= 1)
+  
+  oneregion_agreement <- dplyr::select(oneregion_agreement, -`Row Totals`, -`Percent Row Agreement`) %>%
+    dplyr::rename(LANDFIRE_EVT=`LANDFIRE EVT`) %>%
+    dplyr::filter(!LANDFIRE_EVT %in% c('Column Totals', 'Percent Column Agreement'))
+
+  temp <- oneregion_agreement
+  rownames(temp) <- temp$LANDFIRE_EVT
+  temp <- temp[-1]
+
+  temp <- mutate_all(temp, as.numeric)
+  
+  tab <- as.table(as.matrix(temp))
+  dimnames(tab)[[1]] <- oneregion_agreement$LANDFIRE_EVT
+  
+  
+  res <- greenbrown::AccuracyAssessment(tab)
+  
+  producer <- res[rownames(res) == 'ProducerAccuracy', !colnames(res) %in% c('Sum', 'UserAccuracy')]
+  producer_nplots <- res[rownames(res) == 'Sum', !colnames(res) %in% c('Sum', 'UserAccuracy')]
+
+  user <- res[!rownames(res) %in% c('Sum', 'ProducerAccuracy'), colnames(res) == 'UserAccuracy']
+  user_nplots <- res[!rownames(res) %in% c('Sum', 'ProducerAccuracy'), colnames(res) == 'Sum']
+
+  
+  results_evt <- data.frame(oneregion_agreement$LANDFIRE_EVT, Region = substr(basename(path), start=1, stop=2)) %>%
+    dplyr::mutate(ProducerAccuracy = producer/100, ProducerNPlots_autokey=producer_nplots, UserAccuracy = user/100, UserNPlots_map=user_nplots) %>%
+    dplyr::rename(LANDFIRE_EVT = oneregion_agreement.LANDFIRE_EVT) %>%
+    dplyr::mutate(LANDFIRE_Class = substr(LANDFIRE_EVT, start=1, stop=4), LANDFIRE_Name = substr(LANDFIRE_EVT, start=6, stop=100)) %>%
+    dplyr::select(LANDFIRE_EVT, LANDFIRE_Class, LANDFIRE_Name, everything())
+  
+  if (region == 'NC') {
+    allregions_evt <- results_evt
+  } else {
+    allregions_evt <- rbind(allregions_evt, results_evt)
+  }
+}
+
+
+write.csv(allregions_evt, './data/LANDFIRE_Accuracy/EVT_Accuracy_allregions.csv', row.names = F)
+```
+
