@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tiles=FALSE
+tiles=TRUE
 merge=TRUE
 allstates=FALSE
 
