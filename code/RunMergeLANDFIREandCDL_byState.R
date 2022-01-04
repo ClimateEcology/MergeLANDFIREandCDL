@@ -40,9 +40,7 @@ if (allstates == TRUE) {
     states <- c('WA')
   } else if (region == 'Southeast') {
     states <- c('TX_West')
-  } else {
-    stop("State is not in specified region.")
-  }
+  } 
 }
 
 
