@@ -27,11 +27,11 @@ nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
 
 # make list of states to run (either all in shapefile or manually defined)
-if (allstates == T) {
+if (allstates == TRUE) {
   # load shapefile for state/region 
   regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
   states <- regionalextent$STUSPS
-} else {
+} else if (allstates == FALSE) {
   if (regionName == 'Midwest') {
     states <- c('KS') # states/region to run
   } else if (regionName == 'Northeast') {
