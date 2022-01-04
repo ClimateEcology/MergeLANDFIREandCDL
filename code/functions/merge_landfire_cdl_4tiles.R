@@ -1,6 +1,6 @@
 
 merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear, 
-                               tiles, buffercells, verbose, nvc_agclasses) {
+                               tiles, buffercells, verbose, nvc_agclasses, ID) {
   
   ##### Step 0: Setup and load data
   

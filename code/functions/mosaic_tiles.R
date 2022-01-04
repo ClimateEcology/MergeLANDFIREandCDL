@@ -1,4 +1,4 @@
-mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress=T, ID=NA) {
+mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress=T) {
   
   library(terra)
   
@@ -14,6 +14,8 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
   }
   
   # filter to correct year of CDL (or other ID variable, as necessary)
+  # this ID variable will also be included in filename of final output raster
+  
   if (!is.na(ID)) {
     tile_paths <- tile_paths[grepl(tile_paths, pattern=ID)]
   }
