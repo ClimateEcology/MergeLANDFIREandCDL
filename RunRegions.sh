@@ -5,7 +5,7 @@ merge=TRUE
 allstates=TRUE
 
 # for year in 2012 2013 2014 2015 2016 2017 2018 2019 2020
-for year in 2018
+for year in 2016 2017 2018
 do
 sbatch --job-name=MergeSoutheast --export=ALL,cdlyear=$year,region='Southeast',\
 mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch

@@ -43,6 +43,10 @@ if (allstates == TRUE) {
   } 
 }
 
+# create directories for output files if they don't already exist
+if (!dir.exists(valdir)) {
+  dir.create(valdir, recursive=F)
+}
 
 for (stateName in states) {
   
