@@ -46,8 +46,6 @@ if (allstates == TRUE) {
 }
 
 
-
-
 for (stateName in states) {
   
   if (stateName %in% c('TX_East', 'TX_West')) {
