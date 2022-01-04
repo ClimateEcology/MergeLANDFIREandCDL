@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tiles=TRUE
+tiles=FALSE
 merge=TRUE
 allstates=FALSE
 
@@ -13,9 +13,9 @@ year=2017
 # mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 # sleep 1s
 
-# sbatch --job-name=MergeMidwest --export=ALL,cdlyear=$year,region='Midwest',\
-# mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
-# sleep 1s
-
-sbatch --job-name=MergeWest --export=ALL,cdlyear=$year,region='West',\
+sbatch --job-name=MergeMidwest --export=ALL,cdlyear=$year,region='Midwest',\
 mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
+sleep 1s
+
+# sbatch --job-name=MergeWest --export=ALL,cdlyear=$year,region='West',\
+# mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
