@@ -19,9 +19,12 @@
 
 grid_rasters <- function(rasterpath, rasterID,
                         regionalextent=NA,
-                        div, buffercells=c(0,0),
+                        div, 
+                        buffercells=c(0,0),
                         NAvalues,
-                        writetiles = T, tiledir) {
+                        writetiles=T, 
+                        tiledir,
+                        verbosewrite=F) {
 
   ######################################################################################################
   ##### Part 1: Setup and load data
@@ -229,6 +232,10 @@ grid_rasters <- function(rasterpath, rasterID,
 
       raster::writeRaster(cdl_tiles[[i]], paste0(tiledir, "/", rasterID[1], "/", rasterID[1], "_Tile", i, ".tif"), overwrite=T)
       raster::writeRaster(nvc_tiles[[i]], paste0(tiledir, "/", rasterID[2], "/", rasterID[2], "_Tile", i, ".tif"), overwrite=T)
+      
+      if (verbosewrite == T) {
+        logger::log_info(paste0('Finished writing raster pair #', i, ": ", rasterID[1], "_", rasterID[2] ))
+      }
     }
   }
 

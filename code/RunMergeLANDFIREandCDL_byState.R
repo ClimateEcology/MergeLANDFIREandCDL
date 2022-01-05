@@ -113,9 +113,13 @@ for (stateName in states) {
   if (mktiles == T) {
     tiles <- grid_rasters(rasterpath=c(cdl_path, nvc_path),
                                 rasterID=c(paste0('CDL', CDLYear), 'NVC'),
-                                regionalextent=regionalextent, tiledir=tiledir,
-                                div=c(xdiv, ydiv), buffercells=buffercells,
-                                NAvalues=c(0,-9999), writetiles=writetiles)
+                                regionalextent=regionalextent, 
+                                tiledir=tiledir,
+                                div=c(xdiv, ydiv), 
+                                buffercells=buffercells,
+                                NAvalues=c(0,-9999), 
+                                writetiles=writetiles,
+                                verbosewrite=T)
   
     save(tiles, file=paste0(tiledir,'/tiles_CDL', CDLYear, '.RDA'))
     
