@@ -2,7 +2,7 @@
 
 tiles=TRUE
 merge=TRUE
-allstates=FALSE
+allstates=TRUE
 
 for year in 2017
 do
