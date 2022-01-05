@@ -2,17 +2,17 @@
 
 tiles=TRUE
 merge=TRUE
-allstates=TRUE
+allstates=FALSE
 
 #for year in 2012 2013 2014 2015 2016 2017 2018 2019 2020
-for year in 2016 2017
+for year in 2017 2018 2019 2020
 do
 #year=2016
 # sbatch --job-name=MergeSoutheast --export=ALL,cdlyear=$year,region='Southeast',\
 # mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 # sleep 1s
 
-echo sbatch --job-name=MergeNortheast --export=ALL,cdlyear=$year,region='Northeast',\
+sbatch --job-name=MergeNortheast --export=ALL,cdlyear=$year,region='Northeast',\
 mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 sleep 1s
 
