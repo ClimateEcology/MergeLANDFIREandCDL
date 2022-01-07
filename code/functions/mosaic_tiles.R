@@ -140,10 +140,15 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
       logger::log_info('Final raster is complete.')
       
     }
+    # write compressed (final) raster for states that are very small (only 1 tile)
   } else if (length(tile_paths) ==1) {
     singletile <- terra::rast(tile_paths)
-    terra::writeRaster(singletile, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T, 
+    if (compress == T) {
+      terra::writeRaster(singletile, filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, 
                        wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3")))
+    } else if (compress == F) {
+      terra::writeRaster(singletile, filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T) 
+    }
   }
   
 }
