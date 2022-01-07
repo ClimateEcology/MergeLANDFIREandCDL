@@ -28,7 +28,7 @@ AKReports.zip
 
 # 'project' folder (has necessary R packages)
 **project/*
-
+**figures/
 #writing
 **/writing/*
 **/presentations/*
