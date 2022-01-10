@@ -84,6 +84,10 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   cdl <- terra::rast(tiles[[1]])
   nvc <- terra::rast(tiles[[2]])
   
+  #reclassify NA values in CDL to 0 (otherwise landfire values at these locations are not preserved)
+  mat <- data.frame(is=NA, becomes=0) 
+  cdl <- terra::classify(cdl, rcl=mat) 
+  
   # check if projections of raster tiles are the same. If not, re-project them to match.
   
   if (terra::crs(cdl) != terra::crs(nvc)) {
