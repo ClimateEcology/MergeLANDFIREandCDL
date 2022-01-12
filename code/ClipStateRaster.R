@@ -15,8 +15,8 @@ if (clipstates == TRUE) {
   datadir <- './data' # directory where tabular and spatial data are stored
   compress <- T # compress output rasters
   
-  # load shapefile of state boundaries
-  us_state_bounds <- sf::st_read(paste0(datadir, "/SpatialData/National.shp"))
+  # # load shapefile of state boundaries
+  # us_state_bounds <- sf::st_read(paste0(datadir, "/SpatialData/us_states_better_coasts.shp"))
   
   # make list of states to run (either all in shapefile or manually defined)
   if (allstates == TRUE) {
@@ -47,14 +47,16 @@ if (clipstates == TRUE) {
     }
     
       logger::log_info(paste0('Starting clip for ', stateName))
+      
     # filter shapefile to one state
+      
     # for DC, use regional extent as state boundary (not 'better coasts' file bc it does not have a polygon for DC)
-    if (stateName == 'DC') {
+    #if (stateName == 'DC') {
       this_state <- dplyr::filter(regionalextent, STUSPS == stateName)
-    } else {
-    # filter shapefile to one state
-    this_state <- dplyr::filter(us_state_bounds, STATE_FIPS %in% regionalextent$GEOID[regionalextent$STUSPS == stateName])
-    }
+    # } else {
+    # # filter shapefile to one state
+    # this_state <- dplyr::filter(us_state_bounds, STATE_FIPS %in% regionalextent$GEOID[regionalextent$STUSPS == stateName])
+    # }
        
     # make list of state's finished rasters
     files_toread <- list.files(tiledir, full.names=T)
