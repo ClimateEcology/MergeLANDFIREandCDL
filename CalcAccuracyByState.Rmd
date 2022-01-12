@@ -1,0 +1,49 @@
+---
+title: "Calculate Accuracy of Merged CDL/NVC Raster"
+author: "Melanie Kammerer"
+date: "1/11/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Objective
+The goal of this script is to map the accuracy of our combined CDL/NVC raster. To do this, I use class-level data on spatial accuracy from USDA NASS and LANDFIRE for CDL and NVC, respectively. I combined accuracy statistics from two layers by calculating an area-weighted mean. To start, I do this by state, although it could be aggregated at county level, too.
+
+```{r loadtabulardata}
+library(dplyr); library(logger); library(future)
+
+# load accuracy data from LANDFIRE and USDA NASS (aggregated & formatted in 'AggregateAccuracyAssessmentData.Rmd' script)
+evt <- read.csv('./data/LANDFIRE_Accuracy/EVT_Accuracy_allregions.csv')
+nvc <- read.csv('./data/LANDFIRE_Accuracy/NVC_Accuracy_allregions.csv')
+cdl <- read.csv('./data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv')
+
+```
+ 
+## Load spatial data (merged CDL/NVC raster)
+I use 2017 as a test year (folder of merged rasters by state), to start.
+
+```{r loadspatial}
+state_rasters <- list.files('D:/MergeLANDFIRECDL_Rasters/2017', full.names = T)
+
+tictoc::tic()
+source('./code/functions/tab_merged_raster.R')
+#turn on parallel processing for furrr package
+future::plan(multisession)
+
+logger::log_info('Starting parallel execution of tab_merged_raster function.')
+
+# loop through list of state rasters in parallel with furrr::future_map function
+all_freq <- furrr::future_map_dfr(.x=state_rasters, .f=tab_merged_raster,
+                              .options=furrr::furrr_options(seed = T))
+
+# stop parallel processing
+future::plan(sequential)
+tictoc::toc()    
+
+
+all_freq <- dplyr::group_by(all_freq, State, Year) %>%
+  dplyr::mutate(PctState = (NCells/sum(NCells)*100))
+```
