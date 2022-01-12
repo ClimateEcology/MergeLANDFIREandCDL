@@ -33,13 +33,13 @@ if (allstates == TRUE) {
   states <- regionalextent$STUSPS
 } else if (allstates == FALSE) {
   if (regionName == 'Midwest') {
-    states <- c('KS') # states/region to run
+    states <- c('MI') # states/region to run
   } else if (regionName == 'Northeast') {
     states <- c('NH')
   } else if (regionName == 'West') {
-    states <- c('WA')
+    states <- c('CA')
   } else if (regionName == 'Southeast') {
-    states <- c('DC')
+    states <- c('AL')
   } 
 }
 
