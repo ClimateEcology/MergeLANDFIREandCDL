@@ -50,7 +50,7 @@ VALUE,CLASS_NAME,GROUP,NVC_Match1,NVC_Match2,NVC_Match3,NVC_Classes
 58,Clover/Wildflowers,A,Pasture and hayland,Row Crop - Close Grown Crop,Wheat,
 59,Sod/Grass Seed,A,Pasture and hayland,Row Crop - Close Grown Crop,Wheat,
 60,Switchgrass,A,Pasture and hayland,Row Crop - Close Grown Crop,Wheat,
-61,Fallow/Idle Cropland,A,Fallow/Idle,,,
+61,Fallow/Idle Cropland,A,Fallow/Idle,Row Crop - Close Grown Crop,Wheat,
 63,Forest,N,,,,
 65,Barren,N,,,,
 66,Cherries,A,Orchard,,,
