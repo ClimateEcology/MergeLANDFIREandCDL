@@ -90,7 +90,15 @@ for (stateName in states) {
   ##### derived parameters 
   tiledir <- paste0(intermediate_dir, "/", stateName, "Tiles_", ntiles)
   nvc_path <- paste0(datadir, '/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
-  cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
+  
+  # set CDL path to national rasters with altered NA values (for years when that was necessary)
+  # else CDL path is national raster unaltered from USDA NASS
+  if (file.exists(paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img'))) {
+    cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img')
+  } else {
+    cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
+  }
+  
   ID <- paste0(stateName, '_CDL', CDLYear,'NVC')
   
   # read in class tables necessary in part 2
