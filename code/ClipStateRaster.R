@@ -16,7 +16,7 @@ if (clipstates == TRUE) {
   compress <- T # compress output rasters
   
   # load shapefile of state boundaries
-  us_state_bounds <- sf::st_read(paste0(datadir, "/SpatialData/us_states_better_coasts.shp"))
+  us_state_bounds <- sf::st_read(paste0(datadir, "/SpatialData/National.shp"))
   
   # make list of states to run (either all in shapefile or manually defined)
   if (allstates == TRUE) {
