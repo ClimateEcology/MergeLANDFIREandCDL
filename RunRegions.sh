@@ -10,19 +10,19 @@ for year in 2019
 
 do
 sbatch --job-name="SouthE$year" --export=ALL,cdlyear=$year,region='Southeast',\
-mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
+mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 sleep 1s
 
 sbatch --job-name="NorthE$year" --export=ALL,cdlyear=$year,region='Northeast',\
-mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
+mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 sleep 1s
 
 sbatch --job-name="MidW$year" --export=ALL,cdlyear=$year,region='Midwest',\
-mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
+mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 sleep 1s
 
 sbatch --job-name="West$year" --export=ALL,cdlyear=$year,region='West',\
-mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
+mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 sleep 1s
 
 done

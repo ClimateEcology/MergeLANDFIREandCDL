@@ -1,25 +1,15 @@
 #!/bin/bash
 
-tiles=TRUE
-merge=TRUE
+tiles=FALSE
+merge=FALSE
+mosaic=TRUE
 allstates=FALSE
 
-#year=2016
-#sbatch --job-name=Texas2016 --export=ALL,cdlyear=$year,region='Southeast',\
-#mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
-#sleep 1s
+for year in 2013 2014 2015 2018 2020
 
-year=2017
-sbatch --job-name=Texas2017 --export=ALL,cdlyear=$year,region='Southeast',\
-mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
+do
+sbatch --job-name=Texas$year --export=ALL,cdlyear=$year,region='Southeast',\
+mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunTexas.sbatch
 sleep 1s
 
-year=2018
-sbatch --job-name=Texas2018 --export=ALL,cdlyear=$year,region='Southeast',\
-mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
-sleep 1s
-
-year=2019
-sbatch --job-name=Texas2019 --export=ALL,cdlyear=$year,region='Southeast',\
-mktiles=$tiles,runmerge=$merge,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
-sleep 1s
+done
