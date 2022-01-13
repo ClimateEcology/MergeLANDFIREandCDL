@@ -9,7 +9,7 @@ allstates=FALSE
 for year in 2020
 do
 sbatch --job-name=Texas$year --export=ALL,cdlyear=$year,region='Southeast',\
-mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunTexas.sbatch
+mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 sleep 1s
 
 done
