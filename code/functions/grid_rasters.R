@@ -173,14 +173,15 @@ grid_rasters <- function(rasterpath, rasterID,
 
   tictoc::tic()
   # list of NA tiles for raster1
+  # tiles can be NA by matching specified NA value or if pixel value is NA (equal to meta-data no data value)
   todiscard_cdl <- furrr::future_map(.x=cdl_tiles, .f = function(x) {
-    raster::cellStats(x, stat=max) == NAvalues[1] },
+    raster::cellStats(x, stat=max) == NAvalues[1] | raster::cellStats(x, stat=max) == -Inf },
     .options = furrr::furrr_options(seed = TRUE)) %>% unlist()
-
+  
   # list of NA tiles raster2
   todiscard_nvc <- furrr::future_map(.x=nvc_tiles, .f = function(x) {
-      raster::cellStats(x, stat=max) == NAvalues[2] },
-      .options = furrr::furrr_options(seed = TRUE)) %>% unlist()
+    raster::cellStats(x, stat=max) == NAvalues[2] | raster::cellStats(x, stat=max) == -Inf},
+    .options = furrr::furrr_options(seed = TRUE)) %>% unlist()
 
   tictoc::toc()
 
