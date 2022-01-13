@@ -1,7 +1,7 @@
 #!/bin/bash
 
-tiles=FALSE
-merge=FALSE
+tiles=TRUE
+merge=TRUE
 mosaic=TRUE
 allstates=FALSE
 
