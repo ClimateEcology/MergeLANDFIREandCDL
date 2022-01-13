@@ -14,7 +14,8 @@ CDLYear <- args[2] # year of NASS Cropland Data Layer
 regionName <- args[3] # region to process
 mktiles <- args[4]
 runmerge <- args[5]
-allstates <- args[6]
+mosaic <- args[6]
+allstates <- args[7]
 
 intermediate_dir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
 valdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData' # directory to store validation results (.txt files)
@@ -161,19 +162,21 @@ for (stateName in states) {
     logger::log_info('Completed merge for all tiles.')
   }
   
-  logger::log_info('Starting mosaic operation.')
-
-  ######################################################################################################
-  ##### Part 3: Stitch together all the merged tiles
-
-  # it is faster to mosaic in chunks, then mosaic the bigger pieces together
-  # here I split into vectors of 30 tiles each, stitch these together into 'mega-tiles' then mosaic all the mega-tiles together.
-  # read in tiles created by furrr
+  if (mosaic == T) {
+    logger::log_info('Starting mosaic operation.')
   
-  # run function to mosaic tile into one larger
-  mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=40, chunksize2=5, ID=ID, outdir=tiledir)
+    ######################################################################################################
+    ##### Part 3: Stitch together all the merged tiles
   
-  logger::log_info(paste0('Mosaic of ', stateName, ' tiles are complete!'))
-  logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), " B."))
+    # it is faster to mosaic in chunks, then mosaic the bigger pieces together
+    # here I split into vectors of 30 tiles each, stitch these together into 'mega-tiles' then mosaic all the mega-tiles together.
+    # read in tiles created by furrr
+    
+    # run function to mosaic tile into one larger
+    mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=40, chunksize2=5, ID=ID, outdir=tiledir)
+    
+    logger::log_info(paste0('Mosaic of ', stateName, ' tiles are complete!'))
+    logger::log_info(paste0('Current memory used by R is ', lobstr::mem_used(), " B."))
+  }
   
 }
