@@ -1,9 +1,11 @@
-CDLYear <- '2016'
+CDLYear <- '2020'
 regionName <- 'Southeast'
-mktiles <- T
-runmerge <- T
+mktiles <- F
+runmerge <- F
+mosaic <- T
+allstates <- F
 
-stateName <- 'DE'
+stateName <- 'TX_West'
 veglayer='nvc'
 verbose=F
 
