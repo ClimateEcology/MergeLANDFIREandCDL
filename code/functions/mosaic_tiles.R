@@ -50,7 +50,7 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
     ngroups <- length(unique(clusters))
     
     ##### create mega tiles by executing mosaic respecting cluster membership
-    for (i in i:ngroups) {
+    for (i in 1:ngroups) {
       assign(x=paste0('args', i), value=tile_list[clusters == i]) 
       
       # execute mosaic to create a mega-tile
