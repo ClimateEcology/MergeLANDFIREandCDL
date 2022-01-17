@@ -54,10 +54,10 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
       assign(x=paste0('args', i), value=tile_list[clusters == i]) 
       
       # execute mosaic to create a mega-tile
-      # assign(x=paste0('MT', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean',
-      #                                                          filename=paste0(tiledir, '/', ID,"_MegaTile", i, '.tif'), overwrite=T)))
-      assign(x=paste0('MT', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean'
-                                                               )))
+      assign(x=paste0('MT', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean',
+                                                               filename=paste0(tiledir, '/', ID,"_MegaTile", i, '.tif'), overwrite=T)))
+      # assign(x=paste0('MT', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean'
+      #                                                          )))
     }
     
     logger::log_info('Finished creating mega tiles.')
@@ -76,10 +76,10 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
       assign(x=paste0('args2', i), value=tile_list[clusters2 == i]) 
       
       # execute mosaic to create a mega-mega tile
-      # assign(x=paste0('M2T', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean',
-      #filename=paste0(tiledir, '/', ID,"_MegaMegaTile", i, '.tif'), overwrite=T)))
-      assign(x=paste0('M2T', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean'
-            )))
+      assign(x=paste0('M2T', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean',
+      filename=paste0(tiledir, '/', ID,"_MegaMegaTile", i, '.tif'), overwrite=T)))
+      # assign(x=paste0('M2T', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean'
+      #       )))
     }
     
     # load mega-mega tiles into list to create final raster
