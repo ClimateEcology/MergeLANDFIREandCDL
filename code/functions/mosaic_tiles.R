@@ -46,7 +46,7 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
     end <- length(tile_list)
     
     # assign tiles to clusters based on lat/long
-    clusters <- calc_tile_clusters(tile_list, chunksize=chunksize1, plot_clusters=T)
+    clusters <- calc_tile_clusters(tile_list=tile_list, chunksize=chunksize1, plot_clusters=F)
     ngroups <- length(unique(clusters))
     
     ##### create mega tiles by executing mosaic respecting cluster membership
