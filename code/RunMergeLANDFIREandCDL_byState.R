@@ -173,12 +173,12 @@ for (stateName in states) {
     # read in tiles created by furrr
     
     if (stateName %in% c('TX_West')) {
-      chunksize1 <- 40
+      chunksize1 <- 100
     } else {
       chunksize1 <- 40
     }
     # run function to mosaic tile into one larger
-    mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=chunksize1, chunksize2=5, 
+    mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=chunksize1, chunksize2=4, 
                  ID=ID, outdir=tiledir, verbose=T)
     
     logger::log_info(paste0('Mosaic of ', stateName, ' tiles are complete!'))
