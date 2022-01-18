@@ -9,7 +9,7 @@ logger::log_info(paste0('terra is ', terra, ' and gdal is ', gdal))
 logger::log_info('Loading tiles.')
 # input parameters
 CDLYear <- 2020
-tiledir = outdir = '../../../../90daydata/geoecoservices/MergeLANDFIREandCDL/TX_WestTiles_414/MergedCDLNVC'
+tiledir = outdir = '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/TX_WestTiles_414/MergedCDLNVC'
 ID <- paste0('TX_West_CDL', CDLYear,'NVC')
 
 mega_paths <- list.files(tiledir, full.names=T)
