@@ -1,4 +1,4 @@
-mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress=T) {
+mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress=T, verbose=F) {
   
   library(terra)
   source('./code/functions/calc_tile_clusters.R')
@@ -56,8 +56,9 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
       # execute mosaic to create a mega-tile
       assign(x=paste0('MT', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean',
                                                                filename=paste0(tiledir, '/', ID,"_MegaTile", i, '.tif'), overwrite=T)))
-      # assign(x=paste0('MT', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean'
-      #                                                          )))
+      if (verbose == T) {
+        logger::log_info(paste0('Mega tile ', i, " is finished."))
+      }
     }
     
     logger::log_info('Finished creating mega tiles.')
@@ -80,7 +81,13 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
       filename=paste0(tiledir, '/', ID,"_MegaMegaTile", i, '.tif'), overwrite=T)))
       # assign(x=paste0('M2T', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean'
       #       )))
+      if (verbose == T) {
+        logger::log_info(paste0('Mega-mega tile ', i, " is finished."))
+      }
+      
     }
+    
+    logger::log_info('Finished creating mega mega tiles.')
     
     # load mega-mega tiles into list to create final raster
     mega_mega_tiles <- mget(gtools::mixedsort(ls(pattern='M2T.')))
