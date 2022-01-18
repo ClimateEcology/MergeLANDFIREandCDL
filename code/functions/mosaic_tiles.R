@@ -3,6 +3,11 @@ mosaic_tiles <- function(tiledir, chunksize1, ID, outdir, season=NA, compress=T,
   library(terra)
   source('./code/functions/calc_tile_clusters.R')
   
+  # save some strings to use later
+  compress_filename <- paste0(tiledir, '/', ID, '_FinalRasterCompress.tif')
+  rawsize_filename <- paste0(tiledir, '/', ID, '_FinalRaster.tif')
+  
+  # make list of files in tiledir
   tile_paths <- list.files(tiledir, full.names=T)
   logger::log_info('Make mega: Identified ', length(tile_paths), ' raster files before filtering.')
   
@@ -103,23 +108,38 @@ mosaic_tiles <- function(tiledir, chunksize1, ID, outdir, season=NA, compress=T,
     
     logger::log_info('Loaded ', length(mega_list), ' raster files.')
     
-    logger::log_info('Make final: Attempting mosaic.')
     a <- Sys.time()
     
-    if (compress == T) {
-      file1 <- paste0(tiledir, '/', ID, '_FinalRasterCompress.tif')
-      base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
-                              filename=paste0(tiledir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T,
-                              wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
-    } else if (compress == F) {
-      file1 <- paste0(tiledir, '/', ID, '_FinalRaster.tif')
-      base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
-                              filename=paste0(tiledir, '/', ID, '_FinalRaster.tif'), overwrite=T)) 
-    }
+    # if a state has only one mega-tile, write single mega-tile as final raster
+    if (length(mega_paths) == 1) {
+      logger::log_info('This state only has one mega-tile. Writing this raster as final output.')
+      onetile <- terra::rast(mega_paths[[1]])
+      
+      if (compress == T) {
+        terra::writeRaster(onetile, filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, 
+                           wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3")))
+      } else {
+        terra::writeRaster(onetile, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
+      }
+    } else if (length(mega_paths) > 1) {
 
-    b <- Sys.time() # save end time
-    logger::log_info(paste0("Make final: Final raster exists? ", file.exists(file1)))
-    logger::log_info(paste0("Make final: ", difftime(b,a, units="mins"), ' minutes  to execute mosaic w/ terra.'))
+      logger::log_info('Make final: Attempting mosaic.')
+      
+      if (compress == T) {
+        file1 <- compress_filename
+        base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
+                                filename=compress_filename, overwrite=T,
+                                wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
+      } else if (compress == F) {
+        file1 <- rawsize_filename
+        base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
+                                filename=rawsize_filename, overwrite=T)) 
+      }
+  
+      b <- Sys.time() # save end time
+      logger::log_info(paste0("Make final: Final raster exists? ", file.exists(file1)))
+      logger::log_info(paste0("Make final: ", difftime(b,a, units="mins"), ' minutes  to execute mosaic w/ terra.'))
+    }
   
   }
 }
