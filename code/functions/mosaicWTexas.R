@@ -15,6 +15,7 @@ tiledir = outdir = '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/TX_Wes
 ID <- paste0('TX_West_CDL', CDLYear,'NVC')
 chunksize1 <- 20
 season <- NA
+verbose <- T
 
 library(terra)
 source('./code/functions/calc_tile_clusters.R')
@@ -22,6 +23,7 @@ source('./code/functions/calc_tile_clusters.R')
 ######### Initial tiles to mega-tiles!
 
 tile_paths <- list.files(tiledir, full.names=T)
+logger::log_info('Make mega: Identified ', length(tile_paths), ' raster files before filtering.')
 
 # exclude any extra files
 tile_paths <- tile_paths[!grepl(tile_paths, pattern= ".tif.aux")]
@@ -37,6 +39,7 @@ if (!is.na(season)) {
 if (!is.na(ID)) {
   tile_paths <- tile_paths[grepl(tile_paths, pattern=ID)]
 }
+logger::log_info('Make mega: Trying to load ', length(tile_paths), ' raster files after filtering.')
 
 # if a state has only one tile, write single tile as final raster
 if (length(tile_paths) == 1) {
@@ -49,6 +52,8 @@ if (length(tile_paths) == 1) {
     terra::writeRaster(onetile, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
   }
 }
+
+logger::log_info('Make mega: starting mosaic-ing.')
 
 # if a state has multiple tiles, execute hierarchical mosaic to stitch all tiles into a single raster
 if (length(tile_paths) > 1) {
@@ -79,7 +84,7 @@ if (length(tile_paths) > 1) {
     }
   }
   
-  logger::log_info('Finished creating mega tiles.')
+  logger::log_info('Make mega: Finished creating mega tiles.')
   # remove some large objects from memory
   rm(tile_list); rm(tile_paths)
   rm(list=ls(pattern="args"))
@@ -87,7 +92,7 @@ if (length(tile_paths) > 1) {
 ######### Mega-tiles to final raster!
 
   mega_paths <- list.files(tiledir, full.names=T)
-  logger::log_info('Identified ', length(mega_paths), ' raster files before filtering.')
+  logger::log_info('Make final: Identified ', length(mega_paths), ' raster files before filtering.')
   
   # exclude any extra files
   mega_paths <- mega_paths[!grepl(mega_paths, pattern= ".tif.aux")]
@@ -99,7 +104,7 @@ if (length(tile_paths) > 1) {
     mega_paths <- mega_paths[grepl(mega_paths, pattern=ID)]
   }
   
-  logger::log_info('Trying to load ', length(mega_paths), ' raster files after filtering.')
+  logger::log_info('Make final: Trying to load ', length(mega_paths), ' raster files after filtering.')
   
   
   mega_list <- vector("list", length(mega_paths))
@@ -111,7 +116,7 @@ if (length(tile_paths) > 1) {
   
   
   if (terra == T) {
-    logger::log_info('Attempting mosaic.')
+    logger::log_info('Make final: Attempting mosaic.')
     a <- Sys.time()
     
     if (compress == T) {
@@ -125,7 +130,7 @@ if (length(tile_paths) > 1) {
     
     b <- Sys.time()
     
-    logger::log_info(paste0(difftime(b,a, units="secs"), 'seconds  to execute terra mosaic.'))
+    logger::log_info(paste0("Make final: ", difftime(b,a, units="secs"), 'seconds  to execute terra mosaic.'))
   }
   
   if (gdal == T) {
@@ -133,7 +138,7 @@ if (length(tile_paths) > 1) {
     gdalUtils::mosaic_rasters(gdalfile=mega_paths, dst_dataset=paste0(tiledir, '/', ID,'_FinalRaster_gdal.tif'))
     d <- Sys.time()
     
-    logger::log_info(paste0(difftime(d,c, units="secs"), ' seconds to execute gdalUtils mosaic.'))
+    logger::log_info(paste0("Make final: ", difftime(d,c, units="secs"), ' seconds to execute gdalUtils mosaic.'))
   }
 
 }
