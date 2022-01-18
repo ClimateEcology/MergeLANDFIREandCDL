@@ -93,17 +93,17 @@ if (length(tile_paths) > 1) {
   mega_paths <- list.files(tiledir, full.names=T)
   logger::log_info('Make final: Identified ', length(mega_paths), ' raster files before filtering.')
   
+
   # exclude any extra files
   mega_paths <- mega_paths[!grepl(mega_paths, pattern= ".tif.aux")]
   mega_paths <- mega_paths[grepl(mega_paths, pattern= "MegaTile")]
   mega_paths <- mega_paths[!grepl(mega_paths, pattern= "MegaMega")]
-  mega_paths <- mega_paths[!grepl(mega_paths, pattern= chunksize1)] #filter to mega-tiles that were created with correct chunksize
-  
-  
+  mega_paths <- mega_paths[grepl(mega_paths, pattern= paste0("_", chunksize1, ".tif"))] #filter to mega-tiles that were created with correct chunksize
   
   if (!is.na(ID)) {
     mega_paths <- mega_paths[grepl(mega_paths, pattern=ID)]
   }
+  
   
   logger::log_info('Make final: Trying to load ', length(mega_paths), ' raster files after filtering.')
   
