@@ -111,6 +111,8 @@ source('./code/functions/calc_tile_clusters.R')
   for (i in 1:length(mega_paths)) {
     mega_list[[i]] <- terra::rast(mega_paths[i])
   }
+  rsrc <- terra::src(mega_list)
+  
   logger::log_info('Loaded ', length(mega_list), ' raster files.')
   
   
@@ -119,17 +121,21 @@ source('./code/functions/calc_tile_clusters.R')
     a <- Sys.time()
     
     if (compress == T) {
-      base::eval(rlang::call2("mosaic", !!!get('mega_list'), .ns="terra", fun='mean', 
+      base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
                             filename=paste0(tiledir, '/', ID, '_FinalRasterCompress_terra.tif'), overwrite=T,
                             wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
     } else if (compress == F) {
-      base::eval(rlang::call2("mosaic", !!!get('mega_list'), .ns="terra", fun='mean', 
+      base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
                               filename=paste0(tiledir, '/', ID, '_FinalRaster_terra.tif'), overwrite=T)) 
     }
+    file1 <- paste0(tiledir, '/', ID, '_FinalRasterCompress_terra.tif')
+    file2 <- paste0(tiledir, '/', ID, '_FinalRaster_terra.tif')
     
     b <- Sys.time()
+    logger::log_info(paste0("Make final: Final raster exists? ", file.exists(file1) | file.exists(file2)))
     
     logger::log_info(paste0("Make final: ", difftime(b,a, units="secs"), 'seconds  to execute terra mosaic.'))
+    
   }
   
   if (gdal == T) {
