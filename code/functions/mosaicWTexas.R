@@ -4,7 +4,8 @@ library(terra)
 args <- commandArgs(trailingOnly = T)
 terra <- args[2] # year of NASS Cropland Data Layer
 gdal <- args[3] # region to process
-  
+compress <- args[4] # compress output raster?
+
 logger::log_info(paste0('terra is ', terra, ' and gdal is ', gdal))
 logger::log_info('Loading tiles.')
 # input parameters
@@ -42,7 +43,7 @@ if (terra == T) {
   
   if (compress == T) {
   base::eval(rlang::call2("mosaic", !!!get('mega_list'), .ns="terra", fun='mean', 
-                          filename=paste0(tiledir, '/', ID, '_FinalRaster_terra.tif'), overwrite=T,
+                          filename=paste0(tiledir, '/', ID, '_FinalRasterCompress_terra.tif'), overwrite=T,
                           wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
   } else if (compress == F) {
     base::eval(rlang::call2("mosaic", !!!get('mega_list'), .ns="terra", fun='mean', 
