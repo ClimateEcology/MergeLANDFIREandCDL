@@ -4,6 +4,7 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
   source('./code/functions/calc_tile_clusters.R')
   
   tile_paths <- list.files(tiledir, full.names=T)
+  logger::log_info('Make mega: Identified ', length(tile_paths), ' raster files before filtering.')
   
   # exclude any extra files
   tile_paths <- tile_paths[!grepl(tile_paths, pattern= ".tif.aux")]
@@ -19,6 +20,9 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
   if (!is.na(ID)) {
     tile_paths <- tile_paths[grepl(tile_paths, pattern=ID)]
   }
+  
+  logger::log_info('Make mega: Trying to load ', length(tile_paths), ' raster files after filtering.')
+  
   
   # if a state has only one tile, write single tile as final raster
   if (length(tile_paths) == 1) {
@@ -49,72 +53,73 @@ mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA,
     clusters <- calc_tile_clusters(tile_list=tile_list, chunksize=chunksize1, plot_clusters=F)
     ngroups <- length(unique(clusters))
     
+    logger::log_info('Make mega: starting mosaic-ing.')
+    
     ##### create mega tiles by executing mosaic respecting cluster membership
     for (i in 1:ngroups) {
       assign(x=paste0('args', i), value=tile_list[clusters == i]) 
       
       # execute mosaic to create a mega-tile
       assign(x=paste0('MT', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean',
-                                                               filename=paste0(tiledir, '/', ID,"_MegaTile", i, '.tif'), overwrite=T)))
+                                                               filename=paste0(tiledir, '/', ID,"_MegaTile", i, "_", chunksize1, '.tif'),
+                                                               overwrite=T)))
       if (verbose == T) {
         logger::log_info(paste0('Mega tile ', i, " is finished."))
       }
     }
     
-    logger::log_info('Finished creating mega tiles.')
+    logger::log_info('Make mega: Finished creating mega tiles.')
     
     
-    # load mega tiles into list to create mega-mega tiles (if necessary) OR final raster
-    mega_tiles <- mget(gtools::mixedsort(ls(pattern='MT.')))
-    names(mega_tiles) <- NULL # remove names in list of mega tiles (messes up mosaic execution for some reason)
+    # remove some large objects from memory
+    rm(tile_list); rm(tile_paths)
+    rm(list=ls(pattern="args"))
     
-    # assign mega tiles to clusters based on lat/long
-    clusters2 <- calc_tile_clusters(mega_tiles, chunksize=chunksize2, plot_clusters=T)
-    ngroups2 <- length(unique(clusters2))
+    ######## Mega-tiles to final raster!
     
-    ##### create mega-mega tiles by executing mosaic respecting cluster membership
-    for (i in 1:ngroups2) {
-      assign(x=paste0('args2', i), value=tile_list[clusters2 == i]) 
-      
-      # execute mosaic to create a mega-mega tile
-      assign(x=paste0('M2T', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean',
-      filename=paste0(tiledir, '/', ID,"_MegaMegaTile", i, '.tif'), overwrite=T)))
-      # assign(x=paste0('M2T', i), value= base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean'
-      #       )))
-      if (verbose == T) {
-        logger::log_info(paste0('Mega-mega tile ', i, " is finished."))
-      }
-      
+    mega_paths <- list.files(tiledir, full.names=T)
+    logger::log_info('Make final: Identified ', length(mega_paths), ' raster files before filtering.')
+    
+    
+    # exclude any extra files
+    mega_paths <- mega_paths[!grepl(mega_paths, pattern= ".tif.aux")]
+    mega_paths <- mega_paths[grepl(mega_paths, pattern= "MegaTile")]
+    mega_paths <- mega_paths[!grepl(mega_paths, pattern= "MegaMega")]
+    mega_paths <- mega_paths[grepl(mega_paths, pattern= paste0("_", chunksize1, ".tif"))] #filter to mega-tiles that were created with correct chunksize
+    
+    if (!is.na(ID)) {
+      mega_paths <- mega_paths[grepl(mega_paths, pattern=ID)]
     }
     
-    logger::log_info('Finished creating mega mega tiles.')
+    logger::log_info('Make final: Trying to load ', length(mega_paths), ' raster files after filtering.')
     
-    # load mega-mega tiles into list to create final raster
-    mega_mega_tiles <- mget(gtools::mixedsort(ls(pattern='M2T.')))
-    names(mega_mega_tiles) <- NULL # remove names in list of mega-mega tiles (messes up mosaic execution for some reason)
+    # load mega-tiles into list to mosaic
+    mega_list <- vector("list", length(mega_paths))
     
-    # mosaic mega tiles to make one big raster!
+    for (i in 1:length(mega_paths)) {
+      mega_list[[i]] <- terra::rast(mega_paths[i])
+    }
+    rsrc <- terra::src(mega_list) # convert list of rasters to terra SpatRaster Collection
     
-    # if there are multiple mega-mega tiles mosaic them all together
-    if (length(mega_mega_tiles) > 1) {
-      if (compress == T) {
-      wholemap <- base::eval(rlang::call2("mosaic", !!!mega_mega_tiles, .ns="terra", fun='mean',
-                              filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, 
+    logger::log_info('Loaded ', length(mega_list), ' raster files.')
+    
+    logger::log_info('Make final: Attempting mosaic.')
+    a <- Sys.time()
+    
+    if (compress == T) {
+      file1 <- paste0(tiledir, '/', ID, '_FinalRasterCompress.tif')
+      base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
+                              filename=paste0(tiledir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T,
                               wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
-      } else {
-      wholemap <- base::eval(rlang::call2("mosaic", !!!mega_mega_tiles, .ns="terra", fun='mean',
-                                            filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T))
-      }
-      
-      # if only one mega-mega tile, just write this one
-    } else if (length(mega_mega_tiles) == 1) {
-      if (compress == T) {
-      terra::writeRaster(M2T1, filename=paste0(outdir, '/', ID, '_FinalRasterCompress.tif'), overwrite=T, 
-                         wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3")))
-      } else {
-        terra::writeRaster(M2T1, filename=paste0(outdir, '/', ID, '_FinalRaster.tif'), overwrite=T)
-      }
+    } else if (compress == F) {
+      file1 <- paste0(tiledir, '/', ID, '_FinalRaster.tif')
+      base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
+                              filename=paste0(tiledir, '/', ID, '_FinalRaster.tif'), overwrite=T)) 
     }
+
+    b <- Sys.time() # save end time
+    logger::log_info(paste0("Make final: Final raster exists? ", file.exists(file1)))
+    logger::log_info(paste0("Make final: ", difftime(b,a, units="mins"), ' minutes  to execute mosaic w/ terra.'))
+  
   }
-      logger::log_info('Final raster is complete.')
 }

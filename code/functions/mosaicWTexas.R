@@ -84,6 +84,7 @@ if (length(tile_paths) > 1) {
   }
 
   logger::log_info('Make mega: Finished creating mega tiles.')
+  
   # remove some large objects from memory
   rm(tile_list); rm(tile_paths)
   rm(list=ls(pattern="args"))
@@ -134,7 +135,7 @@ if (length(tile_paths) > 1) {
     file2 <- paste0(tiledir, '/', ID, '_FinalRaster_terra.tif')
     
     b <- Sys.time()
-    logger::log_info(paste0("Make final: Final raster exists?", file.exists(file1) | file.exists(file2)))
+    logger::log_info(paste0("Make final: Final raster exists? ", file.exists(file1) | file.exists(file2)))
     
     logger::log_info(paste0("Make final: ", difftime(b,a, units="mins"), ' minutes  to execute terra mosaic.'))
     
