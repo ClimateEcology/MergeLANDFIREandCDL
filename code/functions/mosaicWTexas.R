@@ -140,4 +140,4 @@ source('./code/functions/calc_tile_clusters.R')
     logger::log_info(paste0("Make final: ", difftime(d,c, units="secs"), ' seconds to execute gdalUtils mosaic.'))
   }
 
-}
+#}
