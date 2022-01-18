@@ -7,7 +7,7 @@ gdal <- args[3] # region to process
   
 # input parameters
 CDLYear <- 2020
-tiledir = outdir = '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/TX_West_414/MergedCDLNVC'
+tiledir = outdir = '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/TX_WestTiles_414/MergedCDLNVC'
 ID <- paste0('TX_West_CDL', CDLYear,'NVC')
 
 mega_paths <- list.files(tiledir, full.names=T)
