@@ -24,6 +24,7 @@ buffercells <- c(3,3)  # number of cells that overlap between raster tiles (in x
 writetiles <- T
 target_area <- 1000 # desired size (in km2) of each tile
 nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
+chunksize1 <- 40
 
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
 
@@ -169,16 +170,10 @@ for (stateName in states) {
     ##### Part 3: Stitch together all the merged tiles
   
     # it is faster to mosaic in chunks, then mosaic the bigger pieces together
-    # here I split into vectors of 30 tiles each, stitch these together into 'mega-tiles' then mosaic all the mega-tiles together.
-    # read in tiles created by furrr
-    
-    if (stateName %in% c('TX_West')) {
-      chunksize1 <- 100
-    } else {
-      chunksize1 <- 40
-    }
+    # here I split into vectors of 40 tiles each, stitch these together into 'mega-tiles' then mosaic all the mega-tiles.
+
     # run function to mosaic tile into one larger
-    mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=chunksize1, chunksize2=4, 
+    mosaic_tiles(tiledir=paste0(tiledir, "/MergedCDLNVC"), chunksize1=chunksize1,
                  ID=ID, outdir=tiledir, verbose=T)
     
     logger::log_info(paste0('Mosaic of ', stateName, ' tiles are complete!'))

@@ -1,4 +1,4 @@
-mosaic_tiles <- function(tiledir, chunksize1, chunksize2, ID, outdir, season=NA, compress=T, verbose=F) {
+mosaic_tiles <- function(tiledir, chunksize1, ID, outdir, season=NA, compress=T, verbose=F) {
   
   library(terra)
   source('./code/functions/calc_tile_clusters.R')
