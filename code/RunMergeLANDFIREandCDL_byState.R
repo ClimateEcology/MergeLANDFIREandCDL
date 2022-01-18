@@ -41,7 +41,7 @@ if (allstates == TRUE) {
   } else if (regionName == 'West') {
     states <- c('CA', 'MT')
   } else if (regionName == 'Southeast') {
-    states <- c('TX_West')
+    states <- c('DE')
   } 
 }
 
