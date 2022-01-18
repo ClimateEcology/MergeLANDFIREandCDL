@@ -6,6 +6,6 @@ do
 sbatch --job-name=MosaicTexas$year --export=ALL,terra=TRUE,gdal=FALSE RunTexas.sbatch
 sleep 1s
 
-sbatch --job-name=MosaicTexas$year --export=ALL,terra=FALSE,gdal=TRUE RunTexas.sbatch
+#sbatch --job-name=MosaicTexas$year --export=ALL,terra=FALSE,gdal=TRUE RunTexas.sbatch
 sleep 1s
 done

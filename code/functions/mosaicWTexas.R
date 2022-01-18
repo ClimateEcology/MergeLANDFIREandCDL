@@ -1,5 +1,5 @@
 
-library(terra); library(gdalUtils)
+library(terra)
 
 args <- commandArgs(trailingOnly = T)
 terra <- args[2] # year of NASS Cropland Data Layer
