@@ -5,6 +5,8 @@ args <- commandArgs(trailingOnly = T)
 terra <- args[2] # year of NASS Cropland Data Layer
 gdal <- args[3] # region to process
   
+logger::log_info(paste0('terra is ', terra, ' and gdal is ', gdal))
+logger::log_info('Loading tiles.')
 # input parameters
 CDLYear <- 2020
 tiledir = outdir = '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/TX_WestTiles_414/MergedCDLNVC'
@@ -22,12 +24,16 @@ if (!is.na(ID)) {
   mega_paths <- mega_paths[grepl(mega_paths, pattern=ID)]
 }
 
+logger::log_info('Trying to load ', length(mega_paths), 'raster files.')
+
 
 mega_list <- vector("list", length(mega_paths))
 
 for (i in 1:length(mega_paths)) {
   mega_list[[i]] <- terra::rast(mega_paths[i])
 }
+logger::log_info('Loaded ', length(mega_list), 'raster files.')
+
 
 if (terra == T) {
   a <- Sys.time()
