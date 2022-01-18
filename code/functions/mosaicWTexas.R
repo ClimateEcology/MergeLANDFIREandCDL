@@ -136,7 +136,7 @@ if (length(tile_paths) > 1) {
     b <- Sys.time()
     logger::log_info(paste0("Make final: Final raster exists?", file.exists(file1) | file.exists(file2)))
     
-    logger::log_info(paste0("Make final: ", difftime(b,a, units="secs"), 'seconds  to execute terra mosaic.'))
+    logger::log_info(paste0("Make final: ", difftime(b,a, units="mins"), ' minutes  to execute terra mosaic.'))
     
   }
   
@@ -145,7 +145,7 @@ if (length(tile_paths) > 1) {
     gdalUtils::mosaic_rasters(gdalfile=mega_paths, dst_dataset=paste0(tiledir, '/', ID,'_FinalRaster_gdal.tif'))
     d <- Sys.time()
     
-    logger::log_info(paste0("Make final: ", difftime(d,c, units="secs"), ' seconds to execute gdalUtils mosaic.'))
+    logger::log_info(paste0("Make final: ", difftime(d,c, units="minutes"), ' minutes to execute gdalUtils mosaic.'))
   }
 
 }
