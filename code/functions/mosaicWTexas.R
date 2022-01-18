@@ -9,10 +9,11 @@ logger::log_info(paste0('terra is ', terra, ' and gdal is ', gdal))
 logger::log_info('Loading tiles.')
 # input parameters
 CDLYear <- 2020
-tiledir = outdir = '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/TX_WestTiles_414/MergedCDLNVC'
+tiledir = outdir = '../../../../90daydata/geoecoservices/MergeLANDFIREandCDL/TX_WestTiles_414/MergedCDLNVC'
 ID <- paste0('TX_West_CDL', CDLYear,'NVC')
 
 mega_paths <- list.files(tiledir, full.names=T)
+logger::log_info('Trying to load ', length(mega_paths), ' raster files.')
 
 # exclude any extra files
 mega_paths <- mega_paths[!grepl(mega_paths, pattern= ".tif.aux")]
@@ -24,7 +25,7 @@ if (!is.na(ID)) {
   mega_paths <- mega_paths[grepl(mega_paths, pattern=ID)]
 }
 
-logger::log_info('Trying to load ', length(mega_paths), 'raster files.')
+logger::log_info('Trying to load ', length(mega_paths), ' raster files after filtering.')
 
 
 mega_list <- vector("list", length(mega_paths))
