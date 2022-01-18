@@ -39,12 +39,19 @@ logger::log_info('Loaded ', length(mega_list), ' raster files.')
 if (terra == T) {
   logger::log_info('Attempting mosaic.')
   a <- Sys.time()
+  
+  if (compress == T) {
   base::eval(rlang::call2("mosaic", !!!get('mega_list'), .ns="terra", fun='mean', 
                           filename=paste0(tiledir, '/', ID, '_FinalRaster_terra.tif'), overwrite=T,
                           wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
+  } else if (compress == F) {
+    base::eval(rlang::call2("mosaic", !!!get('mega_list'), .ns="terra", fun='mean', 
+                            filename=paste0(tiledir, '/', ID, '_FinalRaster_terra.tif'), overwrite=T)) 
+  }
+  
   b <- Sys.time()
   
-  logger::log_info(paste0(b-a, ' seconds to execute terra mosaic.'))
+  logger::log_info(paste0(difftime(b,a, units="mins"), '  to execute terra mosaic.'))
 }
 
 if (gdal == T) {
@@ -52,6 +59,6 @@ if (gdal == T) {
   gdalUtils::mosaic_rasters(gdalfile=mega_paths, dst_dataset=paste0(tiledir, '/', ID,'_FinalRaster_gdal.tif'))
   d <- Sys.time()
   
-  logger::log_info(paste0(d-c, ' seconds to execute gdalUtils mosaic.'))
+  logger::log_info(paste0(difftime(d,c, units="mins"), ' seconds to execute gdalUtils mosaic.'))
 }
 
