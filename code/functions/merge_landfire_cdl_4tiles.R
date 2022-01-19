@@ -182,8 +182,8 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
     # add NVC and CDL classes for mis-matched pixels
     mismatch_points$NVC_Class <- mismatch_points[,3]
     cdl_ext <- terra::extract(cdl, mismatch_points[,1:2], df=F)
-    names(cdl_ext) <- 'CDL_Class'
-    mismatch_points <- cbind(mismatch_points, cdl_ext)
+    names(cdl_ext) <- c('ID', 'CDL_Class')
+    mismatch_points$CDL_Class <- cdl_ext$CDL_Class
     mismatch_points <- mismatch_points[,-3]
     
     # save mismatch pixels results as a csv file

@@ -1,12 +1,12 @@
 CDLYear <- '2020'
 regionName <- 'Southeast'
 mktiles <- F
-runmerge <- F
+runmerge <- T
 mosaic <- T
 allstates <- F
 
-stateName <- 'TX_West'
+stateName <- 'DE'
 veglayer='nvc'
-verbose=F
+verbose=T
 
 tiles <- tiles[[1]]

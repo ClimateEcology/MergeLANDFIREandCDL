@@ -153,8 +153,13 @@ for (stateName in states) {
     # for some reason, furrr:future_map doesn't return the list of rasters
     # so, we use furrr:walk to generate the files, then read them again
     furrr::future_walk(.x=tiles, .f=merge_landfire_cdl,
-                       datadir=datadir, tiledir=tiledir, valdir=valdir, veglayer='nvc', CDLYear=CDLYear,
-                       buffercells=buffercells, verbose=F, nvc_agclasses=nvc_agclasses, ID=ID,
+                       datadir=datadir, tiledir=tiledir, valdir=valdir, 
+                       veglayer='nvc', 
+                       CDLYear=CDLYear,
+                       buffercells=buffercells, 
+                       verbose=T, 
+                       nvc_agclasses=nvc_agclasses, 
+                       ID=ID,
                        .options=furrr::furrr_options(seed = T))
     
     # stop parallel processing
