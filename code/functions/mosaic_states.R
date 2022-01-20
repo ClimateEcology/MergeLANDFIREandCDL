@@ -59,9 +59,7 @@ ID <- paste0('CDL', CDLYear,'NVC')
       base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean',
                                                                filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier1.tif'),
                                                                overwrite=T))
-      if (verbose == T) {
-        logger::log_info(paste0('Tier 1: Mega tile ', i, " is finished."))
-      }
+      logger::log_info(paste0('Tier 1: Mega tile ', i, " is finished."))
     }
     
     logger::log_info('Tier 1: Finished creating mega tiles.')
@@ -100,7 +98,7 @@ ID <- paste0('CDL', CDLYear,'NVC')
     clusters2 <- calc_state_clusters(state_list=mega_list, tier=2, plot_clusters=F)
     ngroups2 <- length(unique(clusters2))
     
-    logger::log_info('Tier 2: starting mosaic-ing.')
+    logger::log_info('Tier 2: starting mosaic-ing state rasters using ', ngroups2, " clusters.")
     
     ##### create mega tiles by executing mosaic respecting cluster membership
     for (i in 1:ngroups2) {
