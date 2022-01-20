@@ -4,8 +4,8 @@ mosaic_tiles <- function(tiledir, chunksize1, ID, outdir, season=NA, compress=T,
   source('./code/functions/calc_tile_clusters.R')
   
   # save some strings to use later
-  compress_filename <- paste0(tiledir, '/', ID, '_FinalRasterCompress.tif')
-  rawsize_filename <- paste0(tiledir, '/', ID, '_FinalRaster.tif')
+  compress_filename <- paste0(outdir, '/', ID, '_FinalRasterCompress.tif')
+  rawsize_filename <- paste0(outdir, '/', ID, '_FinalRaster.tif')
   
   # make list of files in tiledir
   tile_paths <- list.files(tiledir, full.names=T)
