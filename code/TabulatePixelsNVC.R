@@ -7,7 +7,7 @@ states <- sf::st_read('./data/SpatialData/National.shp') %>%
 
 for (state in unique(states$STUSPS)) {
   
-  one_state <- dplyr::filter(states, STATE==state) #%>%
+  one_state <- dplyr::filter(states, STUSPS==state) #%>%
     #sf::st_combine()
   
   one_nvc <- raster::crop(nvc, raster::extent(one_state)) %>%
@@ -20,7 +20,7 @@ for (state in unique(states$STUSPS)) {
 
   logger::log_info(paste0("Finished ", state, "."))
   
-  if (state == unique(states$STATE)[1]) {
+  if (state == unique(states$STUSPS)[1]) {
     all_freq <- nvc_freq
   }  else {
     all_freq <- rbind(all_freq, nvc_freq)
