@@ -10,6 +10,22 @@ national <- tigris::states() %>% sf::st_as_sf() %>%
   dplyr::filter(!NAME %in% c('Alaska', 'American Samoa', 'Commonwealth of the Northern Mariana Islands', 
                              'Guam', 'Hawaii', 'Puerto Rico', 'United States Virgin Islands'))
 
+# download and write national county-level dataset
+national2 <- tigris::states() %>% sf::st_as_sf() 
+
+national_tojoin <- dplyr::select(national2, STATEFP, NAME) %>% 
+  dplyr::mutate(STATEFP = formatC(as.integer(STATEFP), width = 2, format = "d", flag = "0"),
+                NAME.state=NAME) %>%
+  dplyr::select(-NAME) %>%
+  sf::st_drop_geometry()
+
+national_counties <- tigris::counties() %>% sf::st_as_sf() %>%
+  dplyr::left_join(national_tojoin) %>%
+  dplyr::filter(!NAME.state %in% c('Alaska', 'American Samoa', 'Commonwealth of the Northern Mariana Islands', 
+                                   'Guam', 'Hawaii', 'Puerto Rico', 'United States Virgin Islands'))
+
+sf::st_write(national_counties, paste0('./data/SpatialData/National_byCounty.shp'), delete_dsn=T, append=F)
+
 # split Texas in half. Code crashes trying to write so many tiles.
 texas_counties <- tigris::counties(state='TX')
 
