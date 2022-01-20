@@ -13,7 +13,8 @@ tab_merged_raster <- function(state_path) {
   raster_freq <- terra::freq(one_raster) %>%
     data.frame() %>%
     dplyr::mutate(State = statename,
-                  Year = year) %>%
+                  Year = year,
+                  layer = basename(state_path)) %>%
     dplyr::rename(RasterClass = value, NCells=count)
   
   logger::log_info(paste0("Finished ", statename, "."))
