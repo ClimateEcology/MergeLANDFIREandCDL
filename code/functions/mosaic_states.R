@@ -2,7 +2,7 @@
  
 #statedir <- 'D:/MergeLANDFIRECDL_Rasters/2017MergeCDL_LANDFIRE/2017/' #file path on laptop
 
-CDLYear <- 2019
+CDLYear <- 2020
 outdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL'
 statedir <- paste0(intermediate_dir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/StateRasters/', CDLYear)
 ID <- paste0('CDL', CDLYear,'NVC')
