@@ -2,10 +2,10 @@ library(dplyr)
 
 nvc <- raster::raster('./data/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
 
-states <- sf::st_read('./data/SpatialData/us_states_better_coasts.shp') %>%
+states <- sf::st_read('./data/SpatialData/National.shp') %>%
   sf::st_transform(crs = sf::st_crs(nvc))
 
-for (state in unique(states$STATE)) {
+for (state in unique(states$STUSPS)) {
   
   one_state <- dplyr::filter(states, STATE==state) #%>%
     #sf::st_combine()
@@ -18,6 +18,8 @@ for (state in unique(states$STATE)) {
     dplyr::mutate(State = state) %>%
     dplyr::rename(NVC_Class = value, NCells=count)
 
+  logger::log_info(paste0("Finished ", state, "."))
+  
   if (state == unique(states$STATE)[1]) {
     all_freq <- nvc_freq
   }  else {
