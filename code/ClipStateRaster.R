@@ -34,21 +34,29 @@ if (clipstates == TRUE) {
 
   # narrow down to directories that have tiles (pattern = stateNameTiles_ntiles) & are in specified region
   alltiledirs <- alltiledirs[grepl(alltiledirs, pattern = paste0(states, 'Tiles', collapse="|"))]
-
-  # specify that output rasters are in 'MergedCDLNVC' directory
-  alltiledirs <- paste0(alltiledirs, '/MergedCDLNVC')
   
+  # if final raster was saved inside MergedCDLNVC, move it to base Tile directory
+
   for (tiledir in alltiledirs) {
     
-    dirname <- basename(gsub(tiledir, pattern='/MergedCDLNVC', replacement=""))
+    files_toread <- list.files(tiledir, full.names=T)
+    files_toread <- as.list(files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
+                                           grepl(files_toread, pattern = paste0("CDL", CDLYear))])
+    if (length(files_toread) == 0) {
+      files_toread <- list.files(paste0(tiledir, "/MergedCDLNVC"), full.names=T)
+      files_toread <- files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
+                                             grepl(files_toread, pattern = paste0("CDL", CDLYear))]
+      file.copy(from=files_toread[1], to= paste0(dirname(dirname(files_toread[1])),"/", basename(files_toread[1])) )
+    }
     
+
     if (grepl(tiledir, pattern="TX_West")| grepl(tiledir, pattern="TX_East")) {
       
       # save state name as object to use later
-      stateName <- substr(dirname, start=1, stop=7)
+      stateName <- substr(basename(tiledir), start=1, stop=7)
     } else {
       # save state name as object to use later
-      stateName <- substr(dirname, start=1, stop=2)
+      stateName <- substr(basename(tiledir), start=1, stop=2)
     }
     
       logger::log_info(paste0('Starting clip for ', stateName))
