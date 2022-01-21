@@ -69,7 +69,7 @@ ID <- paste0('CDL', CDLYear,'NVC')
     rm(state_list); rm(state_paths)
     rm(list=ls(pattern="args"))
     
-    ######## Mega-tiles to final raster!
+    ######## Tier 2
     
     mega_paths <- list.files(statedir, full.names=T)
     logger::log_info('Tier 2: Identified ', length(mega_paths), ' raster files before filtering.')
@@ -108,14 +108,54 @@ ID <- paste0('CDL', CDLYear,'NVC')
       base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean',
                               filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2.tif'),
                               overwrite=T))
-      if (verbose == T) {
-        logger::log_info(paste0('Tier 2: Mega tile ', i, " is finished."))
-      }
+      logger::log_info(paste0('Tier 2: Mega tile ', i, " is finished."))
     }
     
     logger::log_info('Tier 2: Finished creating mega tiles.')
     
+    ######## Tier 3
     
+    mega_paths2 <- list.files(statedir, full.names=T)
+    logger::log_info('Tier 3: Identified ', length(mega_paths2), ' raster files before filtering.')
+    
+    
+    # exclude any extra files
+    mega_paths2 <- mega_paths2[!grepl(mega_paths2, pattern= ".tif.aux")]
+    mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern= "MegaTile")]
+    mega_paths2 <- mega_paths2[!grepl(mega_paths2, pattern= "MegaMega")]
+    mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern= paste0("_Tier2.tif"))] #filter to mega-tiles that were created in previous round
+    
+    if (!is.na(ID)) {
+      mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern=ID)]
+    }
+    
+    logger::log_info('Tier 3: Trying to load ', length(mega_paths2), ' raster files after filtering.')
+    
+    # load mega-tiles into list to mosaic
+    mega_list2 <- vector("list", length(mega_paths2))
+    
+    for (i in 1:length(mega_paths2)) {
+      mega_list2[[i]] <- terra::rast(mega_paths2[i])
+    }
+    
+    # assign tiles to clusters based on lat/long
+    clusters3 <- calc_state_clusters(state_list=mega_list2, tier=3, plot_clusters=F)
+    ngroups3 <- length(unique(clusters3))
+    
+    logger::log_info('Tier 3: starting mosaic-ing state rasters using ', ngroups2, " clusters.")
+    
+    ##### create mega tiles by executing mosaic respecting cluster membership
+    for (i in 1:ngroups3) {
+      assign(x=paste0('args3', i), value=mega_list2[clusters3 == i]) 
+      
+      # execute mosaic to create a mega-tile
+      base::eval(rlang::call2("mosaic", !!!get(paste0('args3', i)), .ns="terra", fun='mean',
+                              filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2.tif'),
+                              overwrite=T))
+      logger::log_info(paste0('Tier 3: Mega-mega tile ', i, " is finished."))
+    }
+    
+    logger::log_info('Tier 3: Finished creating mega-mega tile.')
 #   
 #       b <- Sys.time() # save end time
 #       logger::log_info(paste0("Make final: Final raster exists? ", file.exists(file1)))
