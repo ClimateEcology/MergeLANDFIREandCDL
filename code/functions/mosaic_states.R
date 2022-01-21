@@ -1,10 +1,10 @@
 #mosaic_states <- function(statedir, chunksize1, ID, outdir, season=NA, compress=T, verbose=F) {
  
-#outdir <- 'D:/MergeLANDFIRECDL_Rasters/2017MergeCDL_LANDFIRE/' #file path on laptop
+outdir <- 'D:/MergeLANDFIRECDL_Rasters/2017MergeCDL_LANDFIRE/' #file path on laptop
 
-CDLYear <- 2019
+CDLYear <- 2017
 outdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/'
-statedir <- paste0(outdir, CDLYear)
+statedir <- paste0(outdir,'/StateRasters/', CDLYear)
 ID <- paste0('CDL', CDLYear,'NVC')
 
   library(terra)
