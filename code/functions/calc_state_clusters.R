@@ -8,7 +8,7 @@ calc_state_clusters <- function(state_list, tier=1, plot_clusters=F) {
   if (tier == 1) {
     maxdist <- firstdist
   } else {
-    maxdist <- firstdist * (tier * 0.5)
+    maxdist <- firstdist * (tier * 0.65)
   }
   
   # convert tiles to polygons
