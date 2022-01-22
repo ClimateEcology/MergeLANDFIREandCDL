@@ -105,6 +105,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
                               filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2.tif'),
                               overwrite=T))
       logger::log_info(paste0('Tier 2: Mega tile ', i, " is finished."))
+      rm(list=ls(pattern='args2'))
     }
     
     logger::log_info('Tier 2: Finished creating mega tiles.')
@@ -152,6 +153,8 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
                               filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2.tif'),
                               overwrite=T))
       logger::log_info(paste0('Tier 3: Mega-mega tile ', i, " is finished."))
+      rm(list=ls(pattern='args3'))
+      
     }
     
     logger::log_info('Tier 3: Finished creating mega-mega tile.')
