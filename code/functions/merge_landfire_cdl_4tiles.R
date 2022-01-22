@@ -39,46 +39,24 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   if (veglayer == 'nvc') {nvc_ag <- dplyr::filter(vegclasses_key, VALUE %in% nvc_agclasses) }
   
   agclass_match <- read.csv(paste0(datadir, '/TabularData/CDL_NVC_AgClassMatch.csv')) %>%
-    dplyr::filter(GROUP == 'A') %>%
-    dplyr::select(VALUE, CLASS_NAME, GROUP, NVC_Match1, NVC_Match2, NVC_Match3)
+    #dplyr::filter(GROUP == 'A') %>%
+    dplyr::select(VALUE, CLASS_NAME, GROUP, NVC_Match1, NVC_Match2, NVC_Match3, NVC_Match4)
   
+  # names of LANDFIRE classes (simplified) that will be re-assigned
+  habitat_groups <- c('wheat', 'orchard', 'berries', 'vineyard', 'row_crop', 'close_grown_crop',
+                      'aquaculture', 'pasture', 'fallow')
+  search_strings <- c('Wheat', 'Orchard', "Bush fruit and berries", 'Vineyard', 'Row Crop', 'Close Grown Crop',
+                      'Aquaculture', 'Pasture', 'Fallow')
   
-  wheat <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern = 'Wheat')| 
-                              grepl(NVC_Match2, pattern= 'Wheat')|
-                              grepl(NVC_Match3, pattern= 'Wheat')) %>% 
-                              dplyr::pull(CLASS_NAME)
+  # create R objects for each LANDFIRE class listing matching CDL classes
+  for (i in 1:length(habitat_groups)) {
+    assign(x=habitat_groups[i], value = dplyr::filter(agclass_match, grepl(NVC_Match1, pattern = search_strings[i])| 
+                                                        grepl(NVC_Match2, pattern= search_strings[i])|
+                                                        grepl(NVC_Match3, pattern= search_strings[i])|
+                                                        grepl(NVC_Match4, pattern= search_strings[i])) %>% 
+             dplyr::pull(CLASS_NAME) )
+  }
   
-  orchard <- dplyr::filter(agclass_match, NVC_Match1 == 'Orchard') %>% 
-                              dplyr::pull(CLASS_NAME)
-  
-  berries <- dplyr::filter(agclass_match, NVC_Match1 == "Bush fruit and berries") %>% dplyr::pull(CLASS_NAME)
-  
-  vineyard <- dplyr::filter(agclass_match, NVC_Match1 == 'Vineyard') %>% dplyr::pull(CLASS_NAME)
-  
-  row_crop <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Row Crop') | 
-                             grepl(NVC_Match2, pattern= 'Row Crop') |
-                             grepl(NVC_Match3, pattern= 'Row Crop')) %>%
-                             dplyr::pull(CLASS_NAME)
-  
-  close_grown_crop <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Close Grown Crop') | 
-                             grepl(NVC_Match2, pattern= 'Close Grown Crop') |
-                             grepl(NVC_Match3, pattern= 'Close Grown Crop')) %>%
-                             dplyr::pull(CLASS_NAME)
-  
-  aquaculture <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Aquaculture') | 
-                             grepl(NVC_Match2, pattern= 'Aquaculture') |
-                             grepl(NVC_Match3, pattern= 'Aquaculture')) %>%
-                             dplyr::pull(CLASS_NAME)
-  
-  pasture <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Pasture') | 
-                             grepl(NVC_Match2, pattern= 'Pasture') |
-                             grepl(NVC_Match3, pattern= 'Pasture')) %>%
-                             dplyr::pull(CLASS_NAME)
-  
-  fallow <- dplyr::filter(agclass_match, grepl(NVC_Match1, pattern= 'Fallow') | 
-                             grepl(NVC_Match2, pattern= 'Fallow') |
-                             grepl(NVC_Match3, pattern= 'Fallow')) %>%
-                             dplyr::pull(CLASS_NAME)
   
   # Load spatial layers (NVC and CDL rasters)
   cdl <- terra::rast(tiles[[1]])
@@ -93,10 +71,6 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   if (terra::crs(cdl) != terra::crs(nvc)) {
     cdl <- terra::project(x=cdl, y=nvc)
   }
-  
-  
-  habitat_groups <- c('wheat', 'orchard', 'berries', 'vineyard', 'row_crop', 'close_grown_crop',
-                      'aquaculture', 'pasture', 'fallow')
 
   # For each habitat group, replace LANDFIRE class with CDL pixel class (but only if CDL class matches)
   for (habitat_name in habitat_groups) {
