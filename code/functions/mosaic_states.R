@@ -1,4 +1,4 @@
-mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
+mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal') {
 
   library(terra)
   source('./code/functions/calc_state_clusters.R')
