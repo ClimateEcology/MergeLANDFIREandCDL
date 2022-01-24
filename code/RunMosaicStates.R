@@ -13,5 +13,5 @@ outdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/'
 statedir <- paste0(outdir,'/StateRasters/', CDLYear)
 ID <- paste0('CDL', CDLYear,'NVC')
 
-mosaic_states(outdir=outdir, statedir=statedir, ID=ID, tier=c(3), usepackage='gdal')
+mosaic_states(outdir=outdir, statedir=statedir, ID=ID, tier=c(1,2), usepackage='gdal')
 

@@ -1,4 +1,4 @@
-calc_state_clusters <- function(state_list, tier=1, plot_clusters=F) {
+calc_state_clusters <- function(state_list, tier=1, plot_clusters=F, mult=0.8) {
   
   library(dplyr)
   # define max cluster distances based on 3 tier hierarchy
@@ -8,7 +8,7 @@ calc_state_clusters <- function(state_list, tier=1, plot_clusters=F) {
   if (tier == 1) {
     maxdist <- firstdist
   } else {
-    maxdist <- firstdist * (tier * 0.60)
+    maxdist <- firstdist * (tier*mult)
   }
   
   # convert tiles to polygons
