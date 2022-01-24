@@ -158,7 +158,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     clusters3 <- calc_state_clusters(state_list=mega_list2, tier=3, plot_clusters=F)
     ngroups3 <- length(unique(clusters3))
     
-    logger::log_info('Tier 3: starting mosaic-ing state rasters using ', ngroups2, " clusters.")
+    logger::log_info('Tier 3: starting mosaic-ing state rasters using ', ngroups3, " clusters.")
     
     ##### create mega tiles by executing mosaic respecting cluster membership
     for (i in 1:ngroups3) {
