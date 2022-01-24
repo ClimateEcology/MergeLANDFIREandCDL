@@ -100,10 +100,22 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
     for (i in 1:ngroups2) {
       assign(x=paste0('args2', i), value=mega_list[clusters2 == i]) 
       
+      # first try terra package, then gdal Utils
+      tryCatch({
       # execute mosaic to create a mega-tile
       base::eval(rlang::call2("mosaic", !!!get(paste0('args2', i)), .ns="terra", fun='mean',
                               filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2.tif'),
                               overwrite=T))
+      }, error=function(cond) {
+        logger::log_info("Mosaic with terra function failed. Here is the error message:")
+        logger::log_info(cond)
+        logger::log_info(paste0("Now trying mega-tile ", i, " with gdalUtils."))
+        
+        gdalUtils::mosaic_rasters(gdalfile=mega_list[clusters2 == i], 
+                              dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2_gdal.tif'))
+        
+      })
+      
       logger::log_info(paste0('Tier 2: Mega tile ', i, " is finished."))
       rm(list=ls(pattern='args2'))
     }
@@ -123,7 +135,8 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
     mega_paths2 <- mega_paths2[!grepl(mega_paths2, pattern= ".tif.aux")]
     mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern= "MegaTile")]
     mega_paths2 <- mega_paths2[!grepl(mega_paths2, pattern= "MegaMega")]
-    mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern= paste0("_Tier2.tif"))] #filter to mega-tiles that were created in previous round
+    mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern= paste0("_Tier2.tif"))|
+                                 grepl(mega_paths2, pattern= paste0("_Tier2_gdal.tif"))] #filter to mega-tiles that were created in previous round
     
     if (!is.na(ID)) {
       mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern=ID)]
@@ -148,10 +161,22 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
     for (i in 1:ngroups3) {
       assign(x=paste0('args3', i), value=mega_list2[clusters3 == i]) 
       
-      # execute mosaic to create a mega-tile
-      base::eval(rlang::call2("mosaic", !!!get(paste0('args3', i)), .ns="terra", fun='mean',
-                              filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2.tif'),
-                              overwrite=T))
+      # first try terra package, then gdal Utils
+      tryCatch({
+        # execute mosaic to create a mega-tile
+        base::eval(rlang::call2("mosaic", !!!get(paste0('args3', i)), .ns="terra", fun='mean',
+                                filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier3.tif'),
+                                overwrite=T))
+      }, error=function(cond) {
+        logger::log_info("Mosaic with terra function failed. Here is the error message:")
+        logger::log_info(cond)
+        logger::log_info(paste0("Now trying mega-tile ", i, " with gdalUtils."))
+        
+        gdalUtils::mosaic_rasters(gdalfile=mega_list2[clusters3 == i], 
+                                  dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier3_gdal.tif'))
+        
+      })
+      
       logger::log_info(paste0('Tier 3: Mega-mega tile ', i, " is finished."))
       rm(list=ls(pattern='args3'))
       
