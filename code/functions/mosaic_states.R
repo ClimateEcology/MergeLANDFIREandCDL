@@ -80,7 +80,8 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     mega_paths <- mega_paths[!grepl(mega_paths, pattern= ".tif.aux")]
     mega_paths <- mega_paths[grepl(mega_paths, pattern= "MegaTile")]
     mega_paths <- mega_paths[!grepl(mega_paths, pattern= "MegaMega")]
-    mega_paths <- mega_paths[grepl(mega_paths, pattern= paste0("_Tier1.tif"))] #filter to mega-tiles that were created in previous round
+    mega_paths <- mega_paths[grepl(mega_paths, pattern= paste0("_Tier1.tif"))|
+                               grepl(mega_paths, pattern= paste0("_Tier1_gdal.tif"))] #filter to mega-tiles that were created in previous round
     
     if (!is.na(ID)) {
       mega_paths <- mega_paths[grepl(mega_paths, pattern=ID)]
@@ -137,7 +138,8 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     mega_paths2 <- mega_paths2[!grepl(mega_paths2, pattern= ".tif.aux")]
     mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern= "MegaTile")]
     mega_paths2 <- mega_paths2[!grepl(mega_paths2, pattern= "MegaMega")]
-    mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern= paste0("_Tier2.tif"))] #filter to mega-tiles that were created in previous round
+    mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern= paste0("_Tier2.tif"))|
+                                 grepl(mega_paths2, pattern= paste0("_Tier2_gdal.tif"))] #filter to mega-tiles that were created in previous round
     
     if (!is.na(ID)) {
       mega_paths2 <- mega_paths2[grepl(mega_paths2, pattern=ID)]
