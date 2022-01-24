@@ -15,5 +15,5 @@ message(tier)
 # statedir <- paste0(outdir,'/StateRasters/', CDLYear)
 # ID <- paste0('CDL', CDLYear,'NVC')
 # 
-# mosaic_states(outdir=outdir, statedir=statedir, ID=ID, tier=c(1), usepackage='gdal')
+# mosaic_states(outdir=outdir, statedir=statedir, ID=ID, tier=c(1,2,3), usepackage='gdal')
 
