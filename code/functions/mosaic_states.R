@@ -155,7 +155,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     }
     
     # assign tiles to clusters based on lat/long
-    clusters3 <- calc_state_clusters(state_list=mega_list2, tier=3, plot_clusters=F, mult=1)
+    clusters3 <- calc_state_clusters(state_list=mega_list2, tier=3, plot_clusters=F, mult=10)
     ngroups3 <- length(unique(clusters3))
     
     logger::log_info('Tier 3: starting mosaic-ing state rasters using ', ngroups3, " clusters.")
