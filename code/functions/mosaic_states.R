@@ -15,6 +15,8 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     # exclude any extra files
     state_paths <- state_paths[!grepl(state_paths, pattern= ".tif.aux")]
     state_paths <- state_paths[!grepl(state_paths, pattern= "MegaTile")]
+    state_paths <- state_paths[!grepl(state_paths, pattern= "NationalRaster")]
+    
     
     # filter to correct year of CDL (or other ID variable, as necessary)
     # this ID variable will also be included in filename of final output raster
@@ -82,6 +84,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     mega_paths <- mega_paths[!grepl(mega_paths, pattern= ".tif.aux")]
     mega_paths <- mega_paths[grepl(mega_paths, pattern= "MegaTile")]
     mega_paths <- mega_paths[!grepl(mega_paths, pattern= "MegaMega")]
+    mega_paths <- mega_paths[!grepl(mega_paths, pattern= "NationalRaster")]
     mega_paths <- mega_paths[grepl(mega_paths, pattern= paste0("_Tier1.tif"))|
                                grepl(mega_paths, pattern= paste0("_Tier1.tif"))] #filter to mega-tiles that were created in previous round
     
