@@ -58,7 +58,9 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
         } else if (usepackage == 'gdal') {
           gdalUtils::mosaic_rasters(gdalfile=state_paths[clusters == i], 
                                   dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier1.tif'),
-                                  overwrite=T)
+                                  overwrite=T,
+                                  ot='Int16')
+  
         }
         
         logger::log_info(paste0('Tier 1: Mega tile ', i, " is finished."))
@@ -116,7 +118,8 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
 
         gdalUtils::mosaic_rasters(gdalfile=mega_paths[clusters2 == i], 
                               dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2.tif'),
-                              overwrite=T)
+                              overwrite=T,
+                              ot='Int16')
       }
       
       logger::log_info(paste0('Tier 2: Mega tile ', i, " is finished."))
@@ -174,7 +177,9 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
 
         gdalUtils::mosaic_rasters(gdalfile=mega_paths2[clusters3 == i], 
                                   dst_dataset=paste0(statedir, '/', ID,"_NationalRaster_Tier3.tif"),
-                                  overwrite=T, co=c("COMPRESS=DEFLATE", "PREDICTOR=3", "BIGTIFF=YES"))
+                                  overwrite=T, 
+                                  ot='Int16',
+                                  co=c("COMPRESS=DEFLATE", "PREDICTOR=3", "BIGTIFF=YES"))
         
       }
       rm(list=ls(pattern='args3'))
