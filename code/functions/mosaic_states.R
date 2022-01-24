@@ -165,14 +165,14 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
       
       if (usepackage == 'terra') {
         
-        assign(x=paste0('args3', i), value=mega_paths2[clusters3 == i]) 
+        assign(x=paste0('args3', i), value=mega_list2[clusters3 == i]) 
         base::eval(rlang::call2("mosaic", !!!get(paste0('args3', i)), .ns="terra", fun='mean',
                                 filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier3.tif'),
                                 overwrite=T))
 
       } else if (usepackage == 'gdal') {
 
-        gdalUtils::mosaic_rasters(gdalfile=mega_list2[clusters3 == i], 
+        gdalUtils::mosaic_rasters(gdalfile=mega_paths2[clusters3 == i], 
                                   dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier3_gdal.tif'),
                                   overwrite=T)
         
