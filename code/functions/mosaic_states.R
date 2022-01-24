@@ -112,7 +112,8 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
       #   logger::log_info(paste0("Now trying mega-tile ", i, " with gdalUtils."))
         
         gdalUtils::mosaic_rasters(gdalfile=mega_paths[clusters2 == i], 
-                              dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2_gdal.tif'))
+                              dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2_gdal.tif'),
+                              overwrite=T)
         
       # })
       
@@ -173,7 +174,8 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
       #   logger::log_info(paste0("Now trying mega-tile ", i, " with gdalUtils."))
         
         gdalUtils::mosaic_rasters(gdalfile=mega_list2[clusters3 == i], 
-                                  dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier3_gdal.tif'))
+                                  dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier3_gdal.tif'),
+                                  overwrite=T)
         
       # })
       
