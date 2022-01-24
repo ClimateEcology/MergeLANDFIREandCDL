@@ -111,7 +111,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
       #   logger::log_info(cond)
       #   logger::log_info(paste0("Now trying mega-tile ", i, " with gdalUtils."))
         
-        gdalUtils::mosaic_rasters(gdalfile=mega_list[clusters2 == i], 
+        gdalUtils::mosaic_rasters(gdalfile=mega_paths[clusters2 == i], 
                               dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2_gdal.tif'))
         
       # })
@@ -159,7 +159,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier) {
     
     ##### create mega tiles by executing mosaic respecting cluster membership
     for (i in 1:ngroups3) {
-      assign(x=paste0('args3', i), value=mega_list2[clusters3 == i]) 
+      assign(x=paste0('args3', i), value=mega_paths2[clusters3 == i]) 
       
       # # first try terra package, then gdal Utils
       # tryCatch({
