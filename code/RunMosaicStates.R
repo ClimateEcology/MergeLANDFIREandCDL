@@ -2,6 +2,7 @@
 source('./code/functions/mosaic_states.R')
 
 args <- commandArgs(trailingOnly = T)
+message(args)
 
 # specify input parameters
 CDLYear <- args[2] # year of NASS Cropland Data Layer
