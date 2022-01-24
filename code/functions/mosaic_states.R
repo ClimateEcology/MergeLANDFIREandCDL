@@ -174,7 +174,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
 
         gdalUtils::mosaic_rasters(gdalfile=mega_paths2[clusters3 == i], 
                                   dst_dataset=paste0(statedir, '/', ID,"_NationalRaster_Tier3.tif"),
-                                  overwrite=T, co=c("COMPRESS=DEFLATE", "PREDICTOR=3"))
+                                  overwrite=T, co=c("COMPRESS=DEFLATE", "PREDICTOR=3", "BIGTIFF=YES"))
         
       }
       rm(list=ls(pattern='args3'))
