@@ -57,7 +57,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
                                                                    overwrite=T))
         } else if (usepackage == 'gdal') {
           gdalUtils::mosaic_rasters(gdalfile=state_paths[clusters == i], 
-                                  dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier1_gdal.tif'),
+                                  dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier1.tif'),
                                   overwrite=T)
         }
         
@@ -81,7 +81,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     mega_paths <- mega_paths[grepl(mega_paths, pattern= "MegaTile")]
     mega_paths <- mega_paths[!grepl(mega_paths, pattern= "MegaMega")]
     mega_paths <- mega_paths[grepl(mega_paths, pattern= paste0("_Tier1.tif"))|
-                               grepl(mega_paths, pattern= paste0("_Tier1_gdal.tif"))] #filter to mega-tiles that were created in previous round
+                               grepl(mega_paths, pattern= paste0("_Tier1.tif"))] #filter to mega-tiles that were created in previous round
     
     if (!is.na(ID)) {
       mega_paths <- mega_paths[grepl(mega_paths, pattern=ID)]
@@ -100,7 +100,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     clusters2 <- calc_state_clusters(state_list=mega_list, tier=2, plot_clusters=F, mult=0.8)
     ngroups2 <- length(unique(clusters2))
     
-    logger::log_info('Tier 2: starting mosaic-ing state rasters using ', ngroups2, " clusters.")
+    logger::log_info('Tier 2: starting mosaic-ing mega tiles using ', ngroups2, " clusters.")
     
     ##### create mega tiles by executing mosaic respecting cluster membership
     for (i in 1:ngroups2) {
@@ -115,7 +115,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
       } else if (usepackage == 'gdal') {
 
         gdalUtils::mosaic_rasters(gdalfile=mega_paths[clusters2 == i], 
-                              dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2_gdal.tif'),
+                              dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2.tif'),
                               overwrite=T)
       }
       
@@ -158,7 +158,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     clusters3 <- calc_state_clusters(state_list=mega_list2, tier=3, plot_clusters=F, mult=10)
     ngroups3 <- length(unique(clusters3))
     
-    logger::log_info('Tier 3: starting mosaic-ing state rasters using ', ngroups3, " clusters.")
+    logger::log_info('Tier 3: starting mosaic-ing mega tiles using ', ngroups3, " clusters.")
     
     ##### create mega tiles by executing mosaic respecting cluster membership
     for (i in 1:ngroups3) {
@@ -173,16 +173,14 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
       } else if (usepackage == 'gdal') {
 
         gdalUtils::mosaic_rasters(gdalfile=mega_paths2[clusters3 == i], 
-                                  dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier3_gdal.tif'),
-                                  overwrite=T)
+                                  dst_dataset=paste0(statedir, '/', ID,"_NationalRaster_Tier3.tif"),
+                                  overwrite=T, co=c("COMPRESS=DEFLATE", "PREDICTOR=3"))
         
       }
-
-      logger::log_info(paste0('Tier 3: Mega-mega tile ', i, " is finished."))
       rm(list=ls(pattern='args3'))
       
     }
     
-    logger::log_info('Tier 3: Finished creating mega-mega tile.')
+    logger::log_info('Tier 3: Finished national raster.')
   }
 }
