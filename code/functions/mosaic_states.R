@@ -55,7 +55,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
           base::eval(rlang::call2("mosaic", !!!get(paste0('args', i)), .ns="terra", fun='mean',
                                                                    filename=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier1.tif'),
                                                                    overwrite=T))
-        } else if (gdal == T) {
+        } else if (usepackage == 'gdal') {
           gdalUtils::mosaic_rasters(gdalfile=state_paths[clusters == i], 
                                   dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier1_gdal.tif'),
                                   overwrite=T)
