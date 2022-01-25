@@ -6,7 +6,7 @@ message(args)
 
 # specify input parameters
 CDLYear <- args[2] # year of NASS Cropland Data Layer
-tier <- args[3] # which hierarchy of mosaic states to process
+tier <- unlist(stringr::str_split(args[3], pattern=":")) # which hierarchy of mosaic states to process
 
 message(tier)
 #outdir <- 'D:/MergeLANDFIRECDL_Rasters/2017MergeCDL_LANDFIRE/' #file path on laptop
