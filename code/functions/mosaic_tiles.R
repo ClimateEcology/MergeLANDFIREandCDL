@@ -127,9 +127,16 @@ mosaic_tiles <- function(tiledir, chunksize1, ID, outdir, season=NA, compress=T,
       
       if (compress == T) {
         file1 <- compress_filename
-        base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
-                                filename=compress_filename, overwrite=T,
-                                wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
+        # base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
+        #                         filename=compress_filename, overwrite=T,
+        #                         wopt= list(gdal=c("COMPRESS=DEFLATE", "PREDICTOR=3"))))
+        
+        gdalUtils::mosaic_rasters(gdalfile=mega_paths, 
+                                  dst_dataset=compress_filename,
+                                  overwrite=T, 
+                                  ot='Int16',
+                                  co=c("COMPRESS=DEFLATE", "BIGTIFF=YES")) 
+        
       } else if (compress == F) {
         file1 <- rawsize_filename
         base::eval(rlang::call2("mosaic", rsrc, .ns="terra", fun='mean', 
@@ -138,7 +145,7 @@ mosaic_tiles <- function(tiledir, chunksize1, ID, outdir, season=NA, compress=T,
   
       b <- Sys.time() # save end time
       logger::log_info(paste0("Make final: Final raster exists? ", file.exists(file1)))
-      logger::log_info(paste0("Make final: ", difftime(b,a, units="mins"), ' minutes  to execute mosaic w/ terra.'))
+      logger::log_info(paste0("Make final: ", difftime(b,a, units="mins"), ' minutes  to execute mosaic.'))
     }
   
   }
