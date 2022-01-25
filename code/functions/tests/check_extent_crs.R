@@ -8,6 +8,13 @@ check_extent_crs <- function(dir) {
   
   files <- list.files(dir, pattern='FinalRasterCompress', full.names=T)
 
+  # save state name
+  if (grepl(basename(files[i]), pattern="TX_East")|grepl(basename(files[i]), pattern="TX_West")) {
+    state <- stringr::str_sub(basename(files[i]), start=1, end=7)
+  } else {
+    state <- stringr::str_sub(basename(files[i]), start=1, end=2)
+  }
+  
   for (onefile in files) {
     
   onerast <- terra::rast(onefile)
@@ -27,7 +34,18 @@ check_extent_crs <- function(dir) {
     res <- rbind(res, onerow)
   }
   
-  if (any(res$CRS_match)) {
-    
+  # warn if CRS does not match
+  if (any(!res$CRS_match)) {
+    warning(paste0(state, " CRS does not match reference raster in at least one year."))
   }
+  
+  if (any(!res$Extent_match)) {
+    warning(paste0(state, " extent does not match reference raster in at least one year."))
+  
+    } else if (all(res$CRS_match) & all(res$Extent_match)) {
+    logger::log_info(paste0('Check raster crs & extent: ', state, " rasters look good."))
+  }
+  
+  }
+}
   
