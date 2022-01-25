@@ -2,8 +2,8 @@
 check_extent_crs <- function(dir) {
   
   # remove output file if it exists in env
-  if (exists('res')) {
-    rm(files, onerast, refrast, crs_match, ext_match, res, onerow) 
+  if (exists('res_df')) {
+    rm(files, onerast, refrast, crs_match, ext_match, res_df, onerow) 
   }
   
   files <- list.files(dir, pattern='FinalRasterCompress', full.names=T)
@@ -26,23 +26,23 @@ check_extent_crs <- function(dir) {
   crs_match <- terra::crs(onerast) == terra::crs(refrast)
   ext_match <- terra::ext(onerast) == terra::ext(refrast)
   
-  onerow <- tibble::tibble(Raster=onerast, CompareTo=files[1], CRS_match=crs_match, Extent_match=ext_match)
+  onerow <- tibble::tibble(Raster=onefile, CompareTo=files[1], CRS_match=crs_match, Extent_match=ext_match)
   
   if (onefile == files[1]) {
-    res <- onerow
+    res_df <- onerow
   } else {
-    res <- rbind(res, onerow)
+    res_df <- rbind(res_df, onerow)
   }
   
   # warn if CRS does not match
-  if (any(!res$CRS_match)) {
+  if (any(!res_df$CRS_match)) {
     warning(paste0(state, " CRS does not match reference raster in at least one year."))
   }
   
-  if (any(!res$Extent_match)) {
+  if (any(!res_df$Extent_match)) {
     warning(paste0(state, " extent does not match reference raster in at least one year."))
   
-    } else if (all(res$CRS_match) & all(res$Extent_match)) {
+    } else if (all(res_df$CRS_match) & all(res_df$Extent_match)) {
     logger::log_info(paste0('Check raster crs & extent: ', state, " rasters look good."))
   }
   
