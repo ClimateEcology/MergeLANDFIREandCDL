@@ -23,5 +23,7 @@ for (onedir in alltiledirs) {
   check_extent_crs(onedir)
 }
 
-# are all values in state rasters in raster attribute table?
-#res2019 <- check_rastervalues(CDLYear = CDLYear)
+logger::log_info('Finished file size, CRS, and extent tests.')
+
+# all values in state rasters in raster attribute table?
+res2019 <- check_rastervalues(CDLYear = CDLYear)
