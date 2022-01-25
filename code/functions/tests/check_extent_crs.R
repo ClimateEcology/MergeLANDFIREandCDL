@@ -9,29 +9,30 @@ check_extent_crs <- function(dir) {
   files <- list.files(dir, pattern='FinalRasterCompress', full.names=T)
   
   for (onefile in files) {
+      
+    # save state name
+    if (grepl(basename(onefile), pattern="TX_East")|grepl(basename(onefile), pattern="TX_West")) {
+      state <- stringr::str_sub(basename(onefile), start=1, end=7)
+    } else {
+      state <- stringr::str_sub(basename(onefile), start=1, end=2)
+    }
     
-  # save state name
-  if (grepl(basename(onefile), pattern="TX_East")|grepl(basename(onefile), pattern="TX_West")) {
-    state <- stringr::str_sub(basename(onefile), start=1, end=7)
-  } else {
-    state <- stringr::str_sub(basename(onefile), start=1, end=2)
-  }
-  
-  onerast <- terra::rast(onefile)
-  
-  if (onefile == files[1]) {
-    refrast <- onerast
-  }
-  
-  crs_match <- terra::crs(onerast) == terra::crs(refrast)
-  ext_match <- terra::ext(onerast) == terra::ext(refrast)
-  
-  onerow <- tibble::tibble(Raster=onefile, CompareTo=files[1], CRS_match=crs_match, Extent_match=ext_match)
-  
-  if (onefile == files[1]) {
-    res_df <- onerow
-  } else {
-    res_df <- rbind(res_df, onerow)
+    onerast <- terra::rast(onefile)
+    
+    if (onefile == files[1]) {
+      refrast <- onerast
+    }
+    
+    crs_match <- terra::crs(onerast) == terra::crs(refrast)
+    ext_match <- terra::ext(onerast) == terra::ext(refrast)
+    
+    onerow <- tibble::tibble(Raster=onefile, CompareTo=files[1], CRS_match=crs_match, Extent_match=ext_match)
+    
+    if (onefile == files[1]) {
+      res_df <- onerow
+    } else {
+      res_df <- rbind(res_df, onerow)
+    }
   }
   
   # warn if CRS does not match
@@ -44,8 +45,6 @@ check_extent_crs <- function(dir) {
   
     } else if (all(res_df$CRS_match) & all(res_df$Extent_match)) {
     logger::log_info(paste0('Check raster crs & extent: ', state, " rasters look good."))
-  }
-  
   }
 }
   
