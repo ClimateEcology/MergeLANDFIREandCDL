@@ -47,7 +47,7 @@ library(terra)
 
 #create new version of CDL class table with negative values to match raster
 cdl_tomerge <- dplyr::mutate(cdl_classes, VALUE = -VALUE) %>%
-  dplyr::filter(GROUP == 'A') %>%
+  dplyr::filter(GROUP == 'A'|VALUE %in% c(-176, -61, -37)) %>%
   dplyr::select(VALUE, CLASS_NAME, RED, GREEN, BLUE)
 
 nvc_tomerge <- dplyr::select(vegclasses_key, VALUE, !!name_column, r, g, b, Red, Green, Blue) %>%
@@ -65,8 +65,11 @@ all_classes <- nvc_tomerge %>%
   dplyr::select(ID, tidyr::everything()) %>%
   dplyr::filter(!duplicated(VALUE)) #take out extra 'background, value = 0' row
 
-#filter all classes to those that are actually in the combined raster (plus grass/pasture and other hay)
-#all_classes <- dplyr::filter(all_classes, VALUE %in% terra::values(vegmap))
+# add created class for 'no data, mis-matched pixel'
+toadd <- all_classes[1,] %>%
+  dplyr::mutate(ID=-1001, VALUE=-1001, Class_Name='Nodata, CDL/NVC mismatch')
+
+all_classes <- rbind(all_classes, toadd)
 ```
 ## Save tables
 ```{r save}
