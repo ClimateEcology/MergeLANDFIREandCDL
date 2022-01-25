@@ -46,7 +46,7 @@ check_rastervalues <- function(CDLYear) {
                                 TestResult= dplyr::if_else(!(length(classes_toflag) > 0), 'PASS', 'FAIL'),
                                 FlagClasses = dplyr::if_else((length(classes_toflag) > 0), paste0(classes_toflag, collapse = ','), 'Test passed'))
     
-    logger::log_info("Finished ", stateName, '.')
+    logger::log_info("Check ", CDLYear, " raster values: Finished ", stateName, '.')
     
     if (i == 1) {
       check_test <- state_out

@@ -41,6 +41,6 @@ check_rastersize <- function(dir, cutoff_pct) {
     
     warning(paste0(state, " had suspiciously small raster output in ", years, ". Check if mosaic function excluded tiles."))
   } else {
-    print(paste0(state, " rasters look fine."))
+    logger::log_info(paste0('Check raster size: ', state, " rasters look fine."))
   }
 }
