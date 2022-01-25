@@ -53,5 +53,6 @@ check_rastervalues <- function(CDLYear) {
       check_test <- rbind(check_test, state_out)
     }
   }
+  logger::log_info('Finished raster values test.')
   return(check_test)
 }
