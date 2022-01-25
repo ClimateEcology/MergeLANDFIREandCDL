@@ -21,7 +21,7 @@ check_rastervalues <- function(CDLYear) {
     temp <- temp[[1]]
     
     if (length(temp) > 2) {
-      stateName <- paste0(temp[1], "_", temp2) # Texas east and west have _ in state name so require special treatment
+      stateName <- paste0(temp[1], "_", temp[2]) # Texas east and west have _ in state name so require special treatment
     } else {
       stateName <- temp[1]
     }
