@@ -1,5 +1,5 @@
 
-source('./code/functions/check_rastersize.R')
+source('./code/functions/tests/check_rastersize.R')
 
 alltiledirs <- list.dirs('../../../90daydata/geoecoservices/MergeLANDFIREandCDL', recursive=F)
 
