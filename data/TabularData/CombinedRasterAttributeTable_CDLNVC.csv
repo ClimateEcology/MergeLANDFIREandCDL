@@ -1,0 +1,608 @@
+"ID","VALUE","Class_Name","RED","GREEN","BLUE"
+-9999,-9999,"Nodata",1,1,1
+6001,6001,"South Florida Slash Pine Forest",0.454902,0.839216,0.8
+6002,6002,"Caribbean Hardwood Hammock & Coastal Strand Forest",0.235294,0.443137,0.494118
+6402,6402,"Caribbean Hardwood Hammock & Coastal Strand Shrubland",0.235294,0.443137,0.494118
+6003,6003,"Caribbean Lowland Swamp",0.847059,0.847059,0.74902
+6005,6005,"Caribbean Fringe Mangrove",0.356863,0.764706,0.780392
+6006,6006,"Dry-Mesic Loamy Longleaf Pine Woodland",0.454902,0.839216,0.8
+6406,6406,"Dry-Mesic Loamy Longleaf Pine Grassland",0.454902,0.839216,0.8
+6007,6007,"Mesic Longleaf Pine Flatwoods-Spodosol Woodland",0.454902,0.839216,0.8
+6008,6008,"Sand Pine Scrub Forest & Open Woodland",0.454902,0.839216,0.8
+6009,6009,"Wet-Mesic Longleaf Pine Woodland",0.454902,0.839216,0.8
+6010,6010,"Xeric Longleaf Pine Woodland",0.454902,0.839216,0.8
+6011,6011,"Western Gulf Coastal Plain Pine - Oak Forest & Woodland - Evergreen Modifier",0.333333,0.733333,0.760784
+6412,6412,"Western Gulf Coastal Plain Pine - Oak Forest & Woodland - Deciduous Modifier",0.333333,0.733333,0.760784
+6413,6413,"Western Gulf Coastal Plain Pine - Oak Forest & Woodland - Mixed Modifier",0.333333,0.733333,0.760784
+6012,6012,"Southern Evergreen Oak Forest",0.568627,1,0.45098
+6013,6013,"Live Oak - Hickory - Palmetto Forest",0.419608,0.819608,0.807843
+6014,6014,"Southern Mesic Beech - Magnolia - Oak Forest",0.568627,1,0.45098
+6015,6015,"Southern Mesic Beech - Oak - Mixed Deciduous Forest",0.568627,1,0.45098
+6016,6016,"California Broadleaf Forest & Woodland",0.513725,0.870588,0.431373
+6017,6017,"California Conifer Forest & Woodland",0.878431,0.988235,0.752941
+6018,6018,"California Moist Coastal Mixed Evergreen Forest",0,0.239216,0
+6019,6019,"Southern Plateau Dry Forest & Woodland",0.47451,1,0.368627
+6020,6020,"Southern Plateau Dry-Mesic Hardwood Forest",0.501961,0.380392,0.270588
+6021,6021,"Madrean Encinal",0,0.929412,0
+6022,6022,"Madrean Juniper Savanna & Woodland",0.568627,0.458824,0.329412
+6023,6023,"Madrean Pinyon - Juniper Woodland",0.47451,1,0.368627
+6024,6024,"Madrean Lower Montane Pine - Oak Forest & Woodland",0,0.929412,0
+6025,6025,"Madrean Upper Montane Conifer - Oak Forest & Woodland",0,0.929412,0
+6026,6026,"Southern Plains Mesquite Scrub Woodland & Shrubland",0.290196,0.172549,0.113725
+6027,6027,"Southern Plains Oak - Juniper Scrub Woodland",0.47451,1,0.368627
+6028,6028,"Appalachian Oak / Chestnut Forest",0.333333,0.733333,0.760784
+6029,6029,"North Atlantic Maritime Scrub Forest",0.568627,1,0.45098
+6429,6429,"North Atlantic Maritime Scrub Shrubland",0.568627,1,0.45098
+6030,6030,"Northeastern Chinkapin Oak - Red-cedar Forest & Woodland",0.47451,1,0.368627
+6031,6031,"Northeastern Oak - Hickory Forest & Woodland",0.333333,0.733333,0.760784
+6032,6032,"Pitch Pine Barrens Woodland",0.47451,1,0.368627
+6432,6432,"Pitch Pine Barrens Shrubland",0.47451,1,0.368627
+6033,6033,"Virginia Pine & Table Mountain Pine Barrens Woodland",0.47451,1,0.368627
+6034,6034,"Appalachian & Interior Mesic Forest",0.501961,0.380392,0.270588
+6035,6035,"North-Central Beech - Maple - Basswood Forest",0.670588,1,0.541176
+6036,6036,"North-Central Oak - Hickory Forest & Woodland",0.333333,0.733333,0.760784
+6037,6037,"North-Central Oak Savanna & Barrens Tree",0.333333,0.733333,0.760784
+6437,6437,"North-Central Oak Savanna & Barrens Herb",0.333333,0.733333,0.760784
+6038,6038,"Eastern Great Plains Tallgrass Aspen Parkland Tree",0.752941,1,0.541176
+6438,6438,"Eastern Great Plains Tallgrass Aspen Parkland Shrub",0.752941,1,0.541176
+6039,6039,"Great Plains Oak Woodland",0.023529,0.207843,0.478431
+6040,6040,"Northern & Central Great Plains Mesic Woodland",0.501961,0.380392,0.270588
+6042,6042,"Central & Southern Appalachian Red Spruce - Fir - Hardwood Forest",1,0.411765,0.180392
+6043,6043,"Laurentian & Acadian Hardwood Forest",1,0.411765,0.180392
+6044,6044,"Laurentian & Acadian Hemlock - White Pine - Hardwood Forest",1,0.411765,0.180392
+6045,6045,"Northern Appalachian & Acadian Red Spruce - Fir - Hardwood Forest",1,0.411765,0.180392
+6046,6046,"Northern Mesic Balsam Fir-Spruce-Hardwood-Forest",1,0.411765,0.180392
+6047,6047,"Appalachian & Allegheny Northern Hardwood - Conifer Mixed Forest",0.501961,0.380392,0.270588
+6048,6048,"Great Lakes Pine Barrens",1,0.580392,0.278431
+6049,6049,"Laurentian & Acadian Pine - Oak Forest & Woodland - Mixed Modifier",1,0.580392,0.278431
+6450,6450,"Laurentian & Acadian Pine - Oak Forest & Woodland - Evergreen Modifier",1,0.580392,0.278431
+6451,6451,"Laurentian & Acadian Pine - Oak Forest & Woodland - Deciduous Modifier",1,0.580392,0.278431
+6050,6050,"Northern Dry Jack Pine-Red Pine-Hardwood Woodland",1,0.580392,0.278431
+6051,6051,"Northern Dry-Mesic Pine-Black Spruce-Hardwood Forest",1,0.580392,0.278431
+6052,6052,"Laurentian & Acadian Limestone Woodland",1,0.580392,0.278431
+6452,6452,"Laurentian & Acadian Limestone Shrubland",1,0.580392,0.278431
+6053,6053,"Chinkapin Oak-Shumard Oak-Blue Ash Alkaline Forest",0.333333,0.733333,0.760784
+6054,6054,"Piedmont & Central Atlantic Coastal Plain Oak Forest",0.333333,0.733333,0.760784
+6055,6055,"Shortleaf Pine - Oak Forest - Evergreen Modifier",0.454902,0.839216,0.745098
+6356,6356,"Shortleaf Pine - Oak Forest - Deciduous Modifier",0.454902,0.839216,0.745098
+6357,6357,"Shortleaf Pine - Oak Forest - Mixed Modifier",0.454902,0.839216,0.745098
+6056,6056,"South-Central Interior Oak Forest & Woodland",0.333333,0.733333,0.760784
+6057,6057,"South-Central Interior Oak Savanna",0.333333,0.733333,0.760784
+6058,6058,"Southeastern Great Plains Post Oak - Blackjack Oak Forest & Woodland",0.333333,0.733333,0.760784
+6059,6059,"Central Rocky Mountain Douglas-fir - Pine Forest",0,0.2,0
+6060,6060,"Central Rocky Mountain Ponderosa Pine Woodland & Savanna",0.215686,0.572549,0.678431
+6061,6061,"Middle Rocky Mountain Montane Douglas-fir Forest & Woodland",0,0.2,0
+6062,6062,"Northwestern Great Plains-Black Hills Ponderosa Pine Forest & Woodland",0.839216,1,0.709804
+6063,6063,"Rocky Mountain Foothill-Rock Outcrop Limber Pine - Juniper Woodland",0.682353,0.960784,0.878431
+6064,6064,"Central Rocky Mountain Interior Western Red-cedar - Western Hemlock Forest",0.376471,1,0.278431
+6065,6065,"Central Rocky Mountain Mesic Grand Fir - Douglas-fir Forest",0.376471,1,0.278431
+6066,6066,"Central Rocky Mountain Montane White Spruce Forest",0.713725,0.980392,0.890196
+6067,6067,"Intermountain Basins Subalpine Limber Pine - Bristlecone Pine Woodland",0.247059,1,0.180392
+6068,6068,"Northern Rocky Mountain Whitebark Pine - Subalpine Larch Woodland",0.74902,1,0.913725
+6069,6069,"Rocky Mountain Lodgepole Pine Forest & Woodland",0.639216,0.941176,0.858824
+6070,6070,"Rocky Mountain Subalpine Dry-Mesic Spruce - Fir Forest & Woodland",0.92549,0.988235,0.8
+6071,6071,"Rocky Mountain Subalpine Moist Spruce - Fir Forest & Woodland",0.92549,0.988235,0.8
+6072,6072,"Rocky Mountain Subalpine-Montane Aspen Forest & Woodland",0.752941,1,0.541176
+6073,6073,"Rocky Mountain Subalpine-Montane Limber Pine - Bristlecone Pine Woodland",0.247059,1,0.180392
+6074,6074,"Rocky Mountain Douglas-fir - White Fir - Blue Spruce Mesic Forest",0,0.8,0
+6075,6075,"Southern Rocky Mountain Ponderosa Pine Forest & Woodland",0.839216,1,0.709804
+6076,6076,"Southern Rocky Mountain Ponderosa Pine Savanna",0.839216,1,0.709804
+6077,6077,"Southern Rocky Mountain White Fir - Douglas-fir Dry Forest",0,0.2,0
+6078,6078,"Colorado Plateau - Great Basin Juniper Woodland & Savanna",0.305882,1,0.231373
+6079,6079,"Colorado Plateau Pinyon - Juniper Woodland",0.47451,1,0.368627
+6080,6080,"Columbia Plateau Western Juniper Woodland & Savanna",0.423529,1,0.321569
+6480,6480,"Columbia Plateau Western Juniper Shrubland",0.423529,1,0.321569
+6081,6081,"Great Basin Pinyon - Juniper Woodland",0.305882,1,0.231373
+6082,6082,"Intermountain Basins Curl-leaf Mountain-mahogany Scrub",0.607843,0.921569,0.847059
+6482,6482,"Intermountain Basins Curl-leaf Mountain-mahogany Woodland",0.607843,0.921569,0.847059
+6083,6083,"Southern Rocky Mountain Juniper Woodland & Savanna",0.47451,1,0.368627
+6084,6084,"Southern Rocky Mountain Pinyon-Juniper Woodland",0.47451,1,0.368627
+6085,6085,"California Montane Conifer Forest & Woodland",0,0.8,0
+6086,6086,"California Coastal Redwood Forest",0.529412,1,0.411765
+6087,6087,"Cascadian Conifer Forest & Woodland",0.796078,1,0.670588
+6388,6388,"Cascadian Oregon White Oak Forest & Woodland",0.796078,1,0.670588
+6389,6389,"Cascadian Oregon White Oak - Conifer Forest & Woodland",0.796078,1,0.670588
+6088,6088,"East Cascades Mesic Grand Fir - Douglas-fir Forest",0.376471,1,0.278431
+6089,6089,"North Pacific Maritime Douglas-fir - Western Hemlock Forest",0,0.411765,0
+6090,6090,"North Pacific Maritime Silver Fir - Western Hemlock Forest",0,0.278431,0
+6091,6091,"North Pacific Red Alder - Bigleaf Maple - Douglas-fir Forest",0.572549,0.909804,0.843137
+6092,6092,"North Pacific Western Hemlock - Sitka Spruce - Western Red-cedar Seasonal Rainforest",0,0.321569,0
+6094,6094,"North Pacific Mountain Hemlock - Silver Fir Forest & Tree Island",0,0.360784,0
+6095,6095,"Sierra-Cascade Cold-Dry Subalpine Woodland",0.639216,0.941176,0.858824
+6096,6096,"Sierra-Cascade Red Fir - Mountain Hemlock Forest",0,0.619608,0
+6097,6097,"Central & Appalachian Seepage Swamp",0.356863,0.764706,0.780392
+6098,6098,"North-Central Flatwoods & Swamp Forest",0.356863,0.764706,0.780392
+6099,6099,"South-Central Flatwoods & Pond Forest",0.568627,1,0.45098
+6100,6100,"Northern & Central Great Plains Floodplain Forest",0.023529,0.207843,0.478431
+6101,6101,"Silver Maple - Green Ash - Black Ash Floodplain Forest",0.356863,0.764706,0.780392
+6501,6501,"Silver Maple - Green Ash - Black Ash Floodplain Shrubland",0.356863,0.764706,0.780392
+6102,6102,"Silver Maple - Green Ash - Sycamore Floodplain Forest",0,0.360784,0
+6502,6502,"Silver Maple - Green Ash - Sycamore Floodplain Shrubland",0,0.360784,0
+6103,6103,"Silver Maple - Sugarberry - Sweetgum Floodplain Forest",0,0.360784,0
+6503,6503,"Silver Maple - Sugarberry - Sweetgum Floodplain Shrubland",0,0.360784,0
+6506,6506,"Silver Maple - Sugarberry - Sweetgum Floodplain Herbaceous",0,0.360784,0
+6104,6104,"Northern Atlantic Coastal Hardwood & Conifer Swamp Forest",0,0.360784,0
+6504,6504,"Northern Atlantic Coastal Hardwood & Conifer Swamp Shrubland",0,0.360784,0
+6505,6505,"Northern Atlantic Coastal Hardwood & Conifer Swamp Herbaceous",0,0.360784,0
+6105,6105,"Laurentian-Acadian-Allegheny Acidic Swamp",0.356863,0.764706,0.780392
+6106,6106,"Laurentian-Acadian-Allegheny Alkaline Swamp",0.356863,0.764706,0.780392
+6108,6108,"Pond-cypress Swamp",0.356863,0.764706,0.780392
+6109,6109,"Coastal Plain Hardwood Basin Swamp",0.847059,0.847059,0.74902
+6110,6110,"Hardwood & Loblolly Pine Nonriverine Wet Flatwoods - Evergreen Modifier",0.392157,0.8,0.807843
+6510,6510,"Hardwood & Loblolly Pine Nonriverine Wet Flatwoods - Deciduous Modifier",0.392157,0.8,0.807843
+6514,6514,"Hardwood & Loblolly Pine Nonriverine Wet Flatwoods - Mixed Modifier",0.392157,0.8,0.807843
+6111,6111,"Coastal Plain Mixed Evergreen Swamp Forest",0.847059,0.847059,0.74902
+6511,6511,"Coastal Plain Mixed Evergreen Swamp Shrubland",0.847059,0.847059,0.74902
+6112,6112,"Bald-cypress - Tupelo Floodplain Forest",0.568627,1,0.45098
+6512,6512,"Bald-cypress - Tupelo Floodplain Shrubland",0.568627,1,0.45098
+6513,6513,"Bald-cypress - Tupelo Floodplain Herbaceous",0.568627,1,0.45098
+6113,6113,"Oak - Sweetgum Floodplain Forest",0.568627,1,0.45098
+6414,6414,"Oak - Sweetgum Floodplain Herbaceous",0.568627,1,0.45098
+6415,6415,"Oak - Sweetgum Floodplain Shrubland",0.568627,1,0.45098
+6115,6115,"Southern Ash-Elm-Willow Floodplain Forest",0.098039,0.627451,0.705882
+6117,6117,"Rocky Mountain & Great Basin Montane Riparian Forest",0.286275,0.670588,0.729412
+6118,6118,"Rocky Mountain & Great Basin Swamp Forest",0.286275,0.670588,0.729412
+6121,6121,"Tamaulipan Wet-Mesic Scrub Forest",0.317647,0.705882,0.552941
+6521,6521,"Tamaulipan Wet-Mesic Scrub Shrubland",0.317647,0.705882,0.552941
+6621,6621,"Tamaulipan Wet-Mesic Scrub Herbaceous",0.317647,0.705882,0.552941
+6122,6122,"North Pacific Lowland Riparian Forest & Woodland",0.262745,0.635294,0.709804
+6522,6522,"North Pacific Lowland Riparian Shrubland",0.262745,0.635294,0.709804
+6123,6123,"North Pacific Maritime Hardwood - Conifer Swamp Forest",0.262745,0.635294,0.709804
+6523,6523,"North Pacific Maritime Hardwood - Conifer Swamp Shrubland",0.262745,0.635294,0.709804
+6125,6125,"North Pacific Montane Riparian Woodland",0.262745,0.635294,0.709804
+6525,6525,"North Pacific Montane Riparian Shrubland",0.262745,0.635294,0.709804
+6129,6129,"Balsam Fir-Black Spruce Eastern Boreal Rich Swamp",0.729412,0.639216,0.466667
+6130,6130,"Eastern Black Spruce-Tamarack Poor Swamp",0.729412,0.639216,0.466667
+6131,6131,"Eastern Boreal Hardwood Floodplain & Swamp",0.196078,0.537255,0.658824
+6132,6132,"Caribbean Coastal Cactus Scrub",0.65098,0.545098,0.419608
+6532,6532,"Caribbean Coastal Cactus Sparse Vegetation",0.65098,0.545098,0.419608
+6133,6133,"Caribbean Coastal Beach & Dune Herb Vegetation",0.392157,0.392157,0.392157
+6533,6533,"Caribbean Coastal Beach & Dune Sparse Vegetation",0.392157,0.392157,0.392157
+6134,6134,"Caribbean Coastal Rock Pavement & Cliff",0.392157,0.392157,0.392157
+6135,6135,"South Florida Freshwater Marsh",1,0.6,0
+6535,6535,"South Florida Freshwater Marsh Willow",1,0.6,0
+6136,6136,"California Maritime Chaparral",0.419608,0.301961,0.211765
+6137,6137,"California Mesic & Pre-montane Chaparral",0.231373,0.117647,0.07451
+6138,6138,"California Xeric Chaparral",0.388235,0.270588,0.184314
+6139,6139,"California Coastal & Foothill Seral Scrub",0.788235,0.454902,0.117647
+6140,6140,"California North Coastal & Mesic Scrub",0.788235,0.454902,0.117647
+6141,6141,"Central & Southern California Coastal Sage Scrub",0.65098,0.545098,0.419608
+6143,6143,"California Native Perennial Grassland",1,0.921569,0.6
+6144,6144,"Central Rocky Mountain High Montane Mesic Shrubland",0.501961,0.380392,0.270588
+6145,6145,"Central Rocky Mountain Lower Montane Foothill & Valley Grassland",1,0.776471,0.419608
+6146,6146,"Central Rocky Mountain Montane Grassland",1,0.721569,0.380392
+6147,6147,"Central Rocky Mountain Montane-Foothill Deciduous Shrubland",0.458824,0.341176,0.239216
+6149,6149,"Rocky Mountain Subalpine-Montane Mesic Herbaceous Meadow",1,0.639216,0.321569
+6151,6151,"Southern Rocky Mountain Montane-Subalpine Grassland",0.670588,0.568627,0.415686
+6152,6152,"Southern Rocky Mountain Gambel Oak - Mixed Montane Shrubland",0.960784,0.686275,0.211765
+6153,6153,"Southern Rocky Mountain Mountain-mahogany - Mixed Foothill Shrubland",0.458824,0.341176,0.239216
+6154,6154,"Southern Vancouverian Shrub & Herbaceous Bald Bluff & Prairie",0.796078,1,0.670588
+6155,6155,"Central Great Plains Mixedgrass Prairie",1,0.945098,0.54902
+6555,6555,"Central Great Plains Mixedgrass Prairie Shrubland",1,0.945098,0.54902
+6156,6156,"Northern Great Plains Dry Mixedgrass Prairie",0.478431,0.364706,0.254902
+6157,6157,"Northern Great Plains Mesic Mixedgrass Prairie Grassland",0.478431,0.364706,0.254902
+6557,6557,"Northern Great Plains Mesic Mixedgrass Prairie Shrubland",0.478431,0.364706,0.254902
+6159,6159,"Great Plains Sand Grassland",1,0.580392,0.278431
+6160,6160,"Great Plains Sand Shrubland",0.439216,0.321569,0.223529
+6161,6161,"Great Plains Shortgrass Prairie",0.588235,0.482353,0.34902
+6163,6163,"Central Great Plains Tallgrass Prairie",1,0.537255,0.25098
+6563,6563,"Central Great Plains Tallgrass Prairie Shrubland",1,0.537255,0.25098
+6164,6164,"Northern Great Plains Tallgrass Prairie",1,0.537255,0.25098
+6165,6165,"Sand & Gravel Tallgrass Prairie",1,0.537255,0.25098
+6166,6166,"South-Central Plains & Coastal Prairie",1,0.580392,0.278431
+6167,6167,"Southern Great Plains Tallgrass Prairie",1,0.537255,0.25098
+6169,6169,"Central & Southern Appalachian Rocky Outcrop Shrubland",0.321569,0.203922,0.133333
+6569,6569,"Central & Southern Appalachian Rocky Outcrop Sparse Vegetation",0.321569,0.203922,0.133333
+6170,6170,"Piedmont Dome & Flatrock Vegetation",1,0.580392,0.278431
+6171,6171,"Southern Appalachian Grass Bald",0.321569,0.203922,0.133333
+6172,6172,"Southern Appalachian Shrub Bald",0.321569,0.203922,0.133333
+6173,6173,"Central Acidic Open Glade & Barrens Grassland",1,0.580392,0.278431
+6573,6573,"Central Acidic Open Glade & Barrens Woodland",1,0.580392,0.278431
+6174,6174,"Appalachian Mafic Glade Woodland",0.321569,0.203922,0.133333
+6574,6574,"Appalachian Mafic Glade Grassland",0.321569,0.203922,0.133333
+6175,6175,"Central Alkaline Open Glade & Barrens Grassland",1,0.580392,0.278431
+6575,6575,"Central Alkaline Open Glade & Barrens Shrubland",1,0.580392,0.278431
+6176,6176,"South-Central Patch Prairie Grassland",0.478431,0.364706,0.254902
+6576,6576,"South-Central Patch Prairie Shrubland",0.478431,0.364706,0.254902
+6177,6177,"Great Lakes Alvar Shrubland",0.478431,0.364706,0.254902
+6577,6577,"Great Lakes Alvar Grassland",0.478431,0.364706,0.254902
+6181,6181,"Western North American Montane Sclerophyll Scrub",0.34902,0.231373,0.156863
+6182,6182,"Eastern Madrean Chaparral",0.568627,0.458824,0.329412
+6183,6183,"Western Madrean Chaparral",0.34902,0.231373,0.156863
+6184,6184,"Florida Dry Prairie Grassland",0.454902,0.839216,0.8
+6584,6584,"Florida Dry Prairie Shrubland",0.454902,0.839216,0.8
+6185,6185,"Florida Xeric Scrub Shrubland",0.568627,1,0.45098
+6186,6186,"Southeastern Coastal Plain Patch Prairie",0,0.14902,0.45098
+6586,6586,"Southeastern Coastal Plain Patch Prairie Woodland",0,0.14902,0.45098
+6188,6188,"Southeastern Coastal Plain Barrens & Glade",0.454902,0.839216,0.8
+6189,6189,"Eastern Subalpine Shrub Vegetation",0.709804,0.611765,0.447059
+6589,6589,"Eastern Subalpine Herb Vegetation",1,0.827451,0.466667
+6590,6590,"Eastern Subalpine Krummholz Vegetation",0.709804,0.611765,0.447059
+6190,6190,"North Atlantic Coastal Beach",0.392157,0.392157,0.392157
+6191,6191,"South Atlantic & Gulf Coastal Beach Herb Vegetation",1,0.6,0
+6591,6591,"South Atlantic & Gulf Coastal Beach Sparse Vegetation",0.392157,0.392157,0.392157
+6192,6192,"Great Lakes Grass Dune",1,0.6,0
+6592,6592,"Great Lakes Shrub Dune",1,0.6,0
+6593,6593,"Great Lakes Sparse Dune",1,0.6,0
+6193,6193,"Great Lakes Sand Beach",1,0.6,0
+6194,6194,"North Atlantic Coastal Shrub Dune",1,0.384314,0.160784
+6594,6594,"North Atlantic Coastal Grass Dune",1,0.384314,0.160784
+6195,6195,"South Atlantic & Gulf Grass Coast & Dune",1,0.6,0
+6595,6595,"South Atlantic & Gulf Shrub Coast & Dune",1,0.6,0
+6196,6196,"Appalachian & Interior Riverscour Barrens & Prairie",1,0.580392,0.278431
+6197,6197,"Eastern North American Inland Lakeshore",1,0.6,0
+6199,6199,"Northern & Central Riverscour Wetland Shrub",1,0.580392,0.278431
+6201,6201,"California Coastal Beach & Dune Scrub",1,0.411765,0.180392
+6601,6601,"California Coastal Beach & Dune Sparse Vegetation",0.392157,0.392157,0.392157
+6202,6202,"North Pacific Maritime Coastal Herb Beach & Dune",1,0,0
+6602,6602,"North Pacific Maritime Coastal Scrub Beach & Dune",1,0,0
+6603,6603,"North Pacific Maritime Coastal Beach & Dune",1,0,0
+6206,6206,"Central & Southern Appalachian Seep Herbaceous",0.356863,0.764706,0.780392
+6606,6606,"Central & Southern Appalachian Seep Woodland",0.356863,0.764706,0.780392
+6207,6207,"Interior Plateau Seepage Fen",0.356863,0.764706,0.780392
+6208,6208,"North-Central & Northeastern Seep",1,0.360784,0.14902
+6209,6209,"Midwest Prairie Alkaline Fen Herbaceous",0.356863,0.764706,0.780392
+6609,6609,"Midwest Prairie Alkaline Fen Shrubland",0.356863,0.764706,0.780392
+6210,6210,"Southeastern Coastal Plain Pocosin & Shrub Bog",0.356863,0.764706,0.780392
+6610,6610,"Southeastern Coastal Plain Pocosin & Tree Bog",0.356863,0.764706,0.780392
+6211,6211,"Eastern North American Boreal Acidic Shrub Bog & Fen",0.356863,0.764706,0.780392
+6611,6611,"Eastern North American Boreal Acidic Treed Bog & Fen",0.356863,0.764706,0.780392
+6212,6212,"Eastern North American Boreal Alkaline Fen",0.356863,0.764706,0.780392
+6213,6213,"Eastern North American Sub-boreal Acidic Shrub Bog & Fen",0.356863,0.764706,0.780392
+6613,6613,"Eastern North American Sub-boreal Acidic Treed Bog & Fen",0.356863,0.764706,0.780392
+6220,6220,"Atlantic & Gulf Coastal Plain Freshwater Tidal Marsh Herbaceous",1,0.6,0
+6620,6620,"Atlantic & Gulf Coastal Plain Freshwater Tidal Marsh Shrubland",1,0.6,0
+6221,6221,"Atlantic & Gulf Coastal Interdunal Marsh & Prairie",1,0.6,0
+6222,6222,"Atlantic & Gulf Coastal Plain Pondshore & Wet Prairie Herbaceous",1,0.6,0
+6622,6622,"Atlantic & Gulf Coastal Plain Pondshore & Wet Prairie Woodland",1,0.6,0
+6223,6223,"Coastal Plain River & Basin Freshwater Marsh",1,0.6,0
+6224,6224,"Southeastern Coastal Plain Seepage Wetland",1,0.6,0
+6225,6225,"Southern Shrub Swamp",0.847059,0.847059,0.74902
+6226,6226,"Northern & Central Forest Vernal Pool",0.356863,0.764706,0.780392
+6227,6227,"Central Shrub & Herb Depression Pond",1,0.537255,0.25098
+6228,6228,"Eastern North American Freshwater Marsh",1,0.360784,0.14902
+6229,6229,"Eastern Saline Wet Meadow & Marsh",1,0.360784,0.14902
+6230,6230,"Laurentian & Northeast Wet Meadow Herbaceous",1,0.360784,0.14902
+6630,6630,"Laurentian & Northeast Wet Meadow Shrub",1,0.360784,0.14902
+6231,6231,"Midwest Wet Prairie & Wet Meadow Herbaceous",1,0.360784,0.14902
+6631,6631,"Midwest Wet Prairie & Wet Meadow Shrubland",1,0.360784,0.14902
+6232,6232,"Northern & Central Shrub Swamp",0.356863,0.764706,0.780392
+6233,6233,"Northern & Mid-Atlantic Coastal Shrub Wetland",1,0.6,0
+6633,6633,"Northern & Mid-Atlantic Coastal Forested Wetland",1,0.6,0
+6643,6643,"Northern & Mid-Atlantic Coastal Herb Wetland",1,0.6,0
+6234,6234,"Great Plains Freshwater Marsh",1,0.360784,0.14902
+6235,6235,"Great Plains Playa & Rainwater Basin Wetland",1,0.537255,0.25098
+6236,6236,"Great Plains Riverine Scour",0.568627,1,0.45098
+6237,6237,"Great Plains Shrub Riparian",0.023529,0.207843,0.478431
+6637,6637,"Great Plains Herb Riparian",0.023529,0.207843,0.478431
+6238,6238,"Great Plains Wet Prairie Wet Meadow & Seepage Fen Grassland",0.356863,0.764706,0.780392
+6638,6638,"Great Plains Wet Prairie Wet Meadow & Seepage Fen Shrubland",0.356863,0.764706,0.780392
+6239,6239,"Western Montane-Subalpine Riparian & Seep Shrubland",0.721569,0.376471,0.094118
+6240,6240,"Vancouverian & Rocky Mountain Montane Wet Meadow & Marsh",0.015686,0.176471,0.458824
+6241,6241,"Vancouverian & Rocky Mountain Subalpine & Alpine Snowbed Wet Meadow",0.015686,0.176471,0.458824
+6641,6641,"Vancouverian & Rocky Mountain Subalpine & Alpine Snowbed Dwarf-Shrubland",0.015686,0.176471,0.458824
+6242,6242,"Arid West Interior Freshwater Emergent Marsh",0.392157,0.392157,0.392157
+6243,6243,"Rocky Mountain & Great Basin Lowland & Foothill Riparian Shrubland",0.286275,0.670588,0.729412
+6245,6245,"Vancouverian Freshwater Wet Meadow & Marsh",1,0.6,0
+6246,6246,"Vancouverian Wet Shrubland",0.572549,0.929412,0.878431
+6249,6249,"North American Warm Desert Riparian Low Bosque & Shrubland",0.317647,0.705882,0.552941
+6251,6251,"Great Plains Depressional Saline & Brackish Wetland ",1,0.537255,0.25098
+6252,6252,"Western Great Plains Saline Depression Wetland",1,0.537255,0.25098
+6253,6253,"Atlantic & Gulf Coast Brackish Tidal Marsh",1,0.6,0
+6254,6254,"Atlantic & Gulf Coast High Salt Marsh",1,0.6,0
+6654,6654,"Atlantic & Gulf Coast High Salt Marsh Shrubland",1,0.6,0
+6255,6255,"Atlantic & Gulf Coast Low Salt Marsh",1,0.6,0
+6256,6256,"Atlantic & Gulf Coast Saline Flat & Panne",1,0.6,0
+6257,6257,"Temperate Pacific Tidal Salt & Brackish Marsh",1,0.6,0.039216
+6258,6258,"North American Desert Alkaline-Saline Shrub Wetland",0.392157,0.392157,0.392157
+6259,6259,"North American Desert Alkaline-Saline Herbaceous Wetland",0.392157,0.392157,0.392157
+6659,6659,"North American Desert Alkaline-Saline Playa",0.392157,0.392157,0.392157
+6260,6260,"Caribbean Salt Flat & Pond",0.392157,0.392157,0.392157
+6261,6261,"Chihuahuan Creosotebush - Mixed Desert Scrub",0.290196,0.172549,0.113725
+6661,6661,"Chihuahuan Creosotebush - Mixed Desert Sparse Vegetation",0.290196,0.172549,0.113725
+6262,6262,"Chihuahuan Desert Lowland Basin Scrub",0.611765,0.501961,0.360784
+6263,6263,"Chihuahuan Desert Sand Scrub",0.588235,0.482353,0.34902
+6663,6663,"Chihuahuan Desert Sand Sparse Vegetation",0.588235,0.482353,0.34902
+6264,6264,"Chihuahuan Desert Succulent Scrub",0.568627,0.458824,0.329412
+6266,6266,"Chihuahuan Desert Foothill-Piedmont & Lower Montane Grassland",1,0.8,0.2
+6666,6666,"Chihuahuan Desert Foothill-Piedmont & Lower Montane Shrubland",1,0.8,0.2
+6267,6267,"Chihuahuan Gypsophilous Grassland",1,0.8,0.2
+6268,6268,"Chihuahuan Sandy Plains Semi-Desert Grassland",1,0.913725,0.529412
+6668,6668,"Chihuahuan Sandy Plains Semi-Desert Shrub Steppe",1,0.913725,0.529412
+6670,6670,"Chihuahuan Sandy Plains Semi-Desert Sparse Vegetation",1,0.913725,0.529412
+6269,6269,"Chihuahuan Semi-Desert Lowland Grassland",1,0.8,0.2
+6669,6669,"Chihuahuan Semi-Desert Lowland Shrub Steppe",1,0.8,0.2
+6270,6270,"Baja Semi-Desert Coastal Succulent Scrub",0.65098,0.545098,0.419608
+6271,6271,"Mojave Mid-Elevation Mixed Desert Scrub",0.54902,0.439216,0.313725
+6272,6272,"Mojave-Sonoran Bajada & Valley Desert Scrub",0.631373,0.52549,0.376471
+6672,6672,"Mojave-Sonoran Bajada & Valley Desert Sparse Vegetation",0.631373,0.52549,0.376471
+6273,6273,"North American Warm Semi-Desert Herb Dunes & Sand Flats",0.392157,0.392157,0.392157
+6673,6673,"North American Warm Semi-Desert Shrub Dunes & Sand Flats",0.392157,0.392157,0.392157
+6674,6674,"North American Warm Semi-Desert Dunes & Sand Flats",0.392157,0.392157,0.392157
+6274,6274,"Sonoran Paloverde - Mixed Cacti Desert Scrub",0.94902,0.658824,0.188235
+6276,6276,"Warm Semi-Desert Shrub Dry Wash & Colluvial Slope",0.317647,0.705882,0.552941
+6676,6676,"Warm Semi-Desert Herb Dry Wash & Colluvial Slope",0.317647,0.705882,0.552941
+6677,6677,"Warm Semi-Desert Dry Wash & Colluvial Slope",0.317647,0.705882,0.552941
+6277,6277,"Tamaulipan Dry Grassland",0.321569,0.203922,0.133333
+6278,6278,"Tamaulipan Dry Mesquite & Thornscrub Shrubland",0.321569,0.203922,0.133333
+6678,6678,"Tamaulipan Dry Mesquite & Thornscrub Woodland",0.321569,0.203922,0.133333
+6279,6279,"Colorado Plateau Blackbrush - Mormon-tea Shrubland",0.54902,0.439216,0.313725
+6281,6281,"Intermountain Semi-Desert Grassland",1,0.886275,0.509804
+6282,6282,"Intermountain Semi-Desert Shrubland & Steppe",0.509804,0.396078,0.282353
+6283,6283,"Intermountain Dune Scrub",0.392157,0.392157,0.392157
+6683,6683,"Intermountain Dune Grassland",0.392157,0.392157,0.392157
+6684,6684,"Intermountain Sparsely Vegetated Dune",0.392157,0.392157,0.392157
+6284,6284,"Columbia Plateau Scabland Shrubland",0.780392,0.690196,0.505882
+6285,6285,"Intermountain Low & Black Sagebrush Shrubland & Steppe",0.8,0.713725,0.529412
+6286,6286,"Intermountain Dry Tall Sagebrush Shrubland",0.529412,0.415686,0.298039
+6287,6287,"Intermountain Mesic Tall Sagebrush Shrubland & Steppe",0.780392,0.690196,0.505882
+6288,6288,"Intermountain Mountain Big Sagebrush Shrubland & Steppe",0.858824,0.54902,0.145098
+6289,6289,"Cool Semi-Desert Shrub & Herb Wash-Arroyo",0.392157,0.392157,0.392157
+6689,6689,"Cool Semi-Desert Wash-Arroyo",0.392157,0.392157,0.392157
+6290,6290,"Intermountain Dwarf Saltbush - Sagebrush Scrub",0.760784,0.666667,0.494118
+6291,6291,"Intermountain Shadscale - Saltbush Scrub",0.611765,0.501961,0.360784
+6292,6292,"Eastern Alpine Dwarf-Shrub Vegetation",0.709804,0.611765,0.447059
+6692,6692,"Eastern Alpine Dwarf-Herb Vegetation",1,0.827451,0.466667
+6293,6293,"Rocky Mountain & Sierran Alpine Dwarf-Shrubland",0.670588,0.568627,0.415686
+6294,6294,"Rocky Mountain & Sierran Alpine Turf & Fell-Field",1,0.827451,0.466667
+6694,6694,"Rocky Mountain & Sierran Alpine Turf & Fell-Field Sparse Vegetation",1,0.827451,0.466667
+6295,6295,"North Pacific Alpine-Subalpine Dwarf-Shrubland & Heath",0.709804,0.611765,0.447059
+6296,6296,"North Pacific Alpine-Subalpine Turf & Herbaceous Meadow",1,0.827451,0.466667
+6298,6298,"North American North Atlantic Intertidal Shore",1,0.6,0
+6300,6300,"North Atlantic Seagrass",1,0.6,0
+6305,6305,"Eastern North American Freshwater Aquatic Vegetation",1,0.537255,0.25098
+6308,6308,"California Cliff Scree & Rock Vegetation",0.392157,0.392157,0.392157
+6309,6309,"Eastern North American Talus & Bluff",0.392157,0.392157,0.392157
+6310,6310,"Eastern North American Temperate Cliff",0.392157,0.392157,0.392157
+6313,6313,"Rocky Mountain Cliff Scree & Rock Vegetation",0.392157,0.392157,0.392157
+6315,6315,"North Vancouverian Montane Massive Bedrock Cliff & Talus",0.392157,0.392157,0.392157
+6316,6316,"Southern Vancouverian Cliff Scree & Rock Vegetation",0.392157,0.392157,0.392157
+6317,6317,"Great Plains Badlands Vegetation",0.392157,0.392157,0.392157
+6318,6318,"Great Plains Cliff Scree & Rock Vegetation",0.392157,0.392157,0.392157
+6319,6319,"North American Warm Semi-Desert Cliff Scree & Pavement Sparse Vegetation",0.392157,0.392157,0.392157
+6320,6320,"Intermountain Basins Cliff Scree & Badland Sparse Vegetation",0.392157,0.392157,0.392157
+6322,6322,"Rocky Mountain & Sierran Alpine Bedrock & Scree",0.392157,0.392157,0.392157
+6323,6323,"North Pacific Alpine-Subalpine Bedrock & Scree",0.392157,0.392157,0.392157
+6324,6324,"Southeastern Great Plains Floodplain Forest",0.568627,1,0.45098
+6724,6724,"Southeastern Great Plains Floodplain Shrubland",0.568627,1,0.45098
+6726,6726,"Southeastern Great Plains Floodplain Herbaceous",0.568627,1,0.45098
+6325,6325,"Laurentian-Acadian Acidic Scrub",1,0.580392,0.278431
+6725,6725,"Laurentian-Acadian Acidic Grassland",1,0.580392,0.278431
+6326,6326,"North-Central Appalachian Acidic Scrub",0.321569,0.203922,0.133333
+6727,6727,"North-Central Appalachian Acidic Grassland",0.321569,0.203922,0.133333
+6827,6827,"North-Central Appalachian Acidic Woodland",0.321569,0.203922,0.133333
+6327,6327,"Ozark-Ouachitas Mesic Forest",0.501961,0.380392,0.270588
+6328,6328,"Laurentian-Acadian Riverscour Vegetation",1,0.580392,0.278431
+6329,6329,"Great Lakes Rocky Shore Vegetation",1,0.6,0
+6330,6330,"Northern Rocky Mountain Lowland & Foothill Riparian Forest",0.286275,0.670588,0.729412
+6331,6331,"Interior West Riparian Forest & Woodland",0.317647,0.705882,0.552941
+6731,6731,"Interior West Riparian Shrubland",0.317647,0.705882,0.552941
+6332,6332,"Texas Live Oak - Wax Mallow Motte & Coastal Forest",0.568627,1,0.45098
+6333,6333,"Southern Vancouverian Dry Douglas-fir - Madrone Woodland",0,0.509804,0
+6427,6427,"Southern Plains Oak - Juniper Scrub Shrubland",0.47451,1,0.368627
+6457,6457,"South-Central Interior Oak Barrens Grassland",0.333333,0.733333,0.760784
+6662,6662,"Chihuahuan Desert Lowland Basin Sparse Vegetation",0.611765,0.501961,0.360784
+6667,6667,"Chihuahuan Gypsophilous Sparse Vegetation",1,0.8,0.2
+7191,7191,"Recently Logged-Herb and Grass Cover",1,0.266667,0.098039
+7192,7192,"Recently Logged-Shrub Cover",1,0.266667,0.098039
+7193,7193,"Recently Logged-Tree Cover",1,0.266667,0.098039
+7195,7195,"Recently Burned-Herb and Grass Cover",1,0.231373,0.078431
+7196,7196,"Recently Burned-Shrub Cover",1,0.231373,0.078431
+7197,7197,"Recently Burned-Tree Cover",1,0.231373,0.078431
+7198,7198,"Recently Disturbed Other-Herb and Grass Cover",1,0.266667,0.098039
+7199,7199,"Recently Disturbed Other-Shrub Cover",1,0.266667,0.098039
+7200,7200,"Recently Disturbed Other-Tree Cover",1,0.266667,0.098039
+7292,7292,"Open Water",0,0,1
+7295,7295,"Quarries-Strip Mines-Gravel Pits-Energy Development",0.901961,0.909804,0.980392
+7296,7296,"Developed-Low Intensity",1,0.478431,0.560784
+7297,7297,"Developed-Medium Intensity",0.992157,0.172549,0.309804
+7298,7298,"Developed-High Intensity",0.678431,0,0.109804
+7299,7299,"Developed-Roads",0,0,0
+7735,7735,"North American Glacier and Ice Field",0.623529,0.631373,0.941176
+7900,7900,"Western Cool Temperate Urban Deciduous Forest",0.439216,0.266667,0.537255
+7901,7901,"Western Cool Temperate Urban Evergreen Forest",0.666667,0.4,0.803922
+7902,7902,"Western Cool Temperate Urban Mixed Forest",0.760784,0.619608,0.843137
+7903,7903,"Western Cool Temperate Urban Herbaceous",0.792157,0.478431,0.960784
+7904,7904,"Western Cool Temperate Urban Shrubland",0.811765,0.670588,0.843137
+7905,7905,"Eastern Cool Temperate Urban Deciduous Forest",0.439216,0.266667,0.537255
+7906,7906,"Eastern Cool Temperate Urban Evergreen Forest",0.666667,0.4,0.803922
+7907,7907,"Eastern Cool Temperate Urban Mixed Forest",0.760784,0.619608,0.843137
+7908,7908,"Eastern Cool Temperate Urban Herbaceous",0.792157,0.478431,0.960784
+7909,7909,"Eastern Cool Temperate Urban Shrubland",0.811765,0.670588,0.843137
+7910,7910,"Western Warm Temperate Urban Deciduous Forest",0.439216,0.266667,0.537255
+7911,7911,"Western Warm Temperate Urban Evergreen Forest",0.666667,0.4,0.803922
+7912,7912,"Western Warm Temperate Urban Mixed Forest",0.760784,0.619608,0.843137
+7913,7913,"Western Warm Temperate Urban Herbaceous",0.792157,0.478431,0.960784
+7914,7914,"Western Warm Temperate Urban Shrubland",0.811765,0.670588,0.843137
+7915,7915,"Eastern Warm Temperate Urban Deciduous Forest",0.439216,0.266667,0.537255
+7916,7916,"Eastern Warm Temperate Urban Evergreen Forest",0.666667,0.4,0.803922
+7917,7917,"Eastern Warm Temperate Urban Mixed Forest",0.760784,0.619608,0.843137
+7918,7918,"Eastern Warm Temperate Urban Herbaceous",0.792157,0.478431,0.960784
+7919,7919,"Eastern Warm Temperate Urban Shrubland",0.811765,0.670588,0.843137
+7920,7920,"Western Cool Temperate Developed Ruderal Deciduous Forest",0.25098,0.239216,0.658824
+7921,7921,"Western Cool Temperate Developed Ruderal Evergreen Forest",0.4,0.466667,0.803922
+7922,7922,"Western Cool Temperate Developed Ruderal Mixed Forest",0.266667,0.309804,0.537255
+7923,7923,"Western Cool Temperate Developed Ruderal Shrubland",0.619608,0.666667,0.843137
+7924,7924,"Western Cool Temperate Developed Ruderal Grassland",0.478431,0.556863,0.960784
+7925,7925,"Western Warm Temperate Developed Ruderal Deciduous Forest",0.25098,0.239216,0.658824
+7926,7926,"Western Warm Temperate Developed Ruderal Evergreen Forest",0.4,0.466667,0.803922
+7927,7927,"Western Warm Temperate Developed Ruderal Mixed Forest",0.266667,0.309804,0.537255
+7928,7928,"Western Warm Temperate Developed Ruderal Shrubland",0.619608,0.666667,0.843137
+7929,7929,"Western Warm Temperate Developed Ruderal Grassland",0.478431,0.556863,0.960784
+7930,7930,"Eastern Cool Temperate Developed Ruderal Deciduous Forest",0.25098,0.239216,0.658824
+7931,7931,"Eastern Cool Temperate Developed Ruderal Evergreen Forest",0.4,0.466667,0.803922
+7932,7932,"Eastern Cool Temperate Developed Ruderal Mixed Forest",0.266667,0.309804,0.537255
+7933,7933,"Eastern Cool Temperate Developed Ruderal Shrubland",0.619608,0.666667,0.843137
+7934,7934,"Eastern Cool Temperate Developed Ruderal Grassland",0.478431,0.556863,0.960784
+7935,7935,"Eastern Warm Temperate Developed Ruderal Deciduous Forest",0.25098,0.239216,0.658824
+7936,7936,"Eastern Warm Temperate Developed Ruderal Evergreen Forest",0.4,0.466667,0.803922
+7937,7937,"Eastern Warm Temperate Developed Ruderal Mixed Forest",0.266667,0.309804,0.537255
+7938,7938,"Eastern Warm Temperate Developed Ruderal Shrubland",0.619608,0.666667,0.843137
+7939,7939,"Eastern Warm Temperate Developed Ruderal Grassland",0.478431,0.556863,0.960784
+7940,7940,"Western Cool Temperate Developed Ruderal Deciduous Forested Wetland",0.266667,0.309804,0.537255
+7941,7941,"Western Cool Temperate Developed Ruderal Evergreen Forested Wetland",0.266667,0.309804,0.537255
+7942,7942,"Western Cool Temperate Developed Ruderal Mixed Forested Wetland",0.266667,0.309804,0.537255
+7943,7943,"Western Cool Temperate Developed Ruderal Shrub Wetland",0.619608,0.666667,0.843137
+7944,7944,"Western Cool Temperate Developed Ruderal Herbaceous Wetland",0.478431,0.556863,0.960784
+7945,7945,"Western Warm Temperate Developed Ruderal Deciduous Forested Wetland",0.266667,0.309804,0.537255
+7946,7946,"Western Warm Temperate Developed Ruderal Evergreen Forested Wetland",0.266667,0.309804,0.537255
+7947,7947,"Western Warm Temperate Developed Ruderal Mixed Forested Wetland",0.266667,0.309804,0.537255
+7948,7948,"Western Warm Temperate Developed Ruderal Shrub Wetland",0.619608,0.666667,0.843137
+7949,7949,"Western Warm Temperate Developed Ruderal Herbaceous Wetland",0.478431,0.556863,0.960784
+7950,7950,"Eastern Cool Temperate Developed Ruderal Deciduous Forested Wetland",0.266667,0.309804,0.537255
+7951,7951,"Eastern Cool Temperate Developed Ruderal Evergreen Forested Wetland",0.266667,0.309804,0.537255
+7952,7952,"Eastern Cool Temperate Developed Ruderal Mixed Forested Wetland",0.266667,0.309804,0.537255
+7953,7953,"Eastern Cool Temperate Developed Ruderal Shrub Wetland",0.619608,0.666667,0.843137
+7954,7954,"Eastern Cool Temperate Developed Ruderal Herbaceous Wetland",0.478431,0.556863,0.960784
+7955,7955,"Eastern Warm Temperate Developed Ruderal Deciduous Forested Wetland",0.266667,0.309804,0.537255
+7956,7956,"Eastern Warm Temperate Developed Ruderal Evergreen Forested Wetland",0.266667,0.309804,0.537255
+7957,7957,"Eastern Warm Temperate Developed Ruderal Mixed Forested Wetland",0.266667,0.309804,0.537255
+7958,7958,"Eastern Warm Temperate Developed Ruderal Shrub Wetland",0.619608,0.666667,0.843137
+7959,7959,"Eastern Warm Temperate Developed Ruderal Herbaceous Wetland",0.478431,0.556863,0.960784
+9301,9301,"California Ruderal Grassland and Meadow",1,0.411765,0.180392
+9337,9337,"California Ruderal Scrub",1,0.411765,0.180392
+9302,9302,"Californian Ruderal Forest",1,0.231373,0.078431
+9307,9307,"Great Basin & Intermountain Introduced Annual and Biennial Forbland",1,0.411765,0.180392
+9308,9308,"Great Basin & Intermountain Introduced Annual Grassland",1,0.411765,0.180392
+9309,9309,"Great Basin & Intermountain Introduced Perennial Grassland and Forbland",1,0.411765,0.180392
+9310,9310,"North American Warm Desert Ruderal & Planted Scrub",1,0.411765,0.180392
+9810,9810,"North American Warm Desert Ruderal & Planted Grassland",1,0.411765,0.180392
+9311,9311,"North Pacific Maritime Coastal Sand Dune Ruderal Scrub",1,0.411765,0.180392
+9811,9811,"North Pacific Maritime Coastal Sand Dune Ruderal Herb Vegetation",1,0.411765,0.180392
+9312,9312,"Northeastern North American Temperate Forest Plantation",0.619608,0.262745,0.054902
+9313,9313,"Northern & Central Exotic Ruderal Forest",0,0.517647,0.658824
+9314,9314,"Northern & Central Native Ruderal Flooded & Swamp Forest",0,0.517647,0.658824
+9315,9315,"Northern & Central Native Ruderal Forest",1,0.411765,0.180392
+9316,9316,"Northern & Central Plains Ruderal & Planted Shrubland",1,0.411765,0.180392
+9816,9816,"Northern & Central Plains Ruderal & Planted Grassland",1,0.411765,0.180392
+9317,9317,"Northern & Central Ruderal Shrubland",1,0.411765,0.180392
+9817,9817,"Northern & Central Ruderal Meadow",1,0.411765,0.180392
+9318,9318,"Northern & Central Ruderal Wet Meadow & Marsh",1,0.411765,0.180392
+9319,9319,"Southeastern Exotic Ruderal Forest",1,0.411765,0.180392
+9320,9320,"Southeastern Native Ruderal Flooded & Swamp Forest",0,0.517647,0.658824
+9321,9321,"Southeastern Native Ruderal Forest",1,0.411765,0.180392
+9322,9322,"Southeastern North American Temperate Forest Plantation",0.619608,0.262745,0.054902
+9323,9323,"Southeastern Ruderal Shrubland",1,0.411765,0.180392
+9823,9823,"Southeastern Ruderal Grassland",1,0.411765,0.180392
+9324,9324,"Southeastern Ruderal Wet Meadow & Marsh",1,0.411765,0.180392
+9325,9325,"Great Plains Comanchian Ruderal Shrubland",1,0.411765,0.180392
+9825,9825,"Great Plains Comanchian Ruderal Grassland",1,0.411765,0.180392
+9326,9326,"Southern Vancouverian Lowland Ruderal Shrubland",1,0.411765,0.180392
+9826,9826,"Southern Vancouverian Lowland Ruderal Grassland",1,0.411765,0.180392
+9327,9327,"Interior West Ruderal Riparian Forest",1,0.411765,0.180392
+9827,9827,"Interior West Ruderal Riparian Scrub",1,0.411765,0.180392
+9328,9328,"Interior Western North American Temperate Ruderal Shrubland",1,0.411765,0.180392
+9828,9828,"Interior Western North American Temperate Ruderal Grassland",1,0.411765,0.180392
+9329,9329,"Western North American Ruderal Wet Shrubland",1,0.411765,0.180392
+9829,9829,"Western North American Ruderal Wet Meadow & Marsh",1,0.411765,0.180392
+9332,9332,"Southeastern Exotic Ruderal Flooded & Swamp Forest",0,0.517647,0.658824
+9336,9336,"Great Basin & Intermountain Ruderal Shrubland",1,0.411765,0.180392
+-1,-1,"Corn",1,0.82745098,0
+-2,-2,"Cotton",1,0.149019608,0.149019608
+-3,-3,"Rice",0,0.658823529,0.898039216
+-4,-4,"Sorghum",1,0.619607843,0.047058824
+-5,-5,"Soybeans",0.149019608,0.439215686,0
+-6,-6,"Sunflower",1,1,0
+-10,-10,"Peanuts",0.439215686,0.647058824,0
+-11,-11,"Tobacco",0,0.68627451,0.298039216
+-12,-12,"Sweet Corn",0.866666667,0.647058824,0.047058824
+-13,-13,"Pop or Orn Corn",0.866666667,0.647058824,0.047058824
+-14,-14,"Mint",0.498039216,0.82745098,1
+-21,-21,"Barley",0.88627451,0,0.48627451
+-22,-22,"Durum Wheat",0.537254902,0.388235294,0.329411765
+-23,-23,"Spring Wheat",0.847058824,0.709803922,0.419607843
+-24,-24,"Winter Wheat",0.647058824,0.439215686,0
+-25,-25,"Other Small Grains",0.839215686,0.619607843,0.737254902
+-26,-26,"Dbl Crop WinWht/Soybeans",0.439215686,0.439215686,0
+-27,-27,"Rye",0.678431373,0,0.48627451
+-28,-28,"Oats",0.62745098,0.349019608,0.537254902
+-29,-29,"Millet",0.439215686,0,0.28627451
+-30,-30,"Speltz",0.839215686,0.619607843,0.737254902
+-31,-31,"Canola",0.819607843,1,0
+-32,-32,"Flaxseed",0.498039216,0.6,1
+-33,-33,"Safflower",0.839215686,0.839215686,0
+-34,-34,"Rape Seed",0.819607843,1,0
+-35,-35,"Mustard",0,0.68627451,0.298039216
+-36,-36,"Alfalfa",1,0.647058824,0.88627451
+-38,-38,"Camelina",0,0.68627451,0.298039216
+-39,-39,"Buckwheat",0.839215686,0.619607843,0.737254902
+-41,-41,"Sugarbeets",0.658823529,0,0.898039216
+-42,-42,"Dry Beans",0.647058824,0,0
+-43,-43,"Potatoes",0.439215686,0.149019608,0
+-44,-44,"Other Crops",0,0.68627451,0.298039216
+-45,-45,"Sugarcane",0.698039216,0.498039216,1
+-46,-46,"Sweet Potatoes",0.439215686,0.149019608,0
+-47,-47,"Misc Vegs & Fruits",1,0.4,0.4
+-48,-48,"Watermelons",1,0.4,0.4
+-49,-49,"Onions",1,0.8,0.4
+-50,-50,"Cucumbers",1,0.4,0.4
+-51,-51,"Chick Peas",0,0.68627451,0.298039216
+-52,-52,"Lentils",0,0.866666667,0.68627451
+-53,-53,"Peas",0.329411765,1,0
+-54,-54,"Tomatoes",0.949019608,0.639215686,0.466666667
+-55,-55,"Caneberries",1,0.4,0.4
+-56,-56,"Hops",0,0.68627451,0.298039216
+-57,-57,"Herbs",0.498039216,0.82745098,1
+-58,-58,"Clover/Wildflowers",0.909803922,0.749019608,1
+-59,-59,"Sod/Grass Seed",0.68627451,1,0.866666667
+-60,-60,"Switchgrass",0,0.68627451,0.298039216
+-66,-66,"Cherries",1,0,1
+-67,-67,"Peaches",1,0.556862745,0.666666667
+-68,-68,"Apples",0.729411765,0,0.309803922
+-69,-69,"Grapes",0.439215686,0.266666667,0.537254902
+-70,-70,"Christmas Trees",0,0.466666667,0.466666667
+-71,-71,"Other Tree Crops",0.698039216,0.607843137,0.439215686
+-72,-72,"Citrus",1,1,0.498039216
+-74,-74,"Pecans",0.709803922,0.439215686,0.356862745
+-75,-75,"Almonds",0,0.647058824,0.509803922
+-76,-76,"Walnuts",0.917647059,0.839215686,0.68627451
+-77,-77,"Pears",0.698039216,0.607843137,0.439215686
+-92,-92,"Aquaculture",0,1,1
+-204,-204,"Pistachios",0,1,0.549019608
+-205,-205,"Triticale",0.839215686,0.619607843,0.737254902
+-206,-206,"Carrots",1,0.4,0.4
+-207,-207,"Asparagus",1,0.4,0.4
+-208,-208,"Garlic",1,0.4,0.4
+-209,-209,"Cantaloupes",1,0.4,0.4
+-210,-210,"Prunes",1,0.556862745,0.666666667
+-211,-211,"Olives",0.2,0.28627451,0.2
+-212,-212,"Oranges",0.898039216,0.439215686,0.149019608
+-213,-213,"Honeydew Melons",1,0.4,0.4
+-214,-214,"Broccoli",1,0.4,0.4
+-215,-215,"Avocados",0.4,0.6,0.298039216
+-216,-216,"Peppers",1,0.4,0.4
+-217,-217,"Pomegranates",0.698039216,0.607843137,0.439215686
+-218,-218,"Nectarines",1,0.556862745,0.666666667
+-219,-219,"Greens",1,0.4,0.4
+-220,-220,"Plums",1,0.556862745,0.666666667
+-221,-221,"Strawberries",1,0.4,0.4
+-222,-222,"Squash",1,0.4,0.4
+-223,-223,"Apricots",1,0.556862745,0.666666667
+-224,-224,"Vetch",0,0.68627451,0.298039216
+-225,-225,"Dbl Crop WinWht/Corn",1,0.82745098,0
+-226,-226,"Dbl Crop Oats/Corn",1,0.82745098,0
+-227,-227,"Lettuce",1,0.4,0.4
+-228,-228,"Dbl Crop Triticale/Corn",1,0.823529412,0
+-229,-229,"Pumpkins",1,0.4,0.4
+-230,-230,"Dbl Crop Lettuce/Durum Wht",0.537254902,0.388235294,0.329411765
+-231,-231,"Dbl Crop Lettuce/Cantaloupe",1,0.4,0.4
+-232,-232,"Dbl Crop Lettuce/Cotton",1,0.149019608,0.149019608
+-233,-233,"Dbl Crop Lettuce/Barley",0.88627451,0,0.48627451
+-234,-234,"Dbl Crop Durum Wht/Sorghum",1,0.619607843,0.047058824
+-235,-235,"Dbl Crop Barley/Sorghum",1,0.619607843,0.047058824
+-236,-236,"Dbl Crop WinWht/Sorghum",0.647058824,0.439215686,0
+-237,-237,"Dbl Crop Barley/Corn",1,0.82745098,0
+-238,-238,"Dbl Crop WinWht/Cotton",0.647058824,0.439215686,0
+-239,-239,"Dbl Crop Soybeans/Cotton",0.149019608,0.439215686,0
+-240,-240,"Dbl Crop Soybeans/Oats",0.149019608,0.439215686,0
+-241,-241,"Dbl Crop Corn/Soybeans",1,0.82745098,0
+-242,-242,"Blueberries",0,0,0.6
+-243,-243,"Cabbage",1,0.4,0.4
+-244,-244,"Cauliflower",1,0.4,0.4
+-245,-245,"Celery",1,0.4,0.4
+-246,-246,"Radishes",1,0.4,0.4
+-247,-247,"Turnips",1,0.4,0.4
+-248,-248,"Eggplants",1,0.4,0.4
+-249,-249,"Gourds",1,0.4,0.4
+-250,-250,"Cranberries",1,0.4,0.4
+-254,-254,"Dbl Crop Barley/Soybeans",0.149019608,0.439215686,0

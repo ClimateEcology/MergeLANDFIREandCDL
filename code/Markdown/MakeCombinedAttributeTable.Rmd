@@ -25,53 +25,57 @@ veglayer <- 'nvc'
 ## Load tabular data for NASS CDL and LANDFIRE EVT land cover classes
 For either EVT or NVC, I specify which column of the data contains the vegetation class name. We will use this later to filter the data.
 ```{r loadtabular}
-#load tabular data for EVT
-if (veglayer == 'evt') {
-  vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_105evt/CSV_Data/US_105evt_05262011.csv') %>%
-    dplyr::rename(VALUE = Value)
-  name_column <- 'EVT_Name'; name_column <- sym(name_column)
-} else if (veglayer == 'nvc') {
-  vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
-  name_column <- 'NVC_Name'; name_column <- sym(name_column)
-}
+#load tabular data for NVC
+
+vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
+name_column <- 'NVC_Name'; name_column <- sym(name_column)
+
 
 #read CDL class names
-cdl_classes <- read.csv('D:/SpatialData/NASS_CDL/NASS_classes_simple.csv') %>% 
+cdl_classes <- read.csv('D:/SpatialData/NASS_CDL/NASS_classes.csv') %>% 
   dplyr::filter(VALUE < 500) #filter out CDL classes that I created for a different project
 ```
 
 ## Load combined vegetation map
 ```{r loadvegmap}
 library(terra)
-vegmap <- terra::rast('./data/CombinedVegCDLRasters/MergeCDlandLANDFIRE_v2/NVC_CDL2016.tif')
+#vegmap <- terra::rast('./data/CombinedVegCDLRasters/MergeCDlandLANDFIRE_v2/NVC_CDL2016.tif')
 ```
 
 ## Create attribute table for combined raster
 ```{r attributes}
 
 #create new version of CDL class table with negative values to match raster
-cdl_tomerge <- dplyr::mutate(cdl_classes, VALUE = -VALUE)
+cdl_tomerge <- dplyr::mutate(cdl_classes, VALUE = -VALUE) %>%
+  dplyr::filter(GROUP == 'A') %>%
+  dplyr::select(VALUE, CLASS_NAME, RED, GREEN, BLUE)
+
+nvc_tomerge <- dplyr::select(vegclasses_key, VALUE, !!name_column, r, g, b, Red, Green, Blue) %>%
+  dplyr::filter(!VALUE %in% c(7960:7999)) %>%
+  dplyr::rename(RED=Red, GREEN=Green, BLUE=Blue) %>%
+  dplyr::select(-r, -g, -b)
 
 #merge CDL attribute table with LANDFIRE
 #create 'ID' column so this data frame plays nice with format raster package expects
-all_classes <- dplyr::select(vegclasses_key, VALUE, !!name_column, r, g, b, Red, Green, Blue) %>%
+all_classes <- nvc_tomerge %>%
   dplyr::rename(CLASS_NAME = !!name_column) %>%
-  dplyr::full_join(cdl_tomerge, by=c('VALUE', 'CLASS_NAME')) %>%
+  dplyr::full_join(cdl_tomerge, by=c('VALUE', 'CLASS_NAME', 'RED', 'GREEN', 'BLUE')) %>%
   dplyr::rename(Class_Name = CLASS_NAME) %>%
   dplyr::mutate(ID = VALUE) %>%
   dplyr::select(ID, tidyr::everything()) %>%
   dplyr::filter(!duplicated(VALUE)) #take out extra 'background, value = 0' row
 
 #filter all classes to those that are actually in the combined raster (plus grass/pasture and other hay)
-all_classes <- dplyr::filter(all_classes, VALUE %in% terra::values(vegmap))
+#all_classes <- dplyr::filter(all_classes, VALUE %in% terra::values(vegmap))
 ```
 ## Save tables
 ```{r save}
-if (veglayer == 'evt') {
-  #write attribute table to csv
-  write.csv(all_classes, './data/CombinedVegCDLRasters/MergeCDLandLANDFIRE_v2/CombinedEVTRasterAttributeTable.csv', row.names=F)
-} else if (veglayer == 'nvc') {
-    #write attribute table to csv
-  write.csv(all_classes, './data/CombinedVegCDLRasters/MergeCDLandLANDFIRE_v2/CombinedNVCRasterAttributeTable.csv', row.names=F)
-}
+#write attribute table to csv
+write.csv(all_classes, './data/TabularData/CombinedRasterAttributeTable_CDLNVC.csv', row.names=F)
+
 ```
+
+
+
+
+
