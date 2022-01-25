@@ -182,7 +182,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
                                   dst_dataset=paste0(statedir, '/', ID,"_NationalRaster_Tier3.tif"),
                                   overwrite=T, 
                                   ot='Int16',
-                                  co=c("COMPRESS=DEFLATE", "PREDICTOR=3", "BIGTIFF=YES"))
+                                  co=c("COMPRESS=DEFLATE", "BIGTIFF=YES")) #"PREDICTOR=3"
         
       }
       rm(list=ls(pattern='args3'))
