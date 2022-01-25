@@ -7,16 +7,16 @@ check_extent_crs <- function(dir) {
   }
   
   files <- list.files(dir, pattern='FinalRasterCompress', full.names=T)
-
-  # save state name
-  if (grepl(basename(files[i]), pattern="TX_East")|grepl(basename(files[i]), pattern="TX_West")) {
-    state <- stringr::str_sub(basename(files[i]), start=1, end=7)
-  } else {
-    state <- stringr::str_sub(basename(files[i]), start=1, end=2)
-  }
   
   for (onefile in files) {
     
+  # save state name
+  if (grepl(basename(onefile), pattern="TX_East")|grepl(basename(onefile), pattern="TX_West")) {
+    state <- stringr::str_sub(basename(onefile), start=1, end=7)
+  } else {
+    state <- stringr::str_sub(basename(onefile), start=1, end=2)
+  }
+  
   onerast <- terra::rast(onefile)
   
   if (onefile == files[1]) {
