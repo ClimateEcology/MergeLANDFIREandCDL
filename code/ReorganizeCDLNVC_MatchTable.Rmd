@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Extract CDL classes that match each NVC
 ```{r extract}
+library(dplyr)
 match_table <- read.csv('./data/TabularData/CDL_NVC_AgClassMatch.csv')
 
 levels1 <- sort(unique(match_table$NVC_Match1))
@@ -101,27 +102,5 @@ reorg_toview <- dplyr::select(reorg_wide, -NVC) %>%
 ```{r table}
 library(pander)
 pander::pandoc.table(reorg_toview, split.cells = c(15, 45))
-
-```
-
-
-```{r codetest}
-agclass_match <- match_table
-
-habitat_groups <- c('wheat', 'orchard', 'berries', 'vineyard', 'row_crop', 'close_grown_crop',
-                    'aquaculture', 'pasture', 'fallow')
-search_strings <- c('Wheat', 'Orchard', "Bush fruit and berries", 'Vineyard', 'Row Crop', 'Close Grown Crop', 'Aquaculture', 'Pasture', 'Fallow')
-  
-for (i in 1:length(habitat_groups)) {
-  assign(x=habitat_groups[i], value = dplyr::filter(agclass_match, grepl(NVC_Match1, pattern = search_strings[i])| 
-                                grepl(NVC_Match2, pattern= search_strings[i])|
-                                grepl(NVC_Match3, pattern= search_strings[i])|
-                                grepl(NVC_Match4, pattern= search_strings[i])) %>% 
-                                dplyr::pull(CLASS_NAME) )
-}
-  
-=
-
-
 
 ```
