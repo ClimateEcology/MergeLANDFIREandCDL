@@ -35,8 +35,9 @@ for (i in c('NVC', 'CDL')) {
   state_out <-  paste0('./data/PixelFreq/', i, '_StatePixelFreq.csv')
   county_out <- paste0('./data/PixelFreq/', i, '_CountyPixelFreq.csv')
   
-  ##### run for NVC
+  ##### run 
   tabulate_pixels_bycounty(rastpath=rastpath, countypath=countypath, outpath=county_out)
   tabulate_pixels_bystate(rastpath=nvc, statepath=statepath, outpath=state_out)
 
+  logger::log_info('Finished ', i)
 }
