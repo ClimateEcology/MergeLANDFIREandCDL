@@ -10,7 +10,9 @@ countypath <- './data/SpatialData/us_counties_better_coasts.shp'
 CDLYear <- 2016 
 
 # 'MergedCDLNVC'
-for (i in c('NVC', 'CDL')) {
+#for (i in c('NVC', 'CDL')) {
+for (i in c('CDL')) {
+    
   # file path to national raster
   if (i == 'NVC') {
     rastpath <- './data/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif'
@@ -37,7 +39,7 @@ for (i in c('NVC', 'CDL')) {
   
   ##### run 
   tabulate_pixels_bycounty(rastpath=rastpath, countypath=countypath, outpath=county_out)
-  tabulate_pixels_bystate(rastpath=rastpath, statepath=statepath, outpath=state_out)
+  #tabulate_pixels_bystate(rastpath=rastpath, statepath=statepath, outpath=state_out)
 
   logger::log_info('Finished ', i)
 }

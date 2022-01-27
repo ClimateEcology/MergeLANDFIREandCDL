@@ -28,7 +28,7 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
     }  else {
       all_freq <- rbind(all_freq, freq)
     }
-    logger::log_info('Finished polygon from ', one_county$COUNTY, ', ', one_county$STATE)
+    logger::log_info('Finished ', one_county$COUNTY, ', ', one_county$STATE)
   }
   
   write.csv(all_freq, outpath, row.names = F)
