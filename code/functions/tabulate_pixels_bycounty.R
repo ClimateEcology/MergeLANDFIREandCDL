@@ -5,6 +5,9 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
   national_raster <- raster::raster(rastpath)
   
   counties <- sf::st_read(countypath) %>%
+    dplyr::filter(!is.na(COUNTY)) %>% # take out state polygons that are all NA (sections of Great Lakes, for example)
+    dplyr::group_by(STATE, COUNTY) %>%
+    summarize(geometry=sf::st_combine(geometry)) %>%
     sf::st_transform(crs = sf::st_crs(national_raster))
   
   for (i in 1:length(counties$COUNTY)) {
@@ -25,7 +28,7 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
     }  else {
       all_freq <- rbind(all_freq, freq)
     }
-    logger::log_info('Finished ', one_county$COUNTY, ', ', one_county$STATE)
+    logger::log_info('Finished polygon from ', one_county$COUNTY, ', ', one_county$STATE)
   }
   
   write.csv(all_freq, outpath, row.names = F)

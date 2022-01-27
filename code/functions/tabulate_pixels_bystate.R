@@ -5,7 +5,11 @@ tabulate_pixels_bystate <- function(rastpath, statepath, outpath) {
   national_raster <- raster::raster(rastpath)
   
   states <- sf::st_read(statepath) %>%
+    dplyr::filter(!is.na(STATE)) %>% # take out state polygons that are all NA (sections of Great Lakes, for example)
+    dplyr::group_by(STATE) %>%
+    summarize(geometry=sf::st_combine(geometry)) %>%
     sf::st_transform(crs = sf::st_crs(national_raster))
+  
   
   for (state in unique(states$STUSPS)) {
     

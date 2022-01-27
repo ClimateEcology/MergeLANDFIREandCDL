@@ -40,13 +40,26 @@ nvc_county <- read.csv('./data/PixelFreq/NVC_CountyPixelFreq.csv') %>%
 ```{r testcrop}
 national_raster <- raster::raster('D:/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
 
-one_county <- dplyr::filter(county_shp, STATE=='MD' & COUNTY=='Calvert County') %>%
+one_county <- county_shp %>%
+    dplyr::filter(!is.na(COUNTY)) %>% # take out state polygons that are all NA (sections of Great Lakes, for example)
+    dplyr::group_by(STATE, COUNTY) %>%
+    summarize(geometry=sf::st_combine(geometry)) %>%
     sf::st_transform(crs = sf::st_crs(national_raster))
+
+  counties <- sf::st_read(countypath) %>%
+    dplyr::filter(!is.na(COUNTY)) %>% # take out state polygons that are all NA (sections of Great Lakes, for example)
+    dplyr::group_by(STATE, COUNTY) %>%
+    sf::st_combine()
+    sf::st_transform(crs = sf::st_crs(national_raster))
+    
 
 onecounty_raster <- raster::crop(national_raster, raster::extent(one_county)) %>%
   raster::mask(one_county)
 
-
+freq <- raster::freq(onecounty_raster, progress=T, merge=T) %>%
+  data.frame() %>%
+  dplyr::mutate(State = one_county$STATE, County=one_county$COUNTY) %>%
+  dplyr::rename(Class = value, NCells=count)
 
 
 ```
