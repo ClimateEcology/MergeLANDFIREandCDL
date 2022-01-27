@@ -37,7 +37,7 @@ for (i in c('NVC', 'CDL')) {
   
   ##### run 
   tabulate_pixels_bycounty(rastpath=rastpath, countypath=countypath, outpath=county_out)
-  tabulate_pixels_bystate(rastpath=nvc, statepath=statepath, outpath=state_out)
+  tabulate_pixels_bystate(rastpath=rastpath, statepath=statepath, outpath=state_out)
 
   logger::log_info('Finished ', i)
 }
