@@ -10,44 +10,44 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Objective
-The goal of this script is to map the accuracy of our combined CDL/NVC raster. To do this, I use class-level data on spatial accuracy from USDA NASS and LANDFIRE for CDL and NVC, respectively. I combined accuracy statistics from two layers by calculating an area-weighted mean. To start, I do this by state, although it could be aggregated at county level, too.
+The goal of this script is to map the accuracy of CDL, NVC, and combined rasters. To do this, I use class-level data on spatial accuracy from USDA NASS and LANDFIRE for CDL and NVC, respectively. I combined accuracy statistics from two layers by calculating an area-weighted mean.
 
 ```{r loadtabulardata}
 library(dplyr); library(logger); library(future); library(terra)
-
+rm(list=ls())
 # load accuracy data from LANDFIRE and USDA NASS (aggregated & formatted in 'AggregateAccuracyAssessmentData.Rmd' script)
-evt <- read.csv('./data/LANDFIRE_Accuracy/EVT_Accuracy_allregions.csv')
 nvc <- read.csv('./data/LANDFIRE_Accuracy/NVC_Accuracy_allregions.csv')
 cdl <- read.csv('./data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv')
 
 ```
  
-## Load spatial data (merged CDL/NVC raster)
-I use 2017 as a test year (folder of merged rasters by state), to start.
+## Load pixel frequency by county
+I use 2016 as a test year to start.
 
-```{r loadspatial}
-state_rasters <- list.files('D:/MergeLANDFIRECDL_Rasters/2017MergeCDL_LANDFIRE/2017', full.names = T)
-state_rasters <- state_rasters[!grepl(state_rasters, pattern= ".tif.aux")] # do not read .tif.aux files
+```{r loadfreq}
+county_shp <- sf::st_read('D:/SpatialData/county_boundaries/us_counties_better_coasts.shp')
 
+nvc_county <- read.csv('./data/PixelFreq/NVC_CountyPixelFreq.csv') %>%
+  dplyr::filter(!is.na(County)) %>%
+  dplyr::group_by(State, County) %>%
+  dplyr::mutate(PctCounty = NCells/sum(NCells)) %>%
+  dplyr::ungroup()
 
-tictoc::tic()
-source('./code/functions/tab_merged_raster.R')
-#turn on parallel processing for furrr package
-future::plan(multisession)
-
-logger::log_info('Starting parallel execution of tab_merged_raster function.')
-
-# loop through list of state rasters in parallel with furrr::future_map function
-# calculate proportion of raster classes by state
-all_freq <- furrr::future_map_dfr(.x=state_rasters[1:5], .f=tab_merged_raster,
-                              .options=furrr::furrr_options(seed = T))
-
-# stop parallel processing
-future::plan(sequential)
-tictoc::toc()    
-
-all_freq <- dplyr::group_by(all_freq, State, Year) %>%
-  dplyr::mutate(PctState = (NCells/sum(NCells)*100))
 ```
 
+
+## Why are there counties with >50% NA values in NVC??
+```{r testcrop}
+national_raster <- raster::raster('D:/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
+
+one_county <- dplyr::filter(county_shp, STATE=='MD' & COUNTY=='Calvert County') %>%
+    sf::st_transform(crs = sf::st_crs(national_raster))
+
+onecounty_raster <- raster::crop(national_raster, raster::extent(one_county)) %>%
+  raster::mask(one_county)
+
+
+
+
+```
 

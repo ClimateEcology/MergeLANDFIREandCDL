@@ -12,7 +12,7 @@ tabulate_pixels_bystate <- function(rastpath, statepath, outpath) {
     one_state <- dplyr::filter(states, STUSPS==state)
     
     onestate_raster <- raster::crop(national_raster, raster::extent(one_state)) %>%
-      terra::mask(one_state)
+      raster::mask(one_state)
   
     freq <- raster::freq(onestate_raster, progress=T, merge=T) %>%
       data.frame() %>%

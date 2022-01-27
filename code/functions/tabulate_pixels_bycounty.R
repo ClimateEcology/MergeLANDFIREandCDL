@@ -13,7 +13,7 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
       #sf::st_combine()
     
     onecounty_raster <- raster::crop(national_raster, raster::extent(one_county)) %>%
-      terra::mask(one_county)
+      raster::mask(one_county)
   
     freq <- raster::freq(onecounty_raster, progress=T, merge=T) %>%
       data.frame() %>%
