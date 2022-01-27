@@ -31,6 +31,7 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
     logger::log_info('Finished ', one_county$COUNTY, ', ', one_county$STATE)
   }
   
+  logger::log_info("All counties finished!")
   write.csv(all_freq, outpath, row.names = F)
 
 }
