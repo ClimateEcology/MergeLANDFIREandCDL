@@ -2,23 +2,23 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
   
   library(dplyr)
     
-  national_raster <- raster::raster(rastpath)
+  national_raster <- terra::rast(rastpath)
   
   counties <- sf::st_read(countypath) %>%
     dplyr::filter(!is.na(COUNTY)) %>% # take out state polygons that are all NA (sections of Great Lakes, for example)
-    dplyr::group_by(STATE, COUNTY) %>%
-    summarize(geometry=sf::st_combine(geometry)) %>%
+    #dplyr::group_by(STATE, COUNTY) %>%
+    #summarize(geometry=sf::st_combine(geometry)) %>%
     sf::st_transform(crs = sf::st_crs(national_raster))
   
   for (i in 1:length(counties$COUNTY)) {
     
-    one_county <- counties[i, ] #%>%
-      #sf::st_combine()
+    one_county <- counties[i, ] %>%
+      terra::vect()
     
-    onecounty_raster <- raster::crop(national_raster, raster::extent(one_county)) %>%
-      raster::mask(one_county)
+    onecounty_raster <- terra::crop(national_raster, terra::ext(one_county)) %>%
+      terra::mask(one_county)
   
-    freq <- raster::freq(onecounty_raster, progress=T, merge=T) %>%
+    freq <- terra::freq(onecounty_raster) %>%
       data.frame() %>%
       dplyr::mutate(State = one_county$STATE, County=one_county$COUNTY) %>%
       dplyr::rename(Class = value, NCells=count)
@@ -33,5 +33,4 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
   
   logger::log_info("All counties finished!")
   write.csv(all_freq, outpath, row.names = F)
-
 }
