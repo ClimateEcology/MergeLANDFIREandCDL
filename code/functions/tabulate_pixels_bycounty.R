@@ -6,8 +6,8 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
   
   counties <- sf::st_read(countypath) %>%
     dplyr::filter(!is.na(COUNTY)) %>% # take out state polygons that are all NA (sections of Great Lakes, for example)
-    #dplyr::group_by(STATE, COUNTY) %>%
-    #summarize(geometry=sf::st_combine(geometry)) %>%
+    dplyr::group_by(STATE, COUNTY) %>%
+    summarize(geometry=sf::st_combine(geometry)) %>%
     sf::st_transform(crs = sf::st_crs(national_raster))
   
   for (i in 1:length(counties$COUNTY)) {
