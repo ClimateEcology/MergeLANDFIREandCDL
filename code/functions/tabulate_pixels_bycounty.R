@@ -10,7 +10,9 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
     summarize(geometry=sf::st_combine(geometry)) %>%
     sf::st_transform(crs = sf::st_crs(national_raster))
   
-  for (i in 1:length(counties$COUNTY)) {
+  #for (i in 1:length(counties$COUNTY)) {
+  for (i in 143:146) {
+      
     
     one_county <- counties[i, ] %>%
       terra::vect()
@@ -18,17 +20,32 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
     onecounty_raster <- terra::crop(national_raster, terra::ext(one_county)) %>%
       terra::mask(one_county)
   
-    freq <- terra::freq(onecounty_raster) %>%
+    freq <- tryCatch( {
+      
+      terra::freq(onecounty_raster) %>%
       data.frame() %>%
       dplyr::mutate(State = one_county$STATE, County=one_county$COUNTY) %>%
       dplyr::rename(Class = value, NCells=count)
-  
-    if (i == 1) {
-      all_freq <- freq
-    }  else {
-      all_freq <- rbind(all_freq, freq)
+    }, error=function(cond) {
+      
+      logger::log_info('error with terra, trying to calculate pixel freq with base')
+      
+      data.frame(table(terra::values(onecounty_raster))) %>%
+      dplyr::mutate(State = one_county$STATE, County=one_county$COUNTY) %>%
+      dplyr::rename(Class = Var1, NCells=Freq)
     }
-    logger::log_info('Finished ', one_county$COUNTY, ', ', one_county$STATE)
+    )
+    
+    if (length(freq) > 0) {
+      if (i == 1) {
+        all_freq <- freq
+      }  else {
+        all_freq <- rbind(all_freq, freq)
+      }
+      logger::log_info('Finished ', one_county$COUNTY, ', ', one_county$STATE)
+    } else {
+      stop(paste0('No data on pixel frequency to return. Investigate ', one_county$COUNTY, ', ', one_county$STATE))
+    }
   }
   
   logger::log_info("All counties finished!")
