@@ -25,7 +25,7 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
       terra::freq(onecounty_raster) %>%
       data.frame() %>%
       dplyr::mutate(State = one_county$STATE, County=one_county$COUNTY) %>%
-      dplyr::rename(Class = value, NCells=count)
+      dplyr::rename(Class = as.factor(value), NCells=count)
     }, error=function(cond) {
       
       logger::log_info('error with terra, trying to calculate pixel freq with base')
@@ -40,7 +40,7 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
       if (i == 1) {
         all_freq <- freq
       }  else {
-        all_freq <- rbind(all_freq, freq)
+        all_freq <- dplyr::full_join(all_freq, freq)
       }
       logger::log_info('Finished ', one_county$COUNTY, ', ', one_county$STATE)
     } else {
