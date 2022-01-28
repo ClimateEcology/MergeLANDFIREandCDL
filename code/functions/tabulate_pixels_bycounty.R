@@ -10,8 +10,8 @@ tabulate_pixels_bycounty <- function(rastpath, countypath, outpath) {
     summarize(geometry=sf::st_combine(geometry)) %>%
     sf::st_transform(crs = sf::st_crs(national_raster))
   
-  #for (i in 1:length(counties$COUNTY)) {
-  for (i in 143:146) {
+  for (i in 1:length(counties$COUNTY)) {
+  #for (i in c(1, 143:146) {
       
     
     one_county <- counties[i, ] %>%
