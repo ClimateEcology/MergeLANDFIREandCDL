@@ -10,9 +10,8 @@ countypath <- './data/SpatialData/us_counties_better_coasts.shp'
 CDLYear <- 2016 
 
 # 'MergedCDLNVC'
-#for (i in c('NVC', 'CDL')) {
-for (i in c('CDL')) {
-    
+for (i in c('NVC', 'CDL')) {
+
   # file path to national raster
   if (i == 'NVC') {
     rastpath <- './data/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif'
