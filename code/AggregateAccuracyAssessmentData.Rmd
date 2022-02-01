@@ -47,15 +47,19 @@ all <- dplyr::rename(all, Pct_Row_Pixels = X__of_Row_Pixels, Row_Total_Pixels= R
 ```{r readcdl}
 for (year in 2012:2020) {
     
-  if (year < 2018) {
+  if (year < 2018 & year != 2016) {
     files <- list.files(paste0('./data/CDL_Accuracy/CDL_', year, '_accuracy_assessments/CDL_', year,
     '_accuracy_assessments/'), full.names = T)
   } else if (year %in% c(2018, 2019, 2020)) {
       files <- list.files(paste0('./data/CDL_Accuracy/CDL_', year, '_accuracy_assessments/'), full.names = T)
+  } else if (year == 2016) {
+      files <- list.files(paste0('./data/CDL_Accuracy/CDL_', year, '_accuracy_assessments/CDL_', year,
+    '_accuracy_assessments/buffered_validation/'), full.names = T)
   }
   
   files <- files[grepl(files, pattern='.xlsx')] # filter out non-excel files
-  
+  files <- files[!grepl(files, pattern='National')] # filter out national cdl results
+
   for (path in files) {
     
     # read correct sheet of excel file
@@ -75,10 +79,20 @@ for (year in 2012:2020) {
       dplyr::select(CDL_Name, CDL_Class, User, Commission, Kappa) %>%
       dplyr::rename(Kappa_User = Kappa)
       
+    if (grepl(basename(path), pattern="CT_MA_ME_NH_RI_VT")) {
+      state <- "CT,MA,ME,NH,RI,VT"
+    } else if (grepl(basename(path), pattern="DE_MD_NJ")) {
+      state <- "DE,MD,NJ,DC"
+    } else if (grepl(basename(path), pattern="VA_WV")) {
+      state <- "VA,WV"
+    } else {
+      state <- substr(basename(path), start=10, stop=11)
+    }
+    
     toretain <- cbind(AL17_user, AL17_producer) %>%
-      dplyr::mutate(State = substr(basename(path), start=10, stop=11), Year = substr(basename(path), start=12, stop=13)) %>%
-      dplyr::select(Year, State, everything()) %>%
-      dplyr::filter(!(is.na(Producer) | is.na(User))) # take out rows that do not have ground truth data OR CDL class was not represented in points to compare
+      dplyr::mutate(State = state, Year = year) %>%
+      dplyr::select(Year, State, everything()) #%>%
+      #dplyr::filter(!(is.na(Producer) | is.na(User))) # take out rows that do not have ground truth data OR CDL class was not represented in points to compare
     
     if (path == files[1] & year == 2012) {
       allstates <- toretain
@@ -88,7 +102,13 @@ for (year in 2012:2020) {
   }
 }
 
-write.csv(allstates, './data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv', row.names = F)
+# some states have combined accuracy assessments. Duplicate these rows and label with each state to facilitate joining with pixel freq data
+towrite <- allstates %>%
+  tibble() %>%
+  transform(State = strsplit(State, ",")) %>%
+  tidyr::unnest(State)
+
+write.csv(towrite, './data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv', row.names = F)
 
 ```
 
