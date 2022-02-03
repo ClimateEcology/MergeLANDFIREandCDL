@@ -77,13 +77,6 @@ if (clipstates == TRUE) {
     # # filter shapefile to one state
     # this_state <- dplyr::filter(us_state_bounds, STATE_FIPS %in% regionalextent$GEOID[regionalextent$STUSPS == stateName])
     # }
-       
-    # make list of state's finished rasters
-    # files_toread <- list.files(tiledir, full.names=T)
-    # files_toread <- as.list(files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
-    #   grepl(files_toread, pattern = paste0("CDL", CDLYear))])
-    # files_toread <- files_toread[!grepl(files_toread, pattern= ".tif.aux")] # do not try to load .aux files
-    # files_toread <- files_toread[!grepl(files_toread, pattern= ".tif.aux.xml")] # do not try to load .aux files
     
     for (i in 1:length(files_toread)) {
     
