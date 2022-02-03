@@ -7,6 +7,7 @@ check_rastersize <- function(dir, cutoff_pct) {
   }
   
   files = list.files(dir, pattern='FinalRasterCompress', full.names=T)
+  files <- files[!grepl(files, pattern= ".tif.aux")]
   filesizes <- file.size(files)
   
   for (i in 1:length(filesizes)) {

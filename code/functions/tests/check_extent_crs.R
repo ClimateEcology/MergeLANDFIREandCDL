@@ -7,6 +7,8 @@ check_extent_crs <- function(dir) {
   }
   
   files <- list.files(dir, pattern='FinalRasterCompress', full.names=T)
+  files <- files[!grepl(files, pattern= ".tif.aux")]
+  
   
   for (onefile in files) {
       
