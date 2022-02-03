@@ -6,11 +6,11 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = F)
 ```
 
 ## Extract CDL classes that match each NVC
-```{r extract}
+```{r extract, results='hide'}
 library(dplyr)
 match_table <- read.csv('./data/TabularData/CDL_NVC_AgClassMatch.csv')
 
@@ -95,6 +95,8 @@ reorg_toview <- dplyr::select(reorg_wide, -NVC) %>%
   tidyr::unite(col='CDL_Match_Classes', sep=", ", remove=T, na.rm=T) %>%
   dplyr::mutate(NVC=reorg_wide$NVC) %>%
   dplyr::select(NVC, everything())
+
+write.csv(reorg_wide, './data/TabularData/CDLNVC_Match_wide.csv', row.names = F)
 
 ```
 
