@@ -42,6 +42,8 @@ if (clipstates == TRUE) {
     files_toread <- list.files(tiledir, full.names=T)
     files_toread <- as.list(files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
                                            grepl(files_toread, pattern = paste0("CDL", CDLYear))])
+    files_toread <- files_toread[!grepl(files_toread, pattern= ".tif.aux")] # do not try to load .aux files
+    
     if (length(files_toread) == 0) {
       files_toread <- list.files(paste0(tiledir, "/MergedCDLNVC"), full.names=T)
       files_toread <- files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
