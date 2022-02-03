@@ -13,7 +13,7 @@ check_rastervalues <- function(CDLYear) {
   
   # list all state rasters in output directory that match appropriate pattern
   statepaths <- list.files(statedir, pattern=paste0(ID, ".tif"), full.names = T)
-  state_paths <- state_paths[!grepl(state_paths, pattern= ".tif.aux")]
+  statepaths <- statepaths[!grepl(statepaths, pattern= ".tif.aux")]
   
   for (i in 1:length(statepaths)) {
 
