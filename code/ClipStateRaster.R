@@ -39,15 +39,20 @@ if (clipstates == TRUE) {
 
   for (tiledir in alltiledirs) {
     
+    # make list of state's finished rasters
     files_toread <- list.files(tiledir, full.names=T)
     files_toread <- as.list(files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
                                            grepl(files_toread, pattern = paste0("CDL", CDLYear))])
     files_toread <- files_toread[!grepl(files_toread, pattern= ".tif.aux")] # do not try to load .aux files
+    files_toread <- files_toread[!grepl(files_toread, pattern= ".tif.aux.xml")] # do not try to load .aux files
+    
     
     if (length(files_toread) == 0) {
       files_toread <- list.files(paste0(tiledir, "/MergedCDLNVC"), full.names=T)
       files_toread <- files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
                                              grepl(files_toread, pattern = paste0("CDL", CDLYear))]
+      files_toread <- files_toread[!grepl(files_toread, pattern= ".tif.aux")] # do not try to load .aux files
+      files_toread <- files_toread[!grepl(files_toread, pattern= ".tif.aux.xml")] # do not try to load .aux files
       file.copy(from=files_toread[1], to= paste0(dirname(dirname(files_toread[1])),"/", basename(files_toread[1])) )
     }
     
@@ -74,9 +79,11 @@ if (clipstates == TRUE) {
     # }
        
     # make list of state's finished rasters
-    files_toread <- list.files(tiledir, full.names=T)
-    files_toread <- as.list(files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
-      grepl(files_toread, pattern = paste0("CDL", CDLYear))])
+    # files_toread <- list.files(tiledir, full.names=T)
+    # files_toread <- as.list(files_toread[grepl(files_toread, pattern= "FinalRasterCompress") & 
+    #   grepl(files_toread, pattern = paste0("CDL", CDLYear))])
+    # files_toread <- files_toread[!grepl(files_toread, pattern= ".tif.aux")] # do not try to load .aux files
+    # files_toread <- files_toread[!grepl(files_toread, pattern= ".tif.aux.xml")] # do not try to load .aux files
     
     for (i in 1:length(files_toread)) {
     
