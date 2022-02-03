@@ -25,5 +25,11 @@ for (onedir in alltiledirs) {
 
 logger::log_info('Finished file size, CRS, and extent tests.')
 
-# all values in state rasters in raster attribute table?
-res2019 <- check_rastervalues(CDLYear = CDLYear)
+if (CDLYear == 'all') {
+  for (i in 2012:2020) {
+  # all values in state rasters in raster attribute table?
+  res <- check_rastervalues(CDLYear = i)
+  }
+} else {
+  res <- check_rastervalues(CDLYear = CDLYear)
+}
