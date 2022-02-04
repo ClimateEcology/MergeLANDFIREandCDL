@@ -34,7 +34,6 @@ do
 
     jobids="$jobids,$seid,$neid,$mwid,$wid"
 done
-
 jobids="${jobids:1}" # strip off leading comma
 
 
