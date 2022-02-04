@@ -8,7 +8,7 @@ allstates=TRUE
 # declare empty string for all job ids
 jobids=""
 
-for year in 2020 2019 2018 2017 2016 2015 2014 2013 2012
+for year in 2020 2019
 
 do
     seid=$(sbatch --job-name="SouthE$year" --export=ALL,cdlyear=$year,region='Southeast',\
