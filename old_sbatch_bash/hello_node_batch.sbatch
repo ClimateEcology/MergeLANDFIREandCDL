@@ -10,3 +10,5 @@
 
 module load r
 Rscript -e "paste('Hello from node', Sys.getenv('SLURMD_NODENAME'))"
+sleep 30s
+
