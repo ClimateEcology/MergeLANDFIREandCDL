@@ -12,6 +12,7 @@ for k in {2..4};
         #jid=$(sbatch --dependency=afterok:${jid} old_sbatch_bash/hello_node_batch.sbatch | cut -d ' ' -f4)
         jid=$(sbatch old_sbatch_bash/hello_node_batch.sbatch | cut -d ' ' -f4)
 
-        jobids="$jobids, $jid"
+        jobids="$jobids,$jid"
     done
+jobids="${jobids:1}" # strip off leading comma
 echo $jobids    
