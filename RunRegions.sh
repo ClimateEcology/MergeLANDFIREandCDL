@@ -23,5 +23,4 @@ sleep 1s
 sbatch --job-name="West$year" --export=ALL,cdlyear=$year,region='West',\
 mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch
 sleep 1s
-
 done
