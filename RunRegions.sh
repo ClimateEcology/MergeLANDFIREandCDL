@@ -10,7 +10,7 @@ jobids="" # declare empty string for all job ids (generate rasters)
 
 years=(2020 2019 2018 2017 2016 2015 2014 2013 2012)
 
-for year in $years
+for year in "${years[@]}"
 
 do
     seid=$(sbatch --job-name="SouthE$year" --export=ALL,cdlyear=$year,region='Southeast',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
@@ -40,7 +40,7 @@ sbatch --dependency=afterany:${jobids} TechnicalValidation.sbatch
 clipstates=TRUE
 clipids="" # declare empty string for all job ids (clip)
 
-for year in $years
+for year in "${years[@]}"
 
 do
     seid2=$(sbatch --dependency=afterany:${jobids} --job-name="ClipSE$year" --export=ALL,cdlyear=$year,region='Southeast',clipstates=$clipstates,allstates=$allstates ClipStateRaster_bigmem.sbatch | cut -d ' ' -f4)
@@ -63,7 +63,7 @@ clipids="${clipids:1}" # strip off leading comma
 # parameters for mosaic
 tier='1:2:3'
 
-for year in $years
+for year in "${years[@]}"
 
 do
     sbatch --dependency=afterany:${clipids} --job-name="Mosaic$year" --export=ALL,cdlyear="$year",tier="$tier" MosaicToNational.sbatch
