@@ -8,7 +8,8 @@ mosaic=TRUE
 allstates=TRUE
 jobids="" # declare empty string for all job ids (generate rasters)
 
-years=(2020 2019 2018 2017 2016 2015 2014 2013 2012)
+#years=(2020 2019 2018 2017 2016 2015 2014 2013 2012)
+years=(2019)
 
 for year in "${years[@]}"
 
