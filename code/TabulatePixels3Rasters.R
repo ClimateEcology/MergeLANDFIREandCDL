@@ -19,7 +19,7 @@ if (CDLYear == 2012) {
   state_out <-  paste0('./data/PixelFreq/', i, '_StatePixelFreq.csv')
   county_out <- paste0('./data/PixelFreq/', i, '_CountyPixelFreq.csv')
   
-  ##### run 
+  ##### tabulate NVC
   tabulate_pixels_bycounty(rastpath=rastpath, countypath=countypath, outpath=county_out)
 }
 
@@ -52,7 +52,6 @@ for (i in c('CDL', 'MergedCDLNVC')) {
   
   ##### run 
   tabulate_pixels_bycounty(rastpath=rastpath, countypath=countypath, outpath=county_out)
-  #tabulate_pixels_bystate(rastpath=rastpath, statepath=statepath, outpath=state_out)
 
   logger::log_info('Finished ', id)
 }
