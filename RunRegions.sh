@@ -12,7 +12,6 @@ jobids="" # declare empty string for all job ids (generate rasters)
 years=(2019)
 
 for year in "${years[@]}"
-
 do
     seid=$(sbatch --job-name="SouthE$year" --export=ALL,cdlyear=$year,region='Southeast',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
     sleep 1s

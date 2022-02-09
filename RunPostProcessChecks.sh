@@ -23,8 +23,8 @@ sbatch --dependency=afterany:${jobids} --job-name="Tests$year" --export=ALL,cdly
 sleep 1s
 
 ########## Part 3: Tabulate the number of pixels in NVC, CDL, and merged raster layers
-for year in "${years[@]}"
-do
-    sbatch --dependency=afterany:${jobids} --job-name="TabPixels$year" --export=ALL,cdlyear="$year" TabPixels.sbatch
-    sleep 1s
-done
+# for year in "${years[@]}"
+# do
+#     sbatch --dependency=afterany:${jobids} --job-name="TabPixels$year" --export=ALL,cdlyear="$year" TabPixels.sbatch
+#     sleep 1s
+# done

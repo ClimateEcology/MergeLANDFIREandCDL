@@ -10,7 +10,7 @@ source('./code/functions/tests/check_rastersize.R')
 source('./code/functions/tests/check_extent_crs.R')
 source('./code/functions/tests/check_rastervalues.R')
 
-
+nationaldir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRasters'
 alltiledirs <- list.dirs('../../../90daydata/geoecoservices/MergeLANDFIREandCDL', recursive=F)
 
 # use this file path if running from 90daydata
@@ -24,6 +24,7 @@ for (onedir in alltiledirs) {
 }
 
 logger::log_info('Finished file size, CRS, and extent tests.')
+logger::log_info('Check raster values next.')
 
 if (CDLYear == 'all') {
   for (i in 2012:2020) {
@@ -31,7 +32,13 @@ if (CDLYear == 'all') {
   outdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/'
   statedir <- paste0(outdir,'/StateRasters/', CDLYear)
   res <- check_rastervalues(CDLYear = i, dir=statedir)
+  # check final, national rasters too
+  res <- check_rastervalues(CDLYear = i, dir=nationaldir)
   }
 } else {
   res <- check_rastervalues(CDLYear = CDLYear, dir=statedir)
+  # check final, national rasters too
+  res <- check_rastervalues(CDLYear = CDLYear, dir=nationaldir)
 }
+
+
