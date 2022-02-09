@@ -36,6 +36,7 @@ if (CDLYear == 'all') {
   }
 } else {
   logger::log_info(paste0('Running check values for ', CDLYear))
+  statedir <- paste0(outdir,'/StateRasters/', CDLYear)
   res <- check_rastervalues(CDLYear = CDLYear, dir=statedir)
 }
 
