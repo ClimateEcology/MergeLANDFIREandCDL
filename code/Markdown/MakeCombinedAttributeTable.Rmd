@@ -28,7 +28,7 @@ For either EVT or NVC, I specify which column of the data contains the vegetatio
 #load tabular data for NVC
 
 vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
-name_column <- 'NVC_Name'; name_column <- sym(name_column)
+name_column <- 'NVC_Name'; name_column <- rlang::sym(name_column)
 
 
 #read CDL class names
@@ -39,7 +39,7 @@ cdl_classes <- read.csv('D:/SpatialData/NASS_CDL/NASS_classes.csv') %>%
 ## Load combined vegetation map
 ```{r loadvegmap}
 library(terra)
-#vegmap <- terra::rast('./data/CombinedVegCDLRasters/MergeCDlandLANDFIRE_v2/NVC_CDL2016.tif')
+vegmap <- terra::rast('D:/MergeLANDFIRECDL_Rasters/NationalRasters/CDL2020NVC_NationalRaster.tif')
 ```
 
 ## Create attribute table for combined raster
@@ -47,7 +47,7 @@ library(terra)
 
 #create new version of CDL class table with negative values to match raster
 cdl_tomerge <- dplyr::mutate(cdl_classes, VALUE = -VALUE) %>%
-  dplyr::filter(GROUP == 'A'|VALUE %in% c(-176, -61, -37)) %>%
+  dplyr::filter(GROUP == 'A'|VALUE %in% c(-176, -61, -37, -111)) %>%
   dplyr::select(VALUE, CLASS_NAME, RED, GREEN, BLUE)
 
 nvc_tomerge <- dplyr::select(vegclasses_key, VALUE, !!name_column, r, g, b, Red, Green, Blue) %>%
