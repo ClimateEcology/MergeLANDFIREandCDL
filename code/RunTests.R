@@ -33,14 +33,10 @@ if (CDLYear == 'all') {
   outdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/'
   statedir <- paste0(outdir,'/StateRasters/', i)
   res <- check_rastervalues(CDLYear = i, dir=statedir)
-  # check final, national rasters too
-  res <- check_rastervalues(CDLYear = i, dir=nationaldir)
   }
 } else {
   logger::log_info(paste0('Running check values for ', CDLYear))
   res <- check_rastervalues(CDLYear = CDLYear, dir=statedir)
-  # check final, national rasters too
-  res <- check_rastervalues(CDLYear = CDLYear, dir=nationaldir)
 }
 
 

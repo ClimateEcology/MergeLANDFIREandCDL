@@ -17,7 +17,8 @@ jobids="${jobids:1}" # strip off leading comma
 
 ########## Part 2: Test that output rasters look good
 # this sections runs checks on crs, extent, file size, and raster values
-year=all
+#year=all
+year=2013
 
 sbatch --dependency=afterany:${jobids} --job-name="Tests$year" --export=ALL,cdlyear="$year" RunTests.sbatch
 sleep 1s
