@@ -2,17 +2,16 @@
 # check values in raster are all present in raster attribute table
 library(terra)
 
-check_rastervalues <- function(CDLYear) {
+check_rastervalues <- function(CDLYear, dir) {
+  
   # specify string patterns for file paths
-  outdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/'
-  statedir <- paste0(outdir,'/StateRasters/', CDLYear)
   ID <- paste0('CDL', CDLYear,'NVC')
   
   # load combined attribute table (NVC & CDL)
   rat <- read.csv('./data/TabularData/CombinedRasterAttributeTable_CDLNVC.csv')
   
   # list all state rasters in output directory that match appropriate pattern
-  statepaths <- list.files(statedir, pattern=paste0(ID, ".tif"), full.names = T)
+  statepaths <- list.files(dir, pattern=paste0(ID, ".tif"), full.names = T)
   statepaths <- statepaths[!grepl(statepaths, pattern= ".tif.aux")]
   
   for (i in 1:length(statepaths)) {

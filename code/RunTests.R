@@ -28,8 +28,10 @@ logger::log_info('Finished file size, CRS, and extent tests.')
 if (CDLYear == 'all') {
   for (i in 2012:2020) {
   # all values in state rasters in raster attribute table?
-  res <- check_rastervalues(CDLYear = i)
+  outdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/'
+  statedir <- paste0(outdir,'/StateRasters/', CDLYear)
+  res <- check_rastervalues(CDLYear = i, dir=statedir)
   }
 } else {
-  res <- check_rastervalues(CDLYear = CDLYear)
+  res <- check_rastervalues(CDLYear = CDLYear, dir=statedir)
 }
