@@ -31,5 +31,3 @@ outrst_name <- gsub(basename(files), pattern='_Tier3', replacement="")
 gdalUtils::gdal_translate(src_dataset=files, dst_dataset = paste0(outrst_dir, "/", outrst_name),
                           ot='Int16', co=c("COMPRESS=DEFLATE", "BIGTIFF=YES"), verbose=T)
 
-# check that all values in converted rasters are in acceptable range (in attribute table)
-res <- check_rastervalues(CDLYear = CDLYear, dir=outrst_dir)
