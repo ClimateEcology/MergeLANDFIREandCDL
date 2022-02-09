@@ -51,6 +51,7 @@ for (i in c('CDL', 'MergedCDLNVC')) {
   county_out <- paste0('./data/PixelFreq/', id, '_CountyPixelFreq.csv')
   
   ##### run 
+  logger::log_info('Tabulating freq pixels by county for ', CDLYear,", ", i)
   tabulate_pixels_bycounty(rastpath=rastpath, countypath=countypath, outpath=county_out)
 
   logger::log_info('Finished ', id)
