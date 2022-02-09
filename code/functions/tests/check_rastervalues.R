@@ -11,7 +11,8 @@ check_rastervalues <- function(CDLYear, dir) {
   rat <- read.csv('./data/TabularData/CombinedRasterAttributeTable_CDLNVC.csv')
   
   # list all state rasters in output directory that match appropriate pattern
-  statepaths <- list.files(dir, pattern=paste0(ID, ".tif"), full.names = T)
+  statepaths <- list.files(dir, pattern=paste0(".tif"), full.names = T)
+  statepaths <- list.files(dir, pattern=paste0(ID), full.names = T)
   statepaths <- statepaths[!grepl(statepaths, pattern= ".tif.aux")]
   
   for (i in 1:length(statepaths)) {

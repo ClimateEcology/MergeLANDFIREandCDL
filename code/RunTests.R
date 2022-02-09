@@ -28,14 +28,16 @@ logger::log_info('Check raster values next.')
 
 if (CDLYear == 'all') {
   for (i in 2012:2020) {
+  logger::log_info('Running all years of check values.')
   # all values in state rasters in raster attribute table?
   outdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/'
-  statedir <- paste0(outdir,'/StateRasters/', CDLYear)
+  statedir <- paste0(outdir,'/StateRasters/', i)
   res <- check_rastervalues(CDLYear = i, dir=statedir)
   # check final, national rasters too
   res <- check_rastervalues(CDLYear = i, dir=nationaldir)
   }
 } else {
+  logger::log_info(paste0('Running check values for ', CDLYear))
   res <- check_rastervalues(CDLYear = CDLYear, dir=statedir)
   # check final, national rasters too
   res <- check_rastervalues(CDLYear = CDLYear, dir=nationaldir)
