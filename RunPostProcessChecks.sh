@@ -8,7 +8,7 @@ years=(2013) # which years to run
 
 for year in "${years[@]}"
 do
-    convert_id=$(sbatch --job-name="ConvertDatatype --$year" --export=ALL,cdlyear=$year ConvertDatatype.sbatch | cut -d ' ' -f4)
+    convert_id=$(sbatch --job-name="ConvertDatatype$year" --export=ALL,cdlyear=$year ConvertDatatype.sbatch | cut -d ' ' -f4)
     sleep 1s
 
     jobids="$jobids,$convert_id"
