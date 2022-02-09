@@ -30,5 +30,5 @@ for (CDLYear in 2012:2020) {
                             ot='Int16', co=c("COMPRESS=DEFLATE", "BIGTIFF=YES"), verbose=T)
   
   # check that all values in converted rasters are in acceptable range (in attribute table)
-  res <- check_rastervalues(CDLYear = i, dir=outrst_dir)
+  res <- check_rastervalues(CDLYear = CDLYear, dir=outrst_dir)
 }
