@@ -14,8 +14,7 @@ check_rastervalues <- function(CDLYear, dir) {
   statepaths <- list.files(dir, pattern=paste0(".tif"), full.names = T)
   statepaths <- list.files(dir, pattern=paste0(ID), full.names = T)
   statepaths <- statepaths[!grepl(statepaths, pattern= ".tif.aux")]
-  statepaths <- statepaths[!grepl(statepaths, pattern= "MegaTil
-                                  e")]
+  statepaths <- statepaths[!grepl(statepaths, pattern= "MegaTile")]
   statepaths <- statepaths[!grepl(statepaths, pattern= "Tier")]
   
   
