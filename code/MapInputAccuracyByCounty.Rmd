@@ -1,5 +1,5 @@
 ---
-title: "Calculate Accuracy of Merged CDL/NVC Raster"
+title: "Calculate Accuracy of CDL and NVC rasters"
 author: "Melanie Kammerer"
 date: "1/11/2022"
 output: html_document
@@ -32,6 +32,8 @@ nvc <- dplyr::full_join(nvc, dplyr::select(toadd, VALUE, NVC_Name, ProducerNPlot
                              'LANDFIRE_Name' ='NVC_Name','ProducerNPlots_autokey'))
 
 length(unique(nvc$LANDFIRE_Class)) == length(unique(nvc$LANDFIRE_Name))
+length(unique(nvc$LANDFIRE_Class)) == length(unique(all_classes$VALUE))
+
 
 # custom max function that returns NA if both input values are NA
 mymax <- function(...,def=NA,na.rm=FALSE) {
@@ -40,13 +42,18 @@ mymax <- function(...,def=NA,na.rm=FALSE) {
 }
 
 # for NVC classes that were taken from EVT, use the accuracy data from EVT
-lf <- dplyr::left_join(nvc, evt, by=c('LANDFIRE_Class', 'LANDFIRE_Name', 'Region'), suffix=c('.nvc', '.evt')) %>%
+lf <- dplyr::full_join(nvc, evt, by=c('LANDFIRE_Class','LANDFIRE_Name', 'Region'), suffix=c('.nvc', '.evt')) %>%
   dplyr::group_by(LANDFIRE_Class, LANDFIRE_Name, Region) %>%
   dplyr::mutate(ProducerAccuracy = mymax(ProducerAccuracy.nvc, ProducerAccuracy.evt, na.rm=T),
                 ProducerNPlots_autokey = mymax(ProducerNPlots_autokey.nvc, ProducerNPlots_autokey.evt, na.rm=T),
-                UserAccuracy = if_else(ProducerNPlots_autokey==ProducerNPlots_autokey.nvc, UserAccuracy.nvc, UserAccuracy.evt),
-                UserNPlots_map = if_else(ProducerNPlots_autokey==ProducerNPlots_autokey.nvc, UserNPlots_map.nvc, UserNPlots_map.evt)) %>%
-  dplyr::ungroup()
+                UserAccuracy = mymax(UserAccuracy.nvc, UserAccuracy.evt, na.rm=T),
+                UserNPlots_map = mymax(UserNPlots_map.nvc, UserNPlots_map.evt, na.rm=T)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(LANDFIRE_NVC = paste(LANDFIRE_Class, LANDFIRE_Name))
+
+#UserAccuracy = if_else(ProducerNPlots_autokey==ProducerNPlots_autokey.nvc, UserAccuracy.nvc, UserAccuracy.evt),
+                #UserNPlots_map = if_else(ProducerNPlots_autokey==ProducerNPlots_autokey.nvc, UserNPlots_map.nvc, UserNPlots_map.evt)) %>%
+
 
 # specify classes that COULD have plots in auto-key (are non-managed, not agriculture or NLCD developed)
 nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
@@ -55,10 +62,9 @@ managed_classes <- lf$LANDFIRE_Class[grepl(lf$LANDFIRE_Name, pattern='Developed-
                                        grepl(lf$LANDFIRE_Name, pattern='Recently Burned-') | 
                                        grepl(lf$LANDFIRE_Name, pattern='Recently Logged-') | 
                                        grepl(lf$LANDFIRE_Name, pattern='Recently Disturbed Other-') | 
-                                       grepl(lf$LANDFIRE_Name, pattern='Forest Plantation') | 
+                                       #grepl(lf$LANDFIRE_Name, pattern='Forest Plantation') | 
                                        lf$LANDFIRE_Class %in% nvc_agclasses |
                                          lf$LANDFIRE_Name == 'Open Water']
-write.csv(lf, './data/NVC_Accuracy_allregions_cleaned.csv')
 ```
  
 ## Load NVC pixel frequency by county
@@ -95,7 +101,7 @@ county <- dplyr::arrange(county_shp, FIPS) %>% cbind(la) %>%
 
 plot(county[5])
 
-sf::st_write(county, './data/SpatialData/us_counties_better_coasts_LFregion.shp')
+#sf::st_write(county, './data/SpatialData/us_counties_better_coasts_LFregion.shp', append=F)
 
 # read NVC pixel frequency data
 nvc_county <- read.csv('./data/PixelFreq/NVC_CountyPixelFreq.csv') %>%
@@ -113,6 +119,13 @@ nvc_county <- sf::st_drop_geometry(county) %>%
 
 # how many classes in spatial data are missing from tabular data?
 sort(unique(nvc_county$Class[!nvc_county$Class %in% lf$LANDFIRE_Class]))
+
+# filter tabular data to ONLY classes in spatial data
+lf2 <- dplyr::filter(lf, LANDFIRE_Class %in% nvc_county$Class)
+
+# write clean version of tabular data
+write.csv(lf, './data/NVC_Accuracy_allregions_cleaned.csv', row.names=F)
+
 ```
 
 # Join NVC accuracy metrics with pixel frequency

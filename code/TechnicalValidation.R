@@ -1,5 +1,6 @@
 # technical validation looking at the distribution of mis-matched pixels in merge CDL and LANDFIRE workflow
 library(dplyr)
+source('./code/functions/addcounty.R')
 
 valdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
 
@@ -18,7 +19,7 @@ if (any(torun > length(tiles))) {
 
   for (i in torun) {
     # load csv of mismatch pixel data for one tile
-    ex <- read.csv(tiles[i])
+    ex <- addcounty(tiles[i])
     
     if (i == torun[1]) {
       all <- ex
@@ -41,10 +42,16 @@ for (i in 1:length(h)) {
   }
 }
 
-freq <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
+freq_bystate <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
   dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
   dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
 
-write.csv(freq, './data/TechnicalValidation/Mismatched_Cells.csv')
+freq_bycounty <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
+  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
+  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
+
+
+write.csv(freq_bystate, './data/TechnicalValidation/Mismatched_Cells_byState.csv')
+write.csv(freq_bycounty, './data/TechnicalValidation/Mismatched_Cells_byCounty.csv')
 write.csv(all, './data/TechnicalValidation/Mismatch_ByCell.csv')
 

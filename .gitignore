@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 .Renviron
+.RDataTmp
 
 # raster and image files
 **/*.tif
