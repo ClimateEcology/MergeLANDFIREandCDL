@@ -11,7 +11,7 @@ nvc <- raster::raster('./data/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
 target_crs <- raster::crs(nvc)
 
 counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
-  dplyr::select(STATE, COUNTY, FIPS) %>%
+  dplyr::select(STATE, COUNTY, FIPS)
   
 
 tiles <- list.files(valdir, full.names = T)
