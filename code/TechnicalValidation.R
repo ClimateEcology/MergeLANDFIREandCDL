@@ -4,6 +4,16 @@ source('./code/functions/addcounty.R')
 
 valdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
 
+# save necessary spatial information
+
+# load NVC raster (just to grab projection information)
+nvc <- raster::raster('./data/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
+target_crs <- raster::crs(nvc)
+
+counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
+  dplyr::select(STATE, COUNTY, FIPS) %>%
+  
+
 tiles <- list.files(valdir, full.names = T)
 increment <- 50
 
@@ -19,7 +29,7 @@ if (any(torun > length(tiles))) {
 
   for (i in torun) {
     # load csv of mismatch pixel data for one tile
-    ex <- addcounty(tiles[i])
+    ex <- addcounty(tiles[i], prj=target_crs, shape=counties)
     
     if (i == torun[1]) {
       all <- ex
