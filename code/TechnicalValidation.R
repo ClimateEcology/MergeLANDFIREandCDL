@@ -11,7 +11,8 @@ nvc <- raster::raster('./data/SpatialData/LANDFIRE/US_200NVC/Tif/us_200nvc.tif')
 target_crs <- raster::crs(nvc)
 
 counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
-  dplyr::select(STATE, COUNTY, FIPS)
+  dplyr::select(STATE, COUNTY, FIPS) %>%
+  dplyr::filter(!is.na(COUNTY)) # take out polygons that form coasts but are not actually land area (e.g. great lakes)
   
 
 tiles <- list.files(valdir, full.names = T)
@@ -52,12 +53,15 @@ for (i in 1:length(h)) {
   }
 }
 
-freq_bystate <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
-  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
-  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
+cleaned <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
+  dplyr::filter(!is.na(FIPS)) %>% # remove mis-match points that do not have FIPS code (overlap water or other non-county polygon)
+  dplyr::filter(!duplicated(paste0(x, y))) %>% # remove points that might be duplicated 
+  #duplication could happen due to calculating mis-match from state tiles rather than actual state polygons, borders don't match exactly
+   
+freq_bystate <- cleaned %>%  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
+  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile, rm.na=T))
 
-freq_bycounty <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
-  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
+freq_bycounty <- cleaned %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
   dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
 
 
