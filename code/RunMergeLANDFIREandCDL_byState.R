@@ -95,10 +95,18 @@ for (stateName in states) {
   
   # set CDL path to national rasters with altered NA values (for years when that was necessary)
   # else CDL path is national raster unaltered from USDA NASS
-  if (file.exists(paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img'))) {
-    cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img')
-  } else {
-    cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
+  if (CDLYear < 2020) {
+    if (file.exists(paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img'))) {
+      cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img')
+    } else {
+      cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
+    }
+  } else if (CDLYear >= 2020) {
+    if (file.exists(paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.tif'))) {
+      cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.tif')
+    } else {
+      cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.tif')
+    }
   }
   
   ID <- paste0(stateName, '_CDL', CDLYear,'NVC')
