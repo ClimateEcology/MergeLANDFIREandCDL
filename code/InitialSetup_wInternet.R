@@ -88,3 +88,20 @@ for (regionName in c('Northeast', 'Southeast', 'Midwest', 'West')) {
     sf::st_write(region, paste0('./data/SpatialData/', regionName, '_OnePoly.shp'), delete_dsn=T, append=F)
   }
 }
+
+# download spatial data
+# Cropland Data layer from USDA NASS
+for (year in c(2012:2021)) {
+  url_oneyear <- paste0('https://www.nass.usda.gov/Research_and_Science/Cropland/Release/datasets/', year, '_30m_cdls.zip')
+  destination_oneyear <- paste0('./data/SpatialData/CDL/', year, '_30m_cdls.zip')
+  download.file(url= url_oneyear, destfile= destination_oneyear)
+}
+
+# unzip downloaded CDL
+zip_archives <- list.files('./data/SpatialData/CDL', pattern='.zip', full.names = T)
+
+for (i in 1:length(zip_archives)) {
+  logger::log_info('Starting ', zip_archives[i])
+  unzip(zip_archives[i], overwrite=F, exdir='./data/SpatialData/CDL')
+}
+
