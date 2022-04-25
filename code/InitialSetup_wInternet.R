@@ -105,3 +105,11 @@ for (i in 1:length(zip_archives)) {
   unzip(zip_archives[i], overwrite=F, exdir='./data/SpatialData/CDL')
 }
 
+#### This part doesn't work due to security certificate issues!
+
+# LANDFIRE raster
+# url_landfire <- 'https://landfire.gov/bulk/downloadfile.php?FNAME=US_200_mosaic-LF2016_NVC_200_CONUS.zip&TYPE=landfire'
+# destination_landfire <- paste0('./data/SpatialData/LANDFIRE/LF2016_NVC_200_CONUS.zip')
+# 
+# download.file(url= url_landfire, destfile= destination_landfire)
+
