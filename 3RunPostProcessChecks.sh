@@ -3,12 +3,12 @@
 jobids="" # declare empty string for all job ids (converting data type)
 years=(2020 2019 2018 2017 2016 2015 2014 2013 2012)
 
-########## Part 1: convert data type to Int16 for final, national rasters
+########## Part 3.1: convert data type to Int16 for final, national rasters
 # run this section first, only start other jobs when these are complete
 
 for year in "${years[@]}"
 do
-    convert_id=$(sbatch --job-name="ConvertDatatype$year" --export=ALL,cdlyear=$year ConvertDatatype.sbatch | cut -d ' ' -f4)
+    convert_id=$(sbatch --job-name="ConvertDatatype$year" --export=ALL,cdlyear=$year 3_1ConvertDatatype.sbatch | cut -d ' ' -f4)
     sleep 1s
 
     jobids="$jobids,$convert_id"
@@ -19,7 +19,7 @@ jobids="${jobids:1}" # strip off leading comma
 ########## Part 2: Tabulate the number of pixels in NVC, CDL, and merged raster layers
 for year in "${years[@]}"
 do
-    sbatch --dependency=afterany:${jobids} --job-name="TabPixels$year" --export=ALL,cdlyear="$year" TabPixels.sbatch
+    sbatch --dependency=afterany:${jobids} --job-name="TabPixels$year" --export=ALL,cdlyear="$year" 3_2TabPixels.sbatch
     sleep 1s
 done
 
@@ -27,5 +27,5 @@ done
 # this sections runs checks on crs, extent, file size, and raster values
 year=all
 
-sbatch --job-name="Tests$year" --export=ALL,cdlyear="$year" RunTests.sbatch
+sbatch --job-name="Tests$year" --export=ALL,cdlyear="$year" 3_3RunTests.sbatch
 sleep 1s

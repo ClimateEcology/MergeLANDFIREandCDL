@@ -1,7 +1,16 @@
 #!/bin/bash
+
+# download necessary spatial data
+module load singularity/3.5.2
+singularity exec --bind /90daydata:/90daydata geospatial_extend_latest.sif Rscript code/DownloadFormatSpatialData_wInternet.R
+
+
+# define raster NoData values (translate from NA to zero)
 # helpful stackoverflow discussion: https://gis.stackexchange.com/questions/134084/replacing-nan-pixel-values-in-geotiff-using-gdal
 
-# identify which CDL years have different (or are lakcing) no data values
+module load gdal # update this if GDAL Python bindings are a separate module
+
+# identify which CDL years have different (or are lacking) no data values
 gdalinfo /project/geoecoservices/MergeLANDFIREandCDL/data/SpatialData/CDL/2019_30m_cdls.img
 
 # change no data value to zero (instead of NA). NA as no data value messes up spatial workflow
@@ -13,13 +22,3 @@ gdal_calc -A /project/geoecoservices/MergeLANDFIREandCDL/data/SpatialData/CDL/20
 gdal_calc -A /project/geoecoservices/MergeLANDFIREandCDL/data/SpatialData/CDL/2012_30m_cdls.img --outfile=/project/geoecoservices/MergeLANDFIREandCDL/data/SpatialData/CDL/2012_30m_cdls_fixNA.img --calc="A" --NoDataValue=0
 
 
-# file paths for laptop
-#gdalinfo D:/SpatialData/NASS_CDL/CDL2019/2019_30m_cdls.img
-
-#gdal_calc -A D:/SpatialData/NASS_CDL/CDL2019/2019_30m_cdls.img --outfile=D:/SpatialData/NASS_CDL/CDL2019/2019_30m_cdls_fixNA.img --calc="A" --NoDataValue=0
-#gdal_calc -A D:/SpatialData/NASS_CDL/CDL2017/2017_30m_cdls.img --outfile=D:/SpatialData/NASS_CDL/CDL2017/2017_30m_cdls_fixNA.img --calc="A" --NoDataValue=0
-#gdal_calc -A D:/SpatialData/NASS_CDL/CDL2016/2016_30m_cdls.img --outfile=D:/SpatialData/NASS_CDL/CDL2016/2016_30m_cdls_fixNA.img --calc="A" --NoDataValue=0
-#gdal_calc -A D:/SpatialData/NASS_CDL/CDL2012/2012_30m_cdls.img --outfile=D:/SpatialData/NASS_CDL/CDL2012/2012_30m_cdls_fixNA.img --calc="A" --NoDataValue=0
-
-#gdal_calc -A 2019_30m_cdls.img --outfile=2019_30m_cdls_fixNA.img --calc="A" --NoDataValue=0
-#gdal_translate D:/SpatialData/NASS_CDL/ZippedCDL/2019_30m_cdls/AL_output.tif D:/SpatialData/NASS_CDL/ZippedCDL/2019_30m_cdls/AL_output2.tif -a_nodata -1001
