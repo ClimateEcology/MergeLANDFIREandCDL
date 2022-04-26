@@ -1,7 +1,9 @@
 #!/bin/bash
 
 jobids="" # declare empty string for all job ids (converting data type)
-years=(2020 2019 2018 2017 2016 2015 2014 2013 2012)
+
+#years=(2020 2019 2018 2017 2016 2015 2014 2013 2012)
+years=(2020 2021)
 
 ########## Part 3.1: convert data type to Int16 for final, national rasters
 # run this section first, only start other jobs when these are complete
