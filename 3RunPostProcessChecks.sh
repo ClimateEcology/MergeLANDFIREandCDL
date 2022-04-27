@@ -26,8 +26,8 @@ do
 done
 
 ########## Part 3: Test that output rasters look good
-# this sections runs checks on crs, extent, file size, and raster values
-year=all
+# this sections runs checks on crs, extent, file size, and raster values for state-level maps
+year=all # implementation of file size checks mean that it makes the most sense to examine all years at the same time
 
 sbatch --job-name="Tests$year" --export=ALL,cdlyear="$year" 3_3RunTests.sbatch
 sleep 1s

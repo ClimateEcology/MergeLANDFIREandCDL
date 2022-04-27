@@ -26,6 +26,12 @@ target_area <- 1000 # desired size (in km2) of each tile
 nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
 chunksize1 <- 40
 
+if (CDLYear < 2020) {
+  cdl_format <- '.img'
+} else if (CDLYear >= 2020) {
+  cdl_format <- '.tif'
+}
+
 # If all states is NOT true, use regionName <- 'National" to specify groups of states that don't match pre-defined regions
 
 # make list of states to run (either all in shapefile or manually defined)
@@ -95,18 +101,10 @@ for (stateName in states) {
   
   # set CDL path to national rasters with altered NA values (for years when that was necessary)
   # else CDL path is national raster unaltered from USDA NASS
-  if (CDLYear < 2020) {
-    if (file.exists(paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img'))) {
-      cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img')
-    } else {
-      cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
-    }
-  } else if (CDLYear >= 2020) {
-    if (file.exists(paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.tif'))) {
-      cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.tif')
-    } else {
-      cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls.tif')
-    }
+  if (file.exists(paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA', cdl_format))) {
+    cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA', cdl_format)
+  } else {
+    cdl_path <- paste0(datadir, '/SpatialData/CDL/', CDLYear, '_30m_cdls', cdl_format)
   }
   
   ID <- paste0(stateName, '_CDL', CDLYear,'NVC')

@@ -11,6 +11,12 @@ countypath <- './data/SpatialData/us_counties_better_coasts.shp'
 args <- commandArgs(trailingOnly = T)
 CDLYear <- args[2] # year of NASS Cropland Data Layer
 
+if (CDLYear < 2020) {
+  cdl_format <- '.img'
+} else if (CDLYear >= 2020) {
+  cdl_format <- '.tif'
+}
+
 # for one year of CDL, run NVC also
 if (CDLYear == 2012) {
   i <- 'NVC'
@@ -30,12 +36,13 @@ for (i in c('CDL', 'MergedCDLNVC')) {
   if (i == 'CDL') {
     # set CDL path to national rasters with altered NA values (for years when that was necessary)
     # else CDL path is national raster unaltered from USDA NASS
-    if (file.exists(paste0('./data/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img'))) {
-      rastpath <- paste0('./data/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA.img')
+
+    if (file.exists(paste0('./data/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA', cdl_format))) {
+      rastpath <- paste0('./data/SpatialData/CDL/', CDLYear, '_30m_cdls_fixNA', cdl_format)
     } else {
-      rastpath <- paste0('./data/SpatialData/CDL/', CDLYear, '_30m_cdls.img')
+      rastpath <- paste0('./data/SpatialData/CDL/', CDLYear, '_30m_cdls', cdl_format)
     }
-      
+
   } else if (i == 'MergedCDLNVC') {
     rastpath <- paste0('../../../90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRasters/CDL', CDLYear, 'NVC_NationalRaster.tif')
   }
