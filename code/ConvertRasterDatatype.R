@@ -29,6 +29,6 @@ outrst_name <- gsub(basename(files), pattern='_Tier3', replacement="")
 
 # move raster to national rasters file and convert to signed Int16 instead of float32
 gdalUtils::gdal_translate(src_dataset=files, dst_dataset = paste0(outrst_dir, "/", outrst_name),
-                          ot='Int16', co=c("COMPRESS=DEFLATE", "BIGTIFF=YES"), verbose=T)
+                          ot='Int16', co=c("COMPRESS=LZW", "BIGTIFF=YES"), verbose=T)
 
 logger::log_info('Finished converting ', CDLYear, ' output raster to Int16.')
