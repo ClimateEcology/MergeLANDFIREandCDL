@@ -1,4 +1,7 @@
 addcounty <- function(x, prj, shape) {
+  suppressPackageStartupMessages(library("dplyr"))
+  suppressPackageStartupMessages(library("raster"))
+  
   library(raster); library(dplyr)
   
   # load csv of mismatch points for one tile
