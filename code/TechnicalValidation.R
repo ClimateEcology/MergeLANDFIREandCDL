@@ -58,6 +58,9 @@ for (i in 1:length(h)) {
   }
 }
 
+logger::log_info("All groups of files are combined together.")
+logger::log_info("Starting summarize by state.")
+
 cleaned <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
   dplyr::filter(!is.na(FIPS)) %>% # remove mis-match points that do not have FIPS code (overlap water or other non-county polygon)
   dplyr::filter(!duplicated(paste0(x, y))) # remove points that might be duplicated 
@@ -66,11 +69,15 @@ cleaned <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>%
 freq_bystate <- cleaned %>%  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
   dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile, rm.na=T))
 
+logger::log_info('Finished summarize by state, starting summarize by county.')
+
 freq_bycounty <- cleaned %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
   dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
 
+logger::log_info('Writing output files.')
 
-write.csv(freq_bystate, './data/TechnicalValidation/Mismatched_Cells_byState_v2.csv')
-write.csv(freq_bycounty, './data/TechnicalValidation/Mismatched_Cells_byCounty_v2.csv')
-write.csv(all, './data/TechnicalValidation/Mismatch_ByCell.csv')
+write.csv(freq_bystate, paste0('./data/TechnicalValidation/Mismatched_Cells_byState_', increment, '.csv'))
+write.csv(freq_bycounty, paste0('./data/TechnicalValidation/Mismatched_Cells_byCounty_v2.csv', increment, '.csv'))
+write.csv(all, paste0('./data/TechnicalValidation/Mismatch_ByCell_', increment, '.csv'))
 
+logger::log_info('Finished, processed in groups of ', increment,'.')
