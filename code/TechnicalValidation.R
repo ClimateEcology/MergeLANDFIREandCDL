@@ -16,7 +16,7 @@ counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
   
 
 tiles <- list.files(valdir, full.names = T)
-increment <- 500
+increment <- 100
 
 h <- seq(from=1, to=length(tiles), by=increment)
 
@@ -70,7 +70,7 @@ freq_bycounty <- cleaned %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, Stat
   dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
 
 
-write.csv(freq_bystate, './data/TechnicalValidation/Mismatched_Cells_byState.csv')
-write.csv(freq_bycounty, './data/TechnicalValidation/Mismatched_Cells_byCounty.csv')
+write.csv(freq_bystate, './data/TechnicalValidation/Mismatched_Cells_byState_v2.csv')
+write.csv(freq_bycounty, './data/TechnicalValidation/Mismatched_Cells_byCounty_v2.csv')
 write.csv(all, './data/TechnicalValidation/Mismatch_ByCell.csv')
 
