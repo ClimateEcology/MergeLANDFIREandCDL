@@ -16,7 +16,7 @@ counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
   
 
 tiles <- list.files(valdir, full.names = T)
-increment <- 50
+increment <- 1000
 
 h <- seq(from=1, to=length(tiles), by=increment)
 
