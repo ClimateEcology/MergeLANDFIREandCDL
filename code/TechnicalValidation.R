@@ -2,6 +2,7 @@
 library(dplyr); library(future)
 source('./code/functions/addcounty.R')
 
+args <- commandArgs(trailingOnly = T)
 parallel <- args[2] # year of NASS Cropland Data Layer
 
 if (parallel == T) {
