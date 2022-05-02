@@ -2,6 +2,16 @@
 library(dplyr); library(future)
 source('./code/functions/addcounty.R')
 
+parallel <- args[2] # year of NASS Cropland Data Layer
+
+if (parallel == T) {
+  increment <- 1000
+  par_text <- 'parallel'
+} else if (parallel == F) {
+  increment <- 250
+  par_text <- 'notparallel'
+}
+
 valdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
 
 # save necessary spatial information
@@ -16,7 +26,6 @@ counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
   
 
 tiles <- list.files(valdir, full.names = T)
-increment <- 1000
 
 h <- seq(from=1, to=length(tiles), by=increment)
 
@@ -30,20 +39,34 @@ for (j in h) {
     torun <- torun[1]:length(tiles)
   }
   
-  #turn on parallel processing for furrr package
-  future::plan(multisession)
-  
-  # loop through list of points in parallel with furrr::future_walk function
-  assign(x=paste0('group', j), value= 
-           furrr::future_map_dfr(.x=tiles[torun], .f=addcounty,
-                     prj=target_crs, shape=counties,
-                     .options=furrr::furrr_options(seed = T))
-  )
-  
-  # stop parallel processing
-  future::plan(sequential)
-  
-  logger::log_info(paste0(j,' files out of ', max(h), ' are finished.'))
+  if (parallel == T) {
+    #turn on parallel processing for furrr package
+    future::plan(multisession)
+    
+    # loop through list of points in parallel with furrr::future_walk function
+    assign(x=paste0('group', j), value= 
+             furrr::future_map_dfr(.x=tiles[torun], .f=addcounty,
+                       prj=target_crs, shape=counties,
+                       .options=furrr::furrr_options(seed = T))
+    )
+    
+    # stop parallel processing
+    future::plan(sequential)
+    
+    logger::log_info(paste0(j,' files out of ', max(h), ' are finished.'))
+  } else if (parallel == F) {
+    for (i in torun) {
+      # load csv of mismatch pixel data for one tile
+      ex <- addcounty(tiles[i], prj=target_crs, shape=counties)
+      
+      if (i == torun[1]) {
+        all <- ex
+      } else {
+        assign(x=paste0('group', j), value=rbind(all, ex)) # combine info for all tiles into one file
+      }
+    }
+    logger::log_info(paste0(j,' files out of ', max(h), ' are finished.'))
+  }
 }
 
 for (i in 1:length(h)) {
@@ -76,8 +99,8 @@ freq_bycounty <- cleaned %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, Stat
 
 logger::log_info('Writing output files.')
 
-write.csv(freq_bystate, paste0('./data/TechnicalValidation/Mismatched_Cells_byState_', increment, '.csv'))
-write.csv(freq_bycounty, paste0('./data/TechnicalValidation/Mismatched_Cells_byCounty_v2.csv', increment, '.csv'))
-write.csv(all, paste0('./data/TechnicalValidation/Mismatch_ByCell_', increment, '.csv'))
+write.csv(freq_bystate, paste0('./data/TechnicalValidation/Mismatched_Cells_byState_group', increment, '_', par_text, '.csv'))
+write.csv(freq_bycounty, paste0('./data/TechnicalValidation/Mismatched_Cells_byCounty_group', increment, '_', par_text, '.csv'))
+write.csv(all, paste0('./data/TechnicalValidation/Mismatch_ByCell_broup', increment, '_', par_text, '.csv'))
 
 logger::log_info('Finished, processed in groups of ', increment,'.')

@@ -32,7 +32,7 @@ jobids="${jobids:1}" # strip off leading comma
 
 ########## Part 2.2: Technical Validation
 # after all regions and years are finished (generating rasters), compile technical validation data
-sbatch --dependency=afterany:${jobids} 2_2TechnicalValidation.sbatch
+sbatch --dependency=afterany:${jobids} 2_2TechnicalValidation.sbatch --export=ALL,parallel=FALSE
 
 
 ########## Part 2.3: Clip state rasters
