@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name="TechnicalValidation" #name of the job submitted
-#SBATCH -p bigmem #partition to use
+#SBATCH -p atlas #partition to use
 #SBATCH -N 1 #number of nodes in this job
 #SBATCH --cpus-per-task=24 #number of cpus to use for each task
 #SBATCH --mem=1500GB #request all memory on a node
