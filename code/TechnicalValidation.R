@@ -4,7 +4,7 @@ source('./code/functions/addcounty.R')
 
 args <- commandArgs(trailingOnly = T)
 parallel <- args[2] # aggregate data using parallel processing
-nprocess <- args[3]
+nprocess <- as.numeric(args[3])
   
 print(nprocess)
 class(nprocess)
