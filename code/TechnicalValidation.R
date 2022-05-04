@@ -7,10 +7,10 @@ parallel <- args[2] # aggregate data using parallel processing
 nprocess <- as.numeric(args[3])
   
 if (parallel == T) {
-  increment <- max(2, round(nprocess/20, digits=0))
+  increment <- max(2, round(nprocess/10, digits=0)) # org 20
   par_text <- 'parallel'
 } else if (parallel == F) {
-  increment <- max(2, round(nprocess/50, digits=0))
+  increment <- max(2, round(nprocess/50, digits=0)) # org 100
   par_text <- 'notparallel'
 }
 
