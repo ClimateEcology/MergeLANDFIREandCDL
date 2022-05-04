@@ -107,8 +107,15 @@ freq_bycounty <- cleaned %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, Stat
 
 logger::log_info('Writing output files.')
 
-write.csv(freq_bystate, paste0('./data/TechnicalValidation/Mismatched_Cells_byState_group', increment, '_', par_text, '.csv'))
-write.csv(freq_bycounty, paste0('./data/TechnicalValidation/Mismatched_Cells_byCounty_group', increment, '_', par_text, '.csv'))
-write.csv(all, paste0('./data/TechnicalValidation/Mismatch_ByCell_group', increment, '_', par_text, '.csv'))
+if(!dir.exists(paste0('./data/TechnicalValidation/run', nprocess))) {
+  dir.create(paste0('./data/TechnicalValidation/run', nprocess))
+}
 
-logger::log_info('Finished, processed in groups of ', increment,'.')
+write.csv(freq_bystate, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byState_run', 
+                               nprocess,  '_group', increment, '_', par_text, '.csv'))
+write.csv(freq_bycounty, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byCounty_run', 
+                                nprocess, '_group', increment, '_', par_text, '.csv'))
+write.csv(all, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatch_ByCell_run', 
+                      nprocess, '_group', increment, '_', par_text, '.csv'))
+
+logger::log_info('Finished, processed ', nprocess, 'in groups of ', increment,'.')
