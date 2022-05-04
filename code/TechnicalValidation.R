@@ -6,9 +6,6 @@ args <- commandArgs(trailingOnly = T)
 parallel <- args[2] # aggregate data using parallel processing
 nprocess <- as.numeric(args[3])
   
-print(nprocess)
-class(nprocess)
-
 if (parallel == T) {
   increment <- max(2, nprocess/20)
   par_text <- 'parallel'
