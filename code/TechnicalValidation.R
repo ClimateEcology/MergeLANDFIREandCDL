@@ -62,6 +62,7 @@ for (j in h) {
     future::plan(sequential)
     
     logger::log_info(paste0(j,' files out of ', max(h), ' are finished.'))
+    
   } else if (parallel == F) {
     for (i in torun) {
       # load csv of mismatch pixel data for one tile
