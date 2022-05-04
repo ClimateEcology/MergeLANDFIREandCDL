@@ -6,20 +6,23 @@ args <- commandArgs(trailingOnly = T)
 parallel <- args[2] # aggregate data using parallel processing
 nprocess <- args[3]
   
+valdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
+
 # if not processing all available data, make sure R knows nprocess is a number
 if (nprocess != 'all') {
   nprocess <- as.numeric(nprocess)
+} else if (nprocess == 'all'){
+  nfiles <- length(list.files(valdir))
 }
 
 if (parallel == T) {
-  increment <- max(2, round(nprocess/10, digits=0)) # org 20
+  increment <- max(2, round(nfiles/10, digits=0)) # org 20
   par_text <- 'parallel'
 } else if (parallel == F) {
-  increment <- max(2, round(nprocess/50, digits=0)) # org 100
+  increment <- max(2, round(nfiles/50, digits=0)) # org 100
   par_text <- 'notparallel'
 }
 
-valdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
 
 # save necessary spatial information
 
