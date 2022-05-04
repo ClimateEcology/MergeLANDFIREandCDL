@@ -3,13 +3,14 @@ library(dplyr); library(future)
 source('./code/functions/addcounty.R')
 
 args <- commandArgs(trailingOnly = T)
-parallel <- args[2] # year of NASS Cropland Data Layer
-
+parallel <- args[2] # aggregate data using parallel processing
+nprocess <- args[3]
+  
 if (parallel == T) {
-  increment <- 1000
+  increment <- max(2, nprocess/20)
   par_text <- 'parallel'
 } else if (parallel == F) {
-  increment <- 250
+  increment <- max(2, nprocess/100)
   par_text <- 'notparallel'
 }
 
@@ -25,8 +26,11 @@ counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
   dplyr::select(STATE, COUNTY, FIPS) %>%
   dplyr::filter(!is.na(COUNTY)) # take out polygons that form coasts but are not actually land area (e.g. great lakes)
   
-
-tiles <- list.files(valdir, full.names = T)
+if (nprocess == 'all') {
+  tiles <- list.files(valdir, full.names = T)
+} else {
+  tiles <- list.files(valdir, full.names = T)[1:nprocess]
+}
 
 h <- seq(from=1, to=length(tiles), by=increment)
 
@@ -102,6 +106,6 @@ logger::log_info('Writing output files.')
 
 write.csv(freq_bystate, paste0('./data/TechnicalValidation/Mismatched_Cells_byState_group', increment, '_', par_text, '.csv'))
 write.csv(freq_bycounty, paste0('./data/TechnicalValidation/Mismatched_Cells_byCounty_group', increment, '_', par_text, '.csv'))
-write.csv(all, paste0('./data/TechnicalValidation/Mismatch_ByCell_broup', increment, '_', par_text, '.csv'))
+write.csv(all, paste0('./data/TechnicalValidation/Mismatch_ByCell_group', increment, '_', par_text, '.csv'))
 
 logger::log_info('Finished, processed in groups of ', increment,'.')
