@@ -116,4 +116,4 @@ write.csv(freq_bycounty, paste0('./data/TechnicalValidation/run', nprocess, '/Mi
 write.csv(all, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatch_ByCell_run', 
                       nprocess, '_group', increment, '_', par_text, '.csv'))
 
-logger::log_info('Finished, processed ', nprocess, 'in groups of ', increment,'.')
+logger::log_info('Finished, processed ', nprocess, ' in groups of ', increment,'.')
