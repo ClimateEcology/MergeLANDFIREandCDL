@@ -69,7 +69,9 @@ for (j in h) {
       if (i == torun[1]) {
         all <- ex
       } else {
-        assign(x=paste0('group', j), value=rbind(all, ex)) # combine info for all tiles into one file
+        all <- rbind(all, ex)
+        if (i == max(torun)) {
+        assign(x=paste0('group', j), value=all) } # combine info for all tiles into one file
       }
     }
     logger::log_info(paste0(j,' files out of ', max(h), ' are finished.'))
