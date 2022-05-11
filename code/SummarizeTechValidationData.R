@@ -1,3 +1,4 @@
+library(dplyr)
 
 args <- commandArgs(trailingOnly = T)
 parallel <- args[2] # aggregate data using parallel processing
