@@ -98,33 +98,12 @@ for (i in 1:length(h)) {
 }
 
 logger::log_info("All groups of files are combined together.")
-logger::log_info("Starting summarize by state.")
 
-cleaned <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
-  dplyr::filter(!is.na(FIPS)) %>% # remove mis-match points that do not have FIPS code (overlap water or other non-county polygon)
-  dplyr::group_by(CDLYear) %>% # group by year to avoid removing the same pixels that appear in multiple years
-  dplyr::mutate(coord = (paste0(x, y))) %>%
-  dplyr::distinct(coord, .keep_all=T)  # remove points that might be duplicated 
-  #duplication could happen due to calculating mis-match from state tiles rather than actual state polygons, borders don't match exactly
-   
-freq_bystate <- cleaned %>%  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
-  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile, rm.na=T))
-
-logger::log_info('Finished summarize by state, starting summarize by county.')
-
-freq_bycounty <- cleaned %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
-  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
-
-logger::log_info('Writing output files.')
+logger::log_info('Writing output file.')
 
 if(!dir.exists(paste0('./data/TechnicalValidation/run', nprocess))) {
   dir.create(paste0('./data/TechnicalValidation/run', nprocess))
 }
-
-write.csv(freq_bystate, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byState_run', 
-                               nprocess,  '_group', increment, '_', par_text, '.csv'))
-write.csv(freq_bycounty, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byCounty_run', 
-                                nprocess, '_group', increment, '_', par_text, '.csv'))
 write.csv(all, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatch_ByCell_run', 
                       nprocess, '_group', increment, '_', par_text, '.csv'))
 
