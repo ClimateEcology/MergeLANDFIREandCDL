@@ -1,4 +1,7 @@
 
+args <- commandArgs(trailingOnly = T)
+parallel <- args[2] # aggregate data using parallel processing
+nprocess <- args[3]
 
 nprocess <- 'all'
 parallel <- T
@@ -21,6 +24,7 @@ if (parallel == T) {
 }
 
 
+logger::log_info('Reading giant file of by pixel results.')
 
 all <- data.table::fread(paste0('./data/TechnicalValidation/run', nprocess, '/Mismatch_ByCell_run', 
                              nprocess, '_group', increment, '_', par_text, '.csv'))
