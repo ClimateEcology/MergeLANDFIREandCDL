@@ -18,6 +18,7 @@
 
 # raster data folders
 **/data/*
+data/TechnicalValidation/ValidationData*
 !data/TabularData
 !data/TechnicalValidation
 !data/PixelFreq

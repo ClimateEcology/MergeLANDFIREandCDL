@@ -58,9 +58,9 @@ done
 clipids="${clipids:1}" # strip off leading comma
 
 
-########## Part 2.4: Mosaic clipped rasters to national
-# parameters for mosaic
-tier='1:2:3'
+########## Part 2.4: Mosaic clipped rasters to national maps
+# parameters for mosaic operation
+tier='1:2:3' # tiers indicate level of hierarchical framework to process (tier 1 is smallest extent, tier 3 is biggest, national map)
 
 for year in "${years[@]}"
 
