@@ -102,7 +102,9 @@ logger::log_info("Starting summarize by state.")
 
 cleaned <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
   dplyr::filter(!is.na(FIPS)) %>% # remove mis-match points that do not have FIPS code (overlap water or other non-county polygon)
-  dplyr::filter(!duplicated(paste0(x, y))) # remove points that might be duplicated 
+  dplyr::group_by(CDLYear) %>% # group by year to avoid removing the same pixels that appear in multiple years
+  dplyr::mutate(coord = (paste0(x, y))) %>%
+  dplyr::distinct(coord, .keep_all=T)  # remove points that might be duplicated 
   #duplication could happen due to calculating mis-match from state tiles rather than actual state polygons, borders don't match exactly
    
 freq_bystate <- cleaned %>%  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
