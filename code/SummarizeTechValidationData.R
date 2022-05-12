@@ -42,7 +42,7 @@ years <- sort(unique(all$CDLYear)) # specify which years are in giant file
 future::plan(multisession)
 
 freq_bycounty <- furrr::future_map_dfr(.x=years, .f=summarize_techval,
-                                       in_data=bothyears,
+                                       in_data=all,
                                        .options=furrr::furrr_options(seed = T))
 # stop parallel processing
 future::plan(sequential)

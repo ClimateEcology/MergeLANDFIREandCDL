@@ -1,6 +1,6 @@
 
 
-summarize_techval <- function(in_data, year) {
+summarize_techval <- function(year, in_data) {
 
   oneyear <- dplyr::filter(in_data, CDLYear == year)
   
