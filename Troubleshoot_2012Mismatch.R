@@ -39,8 +39,10 @@ cdl16_match <- terra::freq(cdl16_at_lfag)
 # load 2012 AZ pixel mismatch data
 library(dplyr); library(future)
 source('./code/functions/addcounty.R')
+source('./code/functions/summarize_techval.R')
 
-CDLYear <- 2014
+
+CDLYear <- 2012
 valdir <- paste0('./data/TechnicalValidation/ValidationData_AZ', CDLYear, '/')
 
 # load NVC raster (just to grab projection information)
@@ -54,6 +56,7 @@ counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
 
 tiles <- list.files(valdir, full.names = T)
 
+
 #turn on parallel processing for furrr package
 future::plan(multisession)
 
@@ -62,46 +65,28 @@ assign(x= paste0('pixels',CDLYear), value=
          furrr::future_map_dfr(.x=tiles, .f=addcounty,
                                prj=target_crs, shape=counties,
                                .options=furrr::furrr_options(seed = T)))
-       
-bothyears <- rbind(pixels2012, pixels2014)
-
-cleaned12 <- dplyr::mutate(pixels2012, PctTile = 1/ncells_tile) %>% 
- dplyr::filter(!is.na(FIPS)) %>% # remove mis-match points that do not have FIPS code (overlap water or other non-county polygon)
- dplyr::filter(!duplicated(paste0(x, y))) # remove points that might be duplicated 
-#duplication could happen due to calculating mis-match from state tiles rather than actual state polygons, borders don't match exactly
-
-freq_bystate12 <- cleaned12 %>%  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
- dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile, rm.na=T))
-
-freq_bycounty12 <- cleaned12 %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
- dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
-
-
-cleaned14 <- dplyr::mutate(pixels2014, PctTile = 1/ncells_tile) %>% 
-  dplyr::filter(!is.na(FIPS)) %>% # remove mis-match points that do not have FIPS code (overlap water or other non-county polygon)
-  dplyr::filter(!duplicated(paste0(x, y))) # remove points that might be duplicated 
-#duplication could happen due to calculating mis-match from state tiles rather than actual state polygons, borders don't match exactly
-
-freq_bystate14 <- cleaned14 %>%  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
-  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile, rm.na=T))
-
-freq_bycounty14 <- cleaned14 %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
-  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
-
 
 bothyears <- rbind(pixels2012, pixels2014)
+
+years <- c(2012, 2014) # for real c(2012:2021)
+
+freq_bycounty <- furrr::future_map_dfr(.x=years, .f=summarize_techval,
+                      in_data=bothyears,
+                      .options=furrr::furrr_options(seed = T))
+
+
+
 
 cleaned <- dplyr::mutate(bothyears, PctTile = 1/ncells_tile) %>% 
   dplyr::filter(!is.na(FIPS)) %>% # remove mis-match points that do not have FIPS code (overlap water or other non-county polygon)
-  dplyr::group_by(CDLYear) %>%
-  dplyr::mutate(coord = (paste0(x, y))) %>%
-  dplyr::distinct(coord, .keep_all=T) # remove points that might be duplicated 
+  dplyr::mutate(coord_year = (paste0(x, y, "_", CDLYear))) %>%
+  dplyr::distinct(coord_year, .keep_all=T) # remove points that might be duplicated 
 #duplication could happen due to calculating mis-match from state tiles rather than actual state polygons, borders don't match exactly
 
 freq_bystate <- cleaned %>%  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
   dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile, rm.na=T))
 
-freq_bycounty <- cleaned %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
+freq_bycounty2 <- cleaned %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
   dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
 
 

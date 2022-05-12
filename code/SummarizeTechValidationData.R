@@ -8,6 +8,8 @@ nprocess <- 'all'
 parallel <- T
 
 valdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
+source('./code/functions/summarize_techval.R')
+
 
 # if not processing all available data, make sure R knows nprocess is a number
 if (nprocess != 'all') {
@@ -30,20 +32,20 @@ logger::log_info('Reading giant file of by pixel results.')
 all <- data.table::fread(paste0('./data/TechnicalValidation/run', nprocess, '/Mismatch_ByCell_run', 
                              nprocess, '_group', increment, '_', par_text, '.csv'))
 
-cleaned <- dplyr::mutate(all, PctTile = 1/ncells_tile) %>% 
-  dplyr::filter(!is.na(FIPS)) %>% # remove mis-match points that do not have FIPS code (overlap water or other non-county polygon)
-  dplyr::group_by(CDLYear) %>% # group by year to avoid removing the same pixels that appear in multiple years
-  dplyr::mutate(coord = (paste0(x, y))) %>%
-  dplyr::distinct(coord, .keep_all=T)  # remove points that might be duplicated 
-#duplication could happen due to calculating mis-match from state tiles rather than actual state polygons, borders don't match exactly
+logger::log_info('Giant file successfully read.')
 
-freq_bystate <- cleaned %>%  dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State) %>%
-  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile, rm.na=T))
+logger::log_info('Split data frame into each CDL year, summarize n mis-matched pixels and join results.')
 
-logger::log_info('Finished summarize by state, starting summarize by county.')
+years <- sort(unique(all$CDLYear)) # specify which years are in giant file
 
-freq_bycounty <- cleaned %>% dplyr::group_by(NVC_Class, CDL_Class, CDLYear, State, FIPS) %>%
-  dplyr::summarise(Mismatch_NCells = n(), Mismatch_PctTile = sum(PctTile))
+#turn on parallel processing for furrr package
+future::plan(multisession)
+
+freq_bycounty <- furrr::future_map_dfr(.x=years, .f=summarize_techval,
+                                       in_data=bothyears,
+                                       .options=furrr::furrr_options(seed = T))
+# stop parallel processing
+future::plan(sequential)
 
 logger::log_info('Writing output files.')
 
@@ -51,8 +53,8 @@ if(!dir.exists(paste0('./data/TechnicalValidation/run', nprocess))) {
   dir.create(paste0('./data/TechnicalValidation/run', nprocess))
 }
 
-write.csv(freq_bystate, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byState_run', 
-                               nprocess,  '_group', increment, '_', par_text, '.csv'))
+# write.csv(freq_bystate, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byState_run', 
+#                                nprocess,  '_group', increment, '_', par_text, '.csv'))
 write.csv(freq_bycounty, paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byCounty_run', 
                                 nprocess, '_group', increment, '_', par_text, '.csv'))
 
