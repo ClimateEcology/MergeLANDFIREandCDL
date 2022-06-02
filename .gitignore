@@ -6,7 +6,6 @@
 .RDataTmp
 
 # raster and image files
-**/*.tif
 **/*.svg
 
 # singularity images
@@ -22,6 +21,7 @@ data/TechnicalValidation/ValidationData*
 !data/TabularData
 !data/TechnicalValidation
 !data/PixelFreq
+!data/SpatialData/ExampleSmallRasters
 **/google_keys*
 
 **/Mismatch_ByCell*
