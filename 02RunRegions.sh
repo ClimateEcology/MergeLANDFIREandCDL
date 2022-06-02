@@ -31,11 +31,11 @@ jobids="${jobids:1}" # strip off leading comma
 
 
 ########## Part 2.2: Technical Validation
-# after all regions and years are finished (generating rasters), compile technical validation data
+# after all regions and years are finished (generating rasters), compile technical validation data by tile
 sbatch --dependency=afterany:${jobids} --export=ALL,parallel=TRUE,nprocess=all 02_2TechnicalValidation.sbatch 
 
 ########## Part 2.3: Clip state rasters
-# parameters for generating rasters
+# parameters for clipping state rasters
 clipstates=TRUE
 clipids="" # declare empty string for all job ids (clip)
 

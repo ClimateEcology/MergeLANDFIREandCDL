@@ -1,6 +1,6 @@
-CDLYear <- '2020'
+CDLYear <- '2021'
 regionName <- 'Southeast'
-mktiles <- F
+mktiles <- T
 runmerge <- T
 mosaic <- T
 allstates <- F
