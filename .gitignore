@@ -38,3 +38,7 @@ AKReports.zip
 # output from sbatch runs
 **/stderr*
 **/stdout*
+
+# do not ignore code used to make figures. not totally sure why it excluded
+!code/make_figures
+

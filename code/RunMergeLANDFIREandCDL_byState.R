@@ -110,8 +110,7 @@ for (stateName in states) {
   ID <- paste0(stateName, '_CDL', CDLYear,'NVC')
   
   # read in class tables necessary in part 2
-  cdl_classes <- read.csv(paste0(datadir, '/TabularData/NASS_classes_simple.csv')) %>% 
-    dplyr::filter(VALUE < 500)  %>% #filter out CDL classes that I created for a different project
+  cdl_classes <- read.csv(paste0(datadir, '/TabularData/NASS_classes_pasture_is_arable.csv')) %>% 
     dplyr::mutate(VALUE = as.character(-VALUE))
   
   # this object will be used later in 'merge_landfire_cdl.' 
