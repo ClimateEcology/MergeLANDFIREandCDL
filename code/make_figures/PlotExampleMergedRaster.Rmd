@@ -1,0 +1,273 @@
+---
+title: "Plot Example of Merged Rasters"
+author: "Melanie Kammerer"
+date: "1/6/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Objective
+The goal of this script is to create a figure showing the input, intermediate, and output rasters associated with CDL-NVC merge workflow. I'm using small rasters created in MakeExampleSmallRasters.R script. The example raster happens to be in the Finger Lakes region.
+
+## Load data
+```{r loadrasters}
+rm(list=ls())
+library(raster); library(dplyr)
+
+# load function to plot categorical maps
+source('./code/functions/plot_categorical_raster.R')
+# load function to adjust margin settings in levelplot
+source('./code/functions/noMargins.R')
+
+
+cdl <- raster::raster('./data/SpatialData/ExampleSmallRasters/small_cdl.tif')
+nvc <- raster::raster('./data/SpatialData/ExampleSmallRasters/small_nvc.tif')
+merged_wgaps <- raster::raster('./data/SpatialData/ExampleSmallRasters/merged_with_gaps.tif') %>%
+  abs()
+merged_nogaps <- raster::raster('./data/SpatialData/ExampleSmallRasters/merged_gapsfilled.tif') %>%
+  abs()
+```
+
+Load tabular data of class names to label maps
+```{r loadtabulardata}
+nvc_classes <- read.csv('./data/TabularData/LF_200NVC_05142020.csv') %>%
+    dplyr::mutate(VALUE = as.character(VALUE)) %>%
+    dplyr::filter(VALUE %in% raster::values(nvc))
+
+# read CDL class names
+cdl_classes <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>% 
+  dplyr::filter(VALUE < 500) %>% #filter out CDL classes that I created for a different project
+  dplyr::filter(VALUE %in% raster::values(cdl))
+
+merged_attribute_table <- read.csv('./data/TabularData/CombinedRasterAttributeTable_CDLNVC.csv') %>%
+  dplyr::mutate(VALUE = abs(VALUE))
+```
+
+```{r makemaps, fig.width=9, fig.height=7}
+library(rasterVis); library(raster); library(svglite)
+
+##### PLOT CDL
+
+cdl_map <- plot_categorical_raster(map=cdl, attribute_table=cdl_classes)
+cdl_map
+
+cdl_wlegend <- plot_categorical_raster(map=cdl, attribute_table=cdl_classes, draw_legend=T)
+cdl_wlegend
+
+##### PLOT NVC
+
+nvc_map <- plot_categorical_raster(map=nvc, attribute_table=nvc_classes)
+nvc_map
+
+
+nvc_wlegend <- plot_categorical_raster(map=nvc, attribute_table=nvc_classes, draw_legend=T)
+nvc_wlegend
+
+# save small rasters with correct colors
+svglite('./figures/ExampleRasterMaps/ExampleRaster_CDL.svg', width=4.111, height=4.625)
+
+print(
+ cdl_map
+)
+dev.off()
+
+# save small rasters with correct colors
+svglite('./figures/ExampleRasterMaps/ExampleRaster_CDL_wlegend.svg', width=4.75, height=4.625)
+
+print(
+ cdl_wlegend
+)
+dev.off()
+
+
+svglite('./figures/ExampleRasterMaps/ExampleRaster_NVC.svg', width=4.111, height=4.625)
+
+print(
+ nvc_map
+)
+dev.off()
+
+svglite('./figures/ExampleRasterMaps/ExampleRaster_NVC_wlegend.svg', width=9, height=7)
+
+print(
+ nvc_wlegend
+)
+dev.off()
+
+
+svglite::svglite('./figures/ExampleRasterMaps/ExampleRaster_ForScalebar.svg', width=4.111, height=4.625)
+
+plot(nvc)
+raster::scalebar(750, type='bar', divs=4, below='meters', adj=c(0.5, -1.25))
+prettymapr::addnortharrow()
+
+dev.off()
+
+```
+
+## Plot derived spatial products
+```{r outputmaps, fig.width=9, fig.height=7}
+library(dplyr)
+
+# filter down to classes contained in merged raster layers
+all_classes <- dplyr::arrange(merged_attribute_table, VALUE)
+
+merged_wgaps_classes <- dplyr::filter(all_classes, VALUE %in% raster::values(merged_wgaps))
+merged_nogaps_classes <- dplyr::filter(all_classes, VALUE %in% raster::values(merged_nogaps))
+
+##### Plot merged map, with gaps (output from step 1 of geospatial workflow)
+
+merged_wgaps_map <- plot_categorical_raster(map=merged_wgaps, attribute_table=merged_wgaps_classes)
+merged_wgaps_map
+
+##### Plot merged map, without gaps (output from step 2 of geospatial workflow)
+
+merged_nogaps_map <- plot_categorical_raster(map=merged_nogaps, attribute_table=merged_nogaps_classes)
+merged_nogaps_map
+
+merged_nogaps_map_wlegend <- plot_categorical_raster(map=merged_nogaps, attribute_table=merged_nogaps_classes, draw_legend=T)
+merged_nogaps_map_wlegend
+
+library(svglite)
+svglite('./figures/ExampleRasterMaps/ExampleRaster_Merged_OutputStep1.svg', width=4.111, height=4.625)
+
+print(
+  merged_wgaps_map
+)
+dev.off()
+
+svglite('./figures/ExampleRasterMaps/ExampleRaster_Merged_OutputStep2.svg', width=4.111, height=4.625)
+
+print(
+  merged_nogaps_map
+)
+dev.off()
+
+
+```
+
+
+```{r arrangemaps, fig.height=11.5, fig.width=9}
+library(gridExtra); library(cowplot)
+# from github:
+devtools::install_github("delta-rho/datadr")
+devtools::install_github("delta-rho/trelliscope")
+
+library(trelliscope)
+#grid.arrange(cdl_map, nvc_map, ncol=1, heights=c(1,1.1))
+
+
+svglite('./figures/ExampleRasterMaps/ExampleRaster_CDL_NVC_Merged.svg', width=9, height=20)
+
+print(
+  plot_grid(cdl_map, nvc_map, merged_wgaps_map, merged_nogaps_map, align="v", nrow=4) #, rel_widths=c(1,1.1))
+)
+dev.off()
+
+```
+
+## Binary versions of all maps
+```{r binary}
+nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
+cdl_agclasses <- cdl_classes$VALUE[cdl_classes$GROUP == 'A']
+
+cdl_bin <- cdl %in% cdl_agclasses
+nvc_bin <- nvc %in% nvc_agclasses
+
+cdl_bin_t <- ratify(cdl_bin)
+rat <- levels(cdl_bin_t)[[1]]
+rat$CLASS_NAME <- c("Not agriculture", "Agriculture")
+
+bin_theme <- rasterTheme(c('#565656', '#CFCFCF'))
+
+cdlbin_map <- rasterVis::levelplot(cdl_bin, par.settings= noMargins(bin_theme, rightkey=T),
+                               margin=list(draw=F), 
+                               scales=list(draw=F))
+cdlbin_map
+
+nvcbin_map <- rasterVis::levelplot(nvc_bin, par.settings= noMargins(bin_theme, rightkey=T),
+                               margin=list(draw=F), 
+                               scales=list(draw=F))
+nvcbin_map
+
+# merged raster with gaps
+merged_wgaps_bin <- raster::reclassify(merged_wgaps, rcl=data.frame(is=1001, becomes=NA))# reclassify unresolved conflict as NA so it shows up on binary raster
+merged_wgaps_bin[merged_wgaps_bin %in% cdl_agclasses & !is.na(merged_wgaps_bin)] <- 1
+merged_wgaps_bin[!(merged_wgaps %in% cdl_agclasses) & !is.na(merged_wgaps_bin)] <- 0
+
+# merged raster no gaps
+merged_nogaps_bin <- raster::reclassify(merged_nogaps, rcl=data.frame(is=1001, becomes=NA))# reclassify unresolved conflict as NA so it shows up on binary raster
+merged_nogaps_bin[merged_nogaps_bin %in% cdl_agclasses & !is.na(merged_nogaps_bin)] <- 1 #a different way to reclassify a raster
+merged_nogaps_bin[!(merged_nogaps %in% cdl_agclasses) & !is.na(merged_nogaps_bin)] <- 0
+
+
+merged_wgaps_bin_t <- ratify(merged_wgaps_bin)
+rat <- levels(merged_wgaps_bin_t)[[1]]
+rat$CLASS_NAME <- c("Not agriculture", "Agriculture")
+
+bin_theme <- rasterTheme(c('#565656', '#CFCFCF'))
+
+merged_wgapsbin_map <- rasterVis::levelplot(merged_wgaps_bin, par.settings= noMargins(bin_theme, rightkey=T),
+                               margin=list(draw=F), 
+                               scales=list(draw=F))
+merged_wgapsbin_map
+
+merged_nogapsbin_map <- rasterVis::levelplot(merged_nogaps_bin, par.settings= noMargins(bin_theme, rightkey=T),
+                               margin=list(draw=F), 
+                               scales=list(draw=F))
+merged_nogapsbin_map
+```
+
+
+
+```{r arrangemaps2, fig.height=11.5, fig.width=9}
+library(gridExtra); library(cowplot); library(svglite)
+# from github:
+devtools::install_github("delta-rho/datadr")
+devtools::install_github("delta-rho/trelliscope")
+
+
+svglite('./figures/ExampleRasterMaps/ExampleRaster_CDL_NVC_Merged_Binary.svg', width=9, height=20)
+
+print(
+  plot_grid(cdlbin_map, nvcbin_map, merged_wgapsbin_map, merged_nogapsbin_map, align="v", nrow=4) #, rel_widths=c(1,1.1))
+)
+dev.off()
+
+
+
+# save single binary maps
+svglite('./figures/ExampleRasterMaps/ExampleRaster_CDL_Binary.svg', width=4.111, height=4.625)
+
+print(
+   cdlbin_map
+)
+dev.off()
+
+svglite('./figures/ExampleRasterMaps/ExampleRaster_NVC_Binary.svg', width=4.111, height=4.625)
+
+print(
+  nvcbin_map
+)
+dev.off()
+
+svglite('./figures/ExampleRasterMaps/ExampleRaster_Merged_OutputStep1_Binary.svg', width=4.111, height=4.625)
+
+print(
+   merged_wgapsbin_map
+)
+dev.off()
+
+svglite('./figures/ExampleRasterMaps/ExampleRaster_Merged_OutputStep2_Binary.svg', width=4.111, height=4.625)
+
+print(
+  merged_nogapsbin_map
+)
+dev.off()
+
+
+```
+

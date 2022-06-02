@@ -20,8 +20,7 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   }
   
   # read CDL class names
-  cdl_classes <- read.csv(paste0(datadir, '/TabularData/NASS_classes_simple.csv')) %>% 
-    dplyr::filter(VALUE < 500)  %>% #filter out CDL classes that I created for a different project
+  cdl_classes <- read.csv(paste0(datadir, '/TabularData/NASS_classes_pasture_is_arable.csv')) %>% 
     dplyr::mutate(VALUE = as.character(-VALUE))
   
   if (verbose == T) {
@@ -39,7 +38,6 @@ merge_landfire_cdl <- function(datadir, tiledir, valdir, veglayer, CDLYear,
   if (veglayer == 'nvc') {nvc_ag <- dplyr::filter(vegclasses_key, VALUE %in% nvc_agclasses) }
   
   agclass_match <- read.csv(paste0(datadir, '/TabularData/CDL_NVC_AgClassMatch.csv')) %>%
-    #dplyr::filter(GROUP == 'A') %>%
     dplyr::select(VALUE, CLASS_NAME, GROUP, NVC_Match1, NVC_Match2, NVC_Match3, NVC_Match4)
   
   # names of LANDFIRE classes (simplified) that will be re-assigned
