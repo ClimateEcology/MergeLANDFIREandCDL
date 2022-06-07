@@ -163,12 +163,10 @@ toplot <- counties %>%
   dplyr::full_join(testyear) %>%
   tidyr::replace_na(list(NCells_Mismatch=0, NCells=1)) %>% # if NA value for NCells_Mismatch, assume no mismatched pixels for that year-county combo
   # set NCells = NA to 1 to avoid divide by zero error
-  dplyr::mutate(Pct_Mismatch = NCells_Mismatch/NCells)
+  dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells)*100)
 
 
 library(classInt); library(viridis)
-
-toplot$Pct_Mismatch <- toplot$Pct_Mismatch*100
 
 ##### Percent mis-matched cells (by county)
 natural.interval = classIntervals(toplot$Pct_Mismatch, n = 6, style = 'jenks')$brks

@@ -17,7 +17,7 @@ I start by loading accuracy data for EVT and NVC. We need NVC and EVT because NV
 ```{r loadtabulardata, echo=F}
 library(dplyr); library(logger); library(future); library(terra)
 rm(list=ls())
-# load accuracy data from LANDFIRE and USDA NASS (aggregated & formatted in 'AggregateAccuracyAssessmentData.Rmd' script)
+# load accuracy data from LANDFIRE and USDA NASS (aggregated & formatted in 'WrangleMergedAccuracyByCounty.Rmd' script)
 evt <- read.csv('./data/LANDFIRE_Accuracy/EVT_Accuracy_allregions.csv')
 nvc <- read.csv('./data/LANDFIRE_Accuracy/NVC_Accuracy_allregions.csv')
 
@@ -50,9 +50,6 @@ lf <- dplyr::full_join(nvc, evt, by=c('LANDFIRE_Class','LANDFIRE_Name', 'Region'
                 UserNPlots_map = mymax(UserNPlots_map.nvc, UserNPlots_map.evt, na.rm=T)) %>%
   dplyr::ungroup() %>%
   dplyr::mutate(LANDFIRE_NVC = paste(LANDFIRE_Class, LANDFIRE_Name))
-
-#UserAccuracy = if_else(ProducerNPlots_autokey==ProducerNPlots_autokey.nvc, UserAccuracy.nvc, UserAccuracy.evt),
-                #UserNPlots_map = if_else(ProducerNPlots_autokey==ProducerNPlots_autokey.nvc, UserNPlots_map.nvc, UserNPlots_map.evt)) %>%
 
 
 # specify classes that COULD have plots in auto-key (are non-managed, not agriculture or NLCD developed)
@@ -105,7 +102,7 @@ county <- dplyr::arrange(county_shp, FIPS) %>% cbind(la) %>%
 nvc_county <- read.csv('./data/PixelFreq/NVC_CountyPixelFreq.csv') %>%
   dplyr::filter(!is.na(County)) %>%
   dplyr::group_by(State, County) %>%
-  dplyr::mutate(PctCounty = NCells/sum(NCells)) %>%
+  dplyr::mutate(PctCounty = (NCells/sum(NCells))*100) %>%
   dplyr::ungroup() 
 
 # are there any counties in county shapefile that are NOT in dataset on NVC pixel frequency?
@@ -172,8 +169,8 @@ acc <- dplyr::filter(nvc_accuracy_bycounty, RFDB_Status == 'well-represented') %
 
 # translate ncells to percentage of un-managed area in each county
 toplot <- dplyr::mutate(ncells, NCells_Unmanaged = (NCells_County - `absent, managed/ag/disturbed`),
-                        Rep_PctUnmanaged = (`well-represented` + `poorly-represented`)/NCells_Unmanaged,
-                        WellRep_PctUnmanaged = (`well-represented`)/NCells_Unmanaged)
+                        Rep_PctUnmanaged = ((`well-represented` + `poorly-represented`)/NCells_Unmanaged)*100,
+                        WellRep_PctUnmanaged = ((`well-represented`)/NCells_Unmanaged)*100)
 ```
 
 
@@ -188,7 +185,7 @@ cdl <- read.csv('./data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv'
 cdl_oneyear <- dplyr::filter(cdl, Year %in% CDLYear)
 
 # key to group CDL classes in arable or non-arable
-cdl_classes <- read.csv('./data/SpatialData/CDL/NASS_classes_simple_pasture_is_arable.csv')
+cdl_classes <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv')
 ag_in_cdl <- cdl_classes$VALUE[cdl_classes$GROUP == 'A']
 
 # load frequency data
@@ -217,7 +214,8 @@ cdl_accuracy_bycounty <- cdl_accuracy  %>%
 ncells_cdl <- tidyr::pivot_wider(cdl_accuracy_bycounty, id_cols=c(Year:County, NCells_County, NCells_Arable), names_from=GT_Status, 
                      values_from=NCells_Group) %>%
   tidyr::replace_na(list(`present` = 0, `no ground-truth` = 0)) %>%
-  dplyr::mutate(PresentGT_PctArable = `present`/NCells_Arable, CountyPctArable=NCells_Arable/NCells_County)
+  dplyr::mutate(PresentGT_PctArable = (`present`/NCells_Arable)*100, 
+                CountyPctArable = (NCells_Arable/NCells_County)*100)
   
 # reshape accuracy to wide format, filter to only well-represented classes
 acc_cdl <- dplyr::filter(cdl_accuracy_bycounty, GT_Status == 'present') %>% 
@@ -236,7 +234,7 @@ toplot_nvc <- dplyr::left_join(toplot, acc) %>%
   dplyr::left_join(acc) %>%
   dplyr::select(-starts_with('absent'), -contains('represented')) %>%
   dplyr::mutate(Dataset='Natural land', Dataset_Name='NVC',
-                FocalGroup_PctCounty=NCells_Unmanaged/NCells_County,
+                FocalGroup_PctCounty=(NCells_Unmanaged/NCells_County)*100,
                 WithData_PctFocalGroup=WellRep_PctUnmanaged) %>%
   dplyr::rename(State=STATE, County=COUNTY)
 
@@ -251,7 +249,8 @@ toplot_merged <- read.csv(paste0('./data/MergedAccuracy_', CDLYear, ".csv")) %>%
   dplyr::rename(County=COUNTY, State=STATE) %>%
   dplyr::mutate(Dataset_Name = 'NVC+CDL') %>%
   dplyr::left_join(dplyr::select(toplot_nvc, State, County, NCells_Unmanaged)) %>%
-  dplyr::mutate(WithData_PctFocalGroup = well.represented / (NCells_Unmanaged + NCells_CDL), FocalGroup_PctCounty = (NCells_Unmanaged + NCells_CDL)/NCells_County)
+  dplyr::mutate(WithData_PctFocalGroup = (well.represented / (NCells_Unmanaged + NCells_CDL))*100, 
+                FocalGroup_PctCounty = ((NCells_Unmanaged + NCells_CDL)/NCells_County)*100)
 
 
 toplot_both <- dplyr::full_join(toplot_nvc, toplot_cdl) %>%
@@ -309,7 +308,7 @@ finalPlot <- ggdraw() +
 
 finalPlot
 
-#ggsave(plot=finalPlot, filename= paste0('./figures/DataCoverageInput_bivariate', CDLYear, '.pdf'),  width=7, height=8)
+ggsave(plot=finalPlot, filename= paste0('./figures/DataCoverageInput_bivariate', CDLYear, '.pdf'),  width=7, height=8)
 ```
 
 ## Univariate map of data coverage. Are these easier to interpret?
@@ -412,7 +411,7 @@ finalPlot_acc <- ggdraw() +
 
 finalPlot_acc
 
-#ggsave(plot=finalPlot_acc, filename=paste0('./figures/AccuracyInput_bivariate', CDLYear, '.pdf'),  width=14.5, height=8)
+ggsave(plot=finalPlot_acc, filename=paste0('./figures/AccuracyInput_bivariate', CDLYear, '.pdf'),  width=14.5, height=8)
 
 ```
 

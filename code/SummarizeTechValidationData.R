@@ -7,7 +7,7 @@ nprocess <- args[3]
 nprocess <- 'all'
 parallel <- T
 
-valdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
+valdir <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/ValidationData/'
 source('./code/functions/summarize_techval.R')
 
 

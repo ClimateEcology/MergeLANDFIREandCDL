@@ -3,7 +3,7 @@ rm(list=ls())
 # import function to merge together CDL and LANDFIRE tiles
 source('./code/functions/merge_landfire_cdl_4tiles.R')
 source('./code/functions/mosaic_tiles.R')
-#source('./code/functions/grid_rasters.R')
+
 
 library(dplyr);  library(raster); library(sf); library(logger); library(future)
 

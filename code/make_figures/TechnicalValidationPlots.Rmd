@@ -19,8 +19,8 @@ rm(list=ls())
 library(dplyr); library(ggplot2)
 
 # read LANDFIRE and CDL keys
-lf_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
-cdl_key <- read.csv('D:/SpatialData/NASS_CDL/NASS_classes_simple.csv')
+lf_key <- read.csv('./data/TabularData/LF_200NVC_05142020.csv')
+cdl_key <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv')
 states1 <- sf::st_read('D:/SpatialData/state_boundaries/cb_2016_us_state_500k.shp') 
 
 freq <- read.csv('./data/TechnicalValidation/Mismatched_Cells_byState.csv') %>%

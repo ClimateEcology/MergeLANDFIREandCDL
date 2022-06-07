@@ -31,8 +31,13 @@ jobids="${jobids:1}" # strip off leading comma
 
 
 ########## Part 2.2: Technical Validation
+valids="" # declare empty string for all ids
+
 # after all regions and years are finished (generating rasters), compile technical validation data by tile
-sbatch --dependency=afterany:${jobids} --export=ALL,parallel=TRUE,nprocess=all 02_2TechnicalValidation.sbatch 
+valid=$(sbatch --dependency=afterany:${jobids} --export=ALL,parallel=TRUE,nprocess=all 02_2TechnicalValidation.sbatch | cut -d ' ' -f4)
+
+# after that, compile technical validation data by county
+sbatch --dependency=afterany:${valid} --export=ALL,parallel=TRUE,nprocess=all 02_21SummarizeValidationData.sbatch
 
 ########## Part 2.3: Clip state rasters
 # parameters for clipping state rasters

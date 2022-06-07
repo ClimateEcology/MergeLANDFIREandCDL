@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 ## Objective
 The goal of this script is to map the accuracy of CDL & NVC combined rasters. To do this, I use class-level data on spatial accuracy from USDA NASS and LANDFIRE for CDL and NVC, respectively. I combined accuracy statistics from two layers by calculating an area-weighted mean.
 
-I start by loading accuracy data for EVT and NVC. We need NVC and EVT because NVC borrows some classes from EVT and LANDFIRE does not publish accuracy values for EVT classes in NVC data files. In this section I also create a list of LANDFIRE 'managed classes' (agriculture, burned, logged, etc). These classes were not included in reference database nor accuracy assessment so, when calculating data coverage, I exclude area covered in these classes.
+I start by loading accuracy data for EVT and NVC. We need NVC and EVT because NVC borrows some classes from EVT and LANDFIRE does not publish accuracy values for EVT classes in NVC data files. In this section I also create a list of LANDFIRE 'managed classes' (agriculture, burned, logged, etc). These classes were not included in reference database nor accuracy assessment so, when calculating data coverage, I exclude area assigned to these classes.
 
 ```{r loadtabulardata, echo=F}
 library(dplyr); library(logger); library(future); library(terra)
@@ -54,7 +54,7 @@ county <- sf::st_read('./data/SpatialData/us_counties_better_coasts_LFregion.shp
 merged_freq <- read.csv(paste0('./data/PixelFreq/CDL', CDLYear, 'NVC_CountyPixelFreq.csv')) %>%
   dplyr::filter(!is.na(County)) %>%
   dplyr::group_by(State, County) %>%
-  dplyr::mutate(PctCounty = NCells/sum(NCells)) %>%
+  dplyr::mutate(PctCounty = (NCells/sum(NCells)) *100) %>%
   dplyr::ungroup()
 
 # are there any counties in county shapefile that are NOT in dataset on NVC pixel frequency?
@@ -86,6 +86,12 @@ nodata <- counties %>%
   dplyr::left_join(nodata_freq) %>%
   tidyr::replace_na(list(PctCounty=0))
 
+sf::st_drop_geometry(nodata) %>%
+write.csv('./data/TechnicalValidation/FinalRaster_FreqPixelsUnresolvedConflict.csv')
+
+sf::st_write(nodata, './data/TechnicalValidation/FinalRaster_FreqPixelsUnresolvedConflict.shp')
+
+
 library(ggplot2); library(viridis)
 # calculate jenk's breaks to use on map
 natural.interval.nodata <- BAMMtools::getJenksBreaks(nodata$PctCounty, k = 7)
@@ -93,18 +99,16 @@ nodata$PctCounty.jenks = cut(nodata$PctCounty, breaks=natural.interval.nodata , 
 
 # map producer accuracy of NVC by county
 nodata_map_jenks <- ggplot() + geom_sf(data=nodata, aes(fill=PctCounty.jenks),  color=NA) +  
-  guides(fill=guide_legend(title='Percent county\n\'no data-raster\nmismatch\'')) +
+  guides(fill=guide_legend(title='Percent county\nCDL/NVC mismatch,\nunresolved conflict')) +
   theme_classic(base_size=13) +
   scale_fill_viridis(discrete=T, option='inferno') +
-  theme(legend.position=c(0.925,0.27),
+  theme(legend.position=c(0.92,0.27),
         strip.text.x = element_text(size = 14),
         strip.text.y = element_text(size = 14))
 
 nodata_map_jenks
 
 saveRDS(nodata_map_jenks, paste0('./nodata_map_jenks_CDL', CDLYear, '.rds'))
-
-ggplot2::ggsave(plot=nodata_map_jenks, './figures/TechnicalValidation_current/NoDataMap.pdf', width=10, height=6)
 
 ```
 
@@ -190,8 +194,8 @@ acc <- dplyr::filter(combined_accuracy_bycounty, ClassStatusShort == 'well-repre
 
 # translate ncells to percentage of county area
 toplot <- dplyr::mutate(ncells, PropCDL = NCells_CDL/NCells_County,
-                        Rep_PctCounty = (`well-represented` + `poorly-represented`)/NCells_County,
-                        WellRep_PctCounty = (`well-represented`)/NCells_County)
+                        Rep_PctCounty = ((`well-represented` + `poorly-represented`)/NCells_County)*100,
+                        WellRep_PctCounty = ((`well-represented`)/NCells_County)*100)
 ```
 
 ## Make maps of combined data coverage and accuracy 

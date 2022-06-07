@@ -18,14 +18,14 @@ do
 done
 jobids="${jobids:1}" # strip off leading comma
 
-########## Part 2: Tabulate the number of pixels in NVC, CDL, and merged raster layers
+########## Part 3.2: Tabulate the number of pixels in NVC, CDL, and merged raster layers
 for year in "${years[@]}"
 do
     sbatch --dependency=afterany:${jobids} --job-name="TabPixels$year" --export=ALL,cdlyear="$year" 03_2TabPixels.sbatch
     sleep 1s
 done
 
-########## Part 3: Test that output rasters look good
+########## Part 3.3: Test that output rasters look good
 # this section runs checks on crs, extent, file size, and raster values for state-level maps
 year=all # implementation of file size checks mean that it makes the most sense to examine all years at the same time
 
