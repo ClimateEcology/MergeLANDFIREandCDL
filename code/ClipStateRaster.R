@@ -11,24 +11,14 @@ allstates <- args[5]
 if (clipstates == TRUE) {
   
   # specify input parameters
-  intermediate_dir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
+  intermediate_dir <- '/90daydata/geoecoservices/MergeLANDFIREandCDL' # directory to store intermediate tiles
   datadir <- './data' # directory where tabular and spatial data are stored
   compress <- T # compress output rasters
   
-  # # load shapefile of state boundaries
-  # us_state_bounds <- sf::st_read(paste0(datadir, "/SpatialData/us_states_better_coasts.shp"))
-  
-  # make list of states to run (either all in shapefile or manually defined)
-  if (allstates == TRUE) {
-    # load shapefile for state/region 
-    regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
-    states <- regionalextent$STUSPS
-  } else {
-    # load shapefile for state/region 
-    regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
-    states <- c('TX_East', 'TX_West') # states/region to run
-  }
-  
+  # make list of states to run
+  regionalextent <- sf::st_read(paste0(datadir,'/SpatialData/', regionName , '.shp'))
+  states <- regionalextent$STUSPS
+
   # save vector of tile directories
   alltiledirs <- list.dirs(intermediate_dir, recursive = F)
 
@@ -69,15 +59,8 @@ if (clipstates == TRUE) {
       logger::log_info(paste0('Starting clip for ', stateName))
       
     # filter shapefile to one state
-      
-    # for DC, use regional extent as state boundary (not 'better coasts' file bc it does not have a polygon for DC)
-    #if (stateName == 'DC') {
-      this_state <- dplyr::filter(regionalextent, STUSPS == stateName)
-    # } else {
-    # # filter shapefile to one state
-    # this_state <- dplyr::filter(us_state_bounds, STATE_FIPS %in% regionalextent$GEOID[regionalextent$STUSPS == stateName])
-    # }
-    
+    this_state <- dplyr::filter(regionalextent, STUSPS == stateName)
+
     for (i in 1:length(files_toread)) {
     
         fname <- gsub(basename(files_toread[[i]]), pattern="_FinalRasterCompress", replacement = "")

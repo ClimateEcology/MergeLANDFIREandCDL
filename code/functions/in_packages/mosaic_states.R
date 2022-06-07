@@ -1,4 +1,14 @@
-mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal') {
+#'Mosaic together state rasters to form a national raster
+#'
+#'@param statedir file path to directory that contains state rasters in .tif format
+#'@param tier numeric indicating round of hierarchical processing (usually 1-3 rounds)
+#'@param ID variable to identify groups of rasters to process together (e.g. CDLYear). Will be included in file name for output raster.
+#'@param outdir file path to directory where natinoal rasters should be saved
+#'@param season if applicable, vector of seasons to process. E.g. spring, summer, fall
+#'@param verbose logical, print many status messages
+#'@details Due to large files sizes, output rasters from this function are always compressed. This is different from 'mosaic_tiles' function.
+#'@export
+mosaic_states <- function(statedir, tier, ID, outdir, season=NA, usepackage='gdal') {
 
   library(terra)
   source('./code/functions/calc_state_clusters.R')
@@ -17,6 +27,10 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
     state_paths <- state_paths[!grepl(state_paths, pattern= "MegaTile")]
     state_paths <- state_paths[!grepl(state_paths, pattern= "NationalRaster")]
     
+    # filter to correct season
+    if (!is.na(season)) {
+      tile_paths <- tile_paths[grepl(tile_paths, pattern=season)]
+    }
     
     # filter to correct year of CDL (or other ID variable, as necessary)
     # this ID variable will also be included in filename of final output raster
@@ -61,8 +75,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
           gdalUtils::mosaic_rasters(gdalfile=state_paths[clusters == i], 
                                   dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier1.tif'),
                                   overwrite=T)
-                                 #ot='Int16')
-  
+
         }
         
         logger::log_info(paste0('Tier 1: Mega tile ', i, " is finished."))
@@ -122,7 +135,6 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
         gdalUtils::mosaic_rasters(gdalfile=mega_paths[clusters2 == i], 
                               dst_dataset=paste0(statedir, '/', ID,"_NationalMegaTile", i, '_Tier2.tif'),
                               overwrite=T)
-                              #ot='Int16')
       }
       
       logger::log_info(paste0('Tier 2: Mega tile ', i, " is finished."))
@@ -181,8 +193,7 @@ mosaic_states <- function(statedir, outdir, CDLYear, ID, tier, usepackage='gdal'
         gdalUtils::mosaic_rasters(gdalfile=mega_paths2[clusters3 == i], 
                                   dst_dataset=paste0(statedir, '/', ID,"_NationalRaster_Tier3.tif"),
                                   overwrite=T, 
-                                  #ot='Int16',
-                                  co=c("COMPRESS=DEFLATE", "BIGTIFF=YES")) #"PREDICTOR=3"
+                                  co=c("COMPRESS=DEFLATE", "BIGTIFF=YES"))
         
       }
       rm(list=ls(pattern='args3'))

@@ -1,6 +1,4 @@
 
-source('./code/functions/mosaic_states.R')
-
 args <- commandArgs(trailingOnly = T)
 message(args)
 
@@ -11,9 +9,9 @@ tier <- unlist(stringr::str_split(args[3], pattern=":")) # which hierarchy of mo
 message(tier)
 #outdir <- 'D:/MergeLANDFIRECDL_Rasters/2017MergeCDL_LANDFIRE/' #file path on laptop
 
-outdir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/'
+outdir <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/'
 statedir <- paste0(outdir,'/StateRasters/', CDLYear)
 ID <- paste0('CDL', CDLYear,'NVC')
 
-mosaic_states(outdir=outdir, statedir=statedir, ID=ID, tier=tier, usepackage='gdal')
+beecoSp::mosaic_states(outdir=outdir, statedir=statedir, ID=ID, tier=tier, usepackage='gdal')
 
