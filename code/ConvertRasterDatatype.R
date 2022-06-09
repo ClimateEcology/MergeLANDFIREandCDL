@@ -5,8 +5,8 @@ args <- commandArgs(trailingOnly = T)
 CDLYear <- args[2] # year of NASS Cropland Data Layer
     
 # save directory paths
-dir_path <- paste0('../../../90daydata/geoecoservices/MergeLANDFIREandCDL/StateRasters/', CDLYear) 
-outrst_dir <- '../../../90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRasters'
+dir_path <- paste0('/90daydata/geoecoservices/MergeLANDFIREandCDL/StateRasters/', CDLYear) 
+outrst_dir <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRasters'
 
 # local laptop file paths
 # dir_path <- 'D:/MergeLANDFIRECDL_Rasters/'
