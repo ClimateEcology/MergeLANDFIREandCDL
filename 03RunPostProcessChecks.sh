@@ -1,6 +1,7 @@
 #!/bin/bash
 
-years=(2021 2020 2019 2018 2017 2016 2015 2014 2013 2012)
+#years=(2021 2020 2019 2018 2017 2016 2015 2014 2013 2012)
+years=(2021)
 container='/project/geoecoservices/Containers/geospatial_extend_v1.41.sif'
 
 jobids="" # declare empty string for all job ids (converting data type)
@@ -10,7 +11,7 @@ jobids="" # declare empty string for all job ids (converting data type)
 
 for year in "${years[@]}"
 do
-    convert_id=$(sbatch --job-name="ConvertDatatype$year" --export=ALL,cdlyear=$year 03_1ConvertDatatype.sbatch | cut -d ' ' -f4)
+    convert_id=$(sbatch --job-name="ConvertDatatype$year" --export=ALL,cdlyear=$year,container=$container 03_1ConvertDatatype.sbatch | cut -d ' ' -f4)
     sleep 1s
 
     jobids="$jobids,$convert_id"
@@ -21,7 +22,7 @@ jobids="${jobids:1}" # strip off leading comma
 ########## Part 3.2: Tabulate the number of pixels in NVC, CDL, and merged raster layers
 for year in "${years[@]}"
 do
-    sbatch --dependency=afterany:${jobids} --job-name="TabPixels$year" --export=ALL,cdlyear="$year" 03_2TabPixels.sbatch
+    sbatch --dependency=afterany:${jobids} --job-name="TabPixels$year" --export=ALL,cdlyear=$year,container=$container 03_2TabPixels.sbatch
     sleep 1s
 done
 
@@ -29,5 +30,5 @@ done
 # this section runs checks on crs, extent, file size, and raster values for state-level maps
 year=all # implementation of file size checks mean that it makes the most sense to examine all years at the same time
 
-sbatch --job-name="Tests$year" --export=ALL,cdlyear="$year" 03_3RunTests.sbatch
+sbatch --job-name="Tests$year" --export=ALL,cdlyear=$year,container=$container 03_3RunTests.sbatch
 sleep 1s
