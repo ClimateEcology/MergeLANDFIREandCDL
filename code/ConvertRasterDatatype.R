@@ -1,7 +1,5 @@
 # convert national rasters to Int16 data type (terra output is Float32)
 
-source('./code/functions/tests/check_rastervalues.R')
-
 # get CDL year from sbatch file
 args <- commandArgs(trailingOnly = T)
 CDLYear <- args[2] # year of NASS Cropland Data Layer

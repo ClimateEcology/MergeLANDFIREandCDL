@@ -89,7 +89,7 @@ nodata <- counties %>%
 sf::st_drop_geometry(nodata) %>%
 write.csv('./data/TechnicalValidation/FinalRaster_FreqPixelsUnresolvedConflict.csv')
 
-sf::st_write(nodata, './data/TechnicalValidation/FinalRaster_FreqPixelsUnresolvedConflict.shp')
+sf::st_write(nodata, './data/TechnicalValidation/FinalRaster_FreqPixelsUnresolvedConflict.shp', delete_dsn=T)
 
 
 library(ggplot2); library(viridis)

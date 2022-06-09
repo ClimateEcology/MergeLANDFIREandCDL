@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
 ```{r tabulate_validation}
 library(dplyr); library(ggplot2)
 nprocess <- 'all'
-increment <- 10272
+increment <- 10270
 #increment <- 2054
 parallel <- T
 
