@@ -13,6 +13,6 @@
 
 export OPENBLAS_NUM_THREADS=1
 module load singularity/3.5.2
-singularity exec --bind /90daydata:/90daydata geospatial_extend_latest.sif Rscript code/SummarizeTechValidationData.R\
+singularity exec --bind /90daydata:/90daydata $container Rscript code/SummarizeTechValidationData.R\
  --args parallel=TRUE nprocess=all
 
