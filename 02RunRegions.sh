@@ -6,6 +6,8 @@ tiles=TRUE
 merge=TRUE
 mosaic=TRUE
 allstates=TRUE
+container='/project/geoecoservices/Containers/geospatial_extend_v1.41.sif'
+
 jobids="" # declare empty string for all job ids (generate rasters)
 
 years=(2021 2020 2019 2018 2017 2016 2015 2014 2013 2012)
@@ -13,16 +15,16 @@ years=(2021 2020 2019 2018 2017 2016 2015 2014 2013 2012)
 
 for year in "${years[@]}"
 do
-    seid=$(sbatch --job-name="SouthE$year" --export=ALL,cdlyear=$year,region='Southeast',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates 02_1RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
+    seid=$(sbatch --job-name="SouthE$year" --export=ALL,cdlyear=$year,region='Southeast',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates,container=$container 02_1RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
     sleep 1s
 
-    neid=$(sbatch --job-name="NorthE$year" --export=ALL,cdlyear=$year,region='Northeast',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates 02_1RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
+    neid=$(sbatch --job-name="NorthE$year" --export=ALL,cdlyear=$year,region='Northeast',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates,container=$container 02_1RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
     sleep 1s
 
-    mwid=$(sbatch --job-name="MidW$year" --export=ALL,cdlyear=$year,region='Midwest',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates 02_1RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
+    mwid=$(sbatch --job-name="MidW$year" --export=ALL,cdlyear=$year,region='Midwest',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates,container=$container 02_1RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
     sleep 1s
 
-    wid=$(sbatch --job-name="West$year" --export=ALL,cdlyear=$year,region='West',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates 02_1RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
+    wid=$(sbatch --job-name="West$year" --export=ALL,cdlyear=$year,region='West',mktiles=$tiles,runmerge=$merge,mosaic=$mosaic,allstates=$allstates,container=$container 02_1RunMerge_in_container_bigmem_bystate.sbatch | cut -d ' ' -f4)
     sleep 1s
 
     jobids="$jobids,$seid,$neid,$mwid,$wid"
@@ -34,7 +36,7 @@ jobids="${jobids:1}" # strip off leading comma
 valids="" # declare empty string for all ids
 
 # after all regions and years are finished (generating rasters), compile technical validation data by tile
-valid=$(sbatch --dependency=afterany:${jobids} --export=ALL,parallel=TRUE,nprocess=all 02_2TechnicalValidation.sbatch | cut -d ' ' -f4)
+valid=$(sbatch --dependency=afterany:${jobids} --export=ALL,parallel=TRUE,nprocess=all,container=$container 02_2TechnicalValidation.sbatch | cut -d ' ' -f4)
 
 # after that, compile technical validation data by county
 sbatch --dependency=afterany:${valid} --export=ALL,parallel=TRUE,nprocess=all 02_21SummarizeValidationData.sbatch
@@ -47,16 +49,16 @@ clipids="" # declare empty string for all job ids (clip)
 for year in "${years[@]}"
 
 do
-    seid2=$(sbatch --dependency=afterany:${jobids} --job-name="ClipSE$year" --export=ALL,cdlyear=$year,region='Southeast',clipstates=$clipstates,allstates=$allstates 02_3ClipStateRaster_bigmem.sbatch | cut -d ' ' -f4)
+    seid2=$(sbatch --dependency=afterany:${jobids} --job-name="ClipSE$year" --export=ALL,cdlyear=$year,region='Southeast',clipstates=$clipstates,allstates=$allstates,container=$container 02_3ClipStateRaster_bigmem.sbatch | cut -d ' ' -f4)
     sleep 1s
 
-    neid2=$(sbatch --dependency=afterany:${jobids} --job-name="ClipNE$year" --export=ALL,cdlyear=$year,region='Northeast',clipstates=$clipstates,allstates=$allstates 02_3ClipStateRaster_bigmem.sbatch | cut -d ' ' -f4)
+    neid2=$(sbatch --dependency=afterany:${jobids} --job-name="ClipNE$year" --export=ALL,cdlyear=$year,region='Northeast',clipstates=$clipstates,allstates=$allstates,container=$container 02_3ClipStateRaster_bigmem.sbatch | cut -d ' ' -f4)
     sleep 1s
 
-    mwid2=$(sbatch --dependency=afterany:${jobids} --job-name="ClipMW$year" --export=ALL,cdlyear=$year,region='Midwest',clipstates=$clipstates,allstates=$allstates 02_3ClipStateRaster_bigmem.sbatch | cut -d ' ' -f4)
+    mwid2=$(sbatch --dependency=afterany:${jobids} --job-name="ClipMW$year" --export=ALL,cdlyear=$year,region='Midwest',clipstates=$clipstates,allstates=$allstates,container=$container 02_3ClipStateRaster_bigmem.sbatch | cut -d ' ' -f4)
     sleep 1s
 
-    wid2=$(sbatch --dependency=afterany:${jobids} --job-name="ClipWest$year" --export=ALL,cdlyear=$year,region='West',clipstates=$clipstates,allstates=$allstates 02_3ClipStateRaster_bigmem.sbatch | cut -d ' ' -f4)
+    wid2=$(sbatch --dependency=afterany:${jobids} --job-name="ClipWest$year" --export=ALL,cdlyear=$year,region='West',clipstates=$clipstates,allstates=$allstates,container=$container 02_3ClipStateRaster_bigmem.sbatch | cut -d ' ' -f4)
     
     clipids="$clipids,$seid2,$neid2,$mwid2,$wid2"
 done
@@ -70,6 +72,6 @@ tier='1:2:3' # tiers indicate level of hierarchical framework to process (tier 1
 for year in "${years[@]}"
 
 do
-    sbatch --dependency=afterany:${clipids} --job-name="Mosaic$year" --export=ALL,cdlyear="$year",tier="$tier" 02_4MosaicToNational.sbatch
+    sbatch --dependency=afterany:${clipids} --job-name="Mosaic$year" --export=ALL,cdlyear=$year,tier=$tier,container=$container 02_4MosaicToNational.sbatch
     sleep 1s
 done
