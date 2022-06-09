@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -p atlas #partition to use
+#SBATCH -p bigmem #partition to use
 #SBATCH -N 1 #number of nodes in this job
 #SBATCH --cpus-per-task=16 #number of cpus to use for each task
 #SBATCH --mem=300GB #request all memory on a node
