@@ -179,7 +179,7 @@ toplot <- dplyr::mutate(ncells, NCells_Unmanaged = (NCells_County - `absent, man
 names(county)
 CDLYear <- 2017
 
-# load accuracy loada
+# load accuracy data
 cdl <- read.csv('./data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv')
 # filter cdl to selected year to match pixel freq data
 cdl_oneyear <- dplyr::filter(cdl, Year %in% CDLYear)
@@ -257,10 +257,12 @@ toplot_both <- dplyr::full_join(toplot_nvc, toplot_cdl) %>%
   dplyr::full_join(toplot_merged)
 
 toplot_both <- dplyr::left_join(county, toplot_both, by = c('STATE'='State', 'COUNTY'='County'))
+
+saveRDS(toplot_both, './data/TechnicalValidation/summarized_accuracy_data_CDL_NVC_Merged.rds')
 ```
 
 ## Bi-variate choropleth map showing amount of agriculture and data coverage of NVC and CDL
-First, I start with a bivariate chloropleth map showing data coverage and the percent of each county in agriculture or natural land (for CDL and NVC,respectively). 
+First, I start with a bivariate choropleth map showing data coverage and the percent of each county in agriculture or natural land (for CDL and NVC,respectively). 
 ```{r bivariate}
 # bi-variate choropleth map showing amount of agriculture and data coverage of NVC and CDL
 library(biscale); library(ggplot2)

@@ -91,7 +91,7 @@ length(unique(pairs_to_keep$CDL_Class))
 
 cdl_nvc_national_byYear$CDL_Name_N <- if_else(!cdl_nvc_national_byYear$CDL_Class %in% pairs_to_keep$CDL_Class, 'Other', cdl_nvc_national_byYear$CDL_Name)
 
-# take out row crop- close grown crop
+# take out row crop- close grown crop for visualization
 cdl_nvc_national_byYear <- dplyr::filter(cdl_nvc_national_byYear, NVC_SpecificClass != "Row Crop - Close Grown Crop")
 
 ```
@@ -111,7 +111,7 @@ cols <- c("#aee39a", "#26496d", "#4cf185", "#D3D3D3", "#77c4d3", "#1c5e39", "#bc
 
 
 # try on same graph
-var.labs <- c('Number of mismatched cells', 'Percent mismatched cells')
+var.labs <- c('Number of mismatched pixels', 'Percent mismatched pixels')
 names(var.labs) <- c("NCells_Mismatch", "Pct_Mismatch")
 
 la <- tidyr::pivot_longer(cdl_nvc_national_byYear, cols=c(NCells_Mismatch, Pct_Mismatch), names_to='variable_type')
@@ -165,6 +165,13 @@ toplot <- counties %>%
   # set NCells = NA to 1 to avoid divide by zero error
   dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells)*100)
 
+# identify counties with the highest percent mismatch
+worst_counties <- dplyr::filter(toplot, CDLYear == 2017) %>%
+  dplyr::arrange(desc(Pct_Mismatch)) %>%
+  dplyr::filter(NCells_Mismatch > 100, Pct_Mismatch > 65)
+
+# save data frame for the worst mismatched counties in 2017
+saveRDS(worst_counties, './data/TechnicalValidation/counties_with_highest_mismatch_2017.rds')
 
 library(classInt); library(viridis)
 
@@ -223,8 +230,7 @@ seventeen <- ggdraw() +
 
 seventeen
 
-ggplot2::ggsave(plot=seventeen, paste0('./figures/TechnicalValidation_current/CombinedFigMap_MismatchedPixels_', CDLYear, 'Only.pdf'),
-                width=10, height=11)
+# ggplot2::ggsave(plot=seventeen, paste0('./figures/TechnicalValidation_current/CombinedFigMap_MismatchedPixels_', CDLYear, 'Only.pdf'), width=10, height=11)
 
 ```
 

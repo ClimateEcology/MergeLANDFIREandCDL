@@ -24,6 +24,7 @@ proportional_tradeoff
 ggplot2::ggsave(plot=proportional_tradeoff, './figures/PercentAgLandvsPercentClassMismatch.svg', width=6, height=4.5)
 
 
+
 sum_land <- filter(mismatch_summary, variable_type == 'NCells_Mismatch') %>%
   mutate(high_pctmismatch = if_else(NVC_SpecificClass %in% c('Bush fruit and berries', 'Orchard', 'Vineyard', 'Aquaculture') , 'yes', 'no')) %>%
   dplyr::group_by(high_pctmismatch) %>%
@@ -48,4 +49,17 @@ unresolved_conflicts <- read.csv('./data/TechnicalValidation/FinalRaster_FreqPix
 
 
 length(unique(unresolved_conflicts$FIPS[unresolved_conflicts$PctCounty < 0.4]))/length(unique(unresolved_conflicts$FIPS))
-N
+length(unique(unresolved_conflicts$FIPS[unresolved_conflicts$PctCounty > 4.55]))
+
+# summarize accuracy data too 
+
+# national weighted average
+accuracy <- readRDS('./data/TechnicalValidation/summarized_accuracy_data_CDL_NVC_Merged.rds')
+
+national_accuracy <- accuracy %>% group_by(Dataset_Name) %>%
+  dplyr::mutate(RelArea = NCells_County/sum(NCells_County), temp=WtdUserAcc*RelArea) %>%
+  dplyr::summarise(WtdUserAcc = sum(temp))
+  
+
+
+

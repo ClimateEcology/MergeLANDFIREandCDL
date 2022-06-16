@@ -1,0 +1,174 @@
+---
+title: "Deeper dive into counties with unresolved pixel conflict"
+author: "Melanie Kammerer"
+date: '2022-06-10'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Identify regions with many unresolved pixels
+
+```{r county_summary}
+library(sf); library(dplyr)
+unresolved_shp <- sf::st_read('./data/TechnicalValidation/FinalRaster_FreqPixelsUnresolvedConflict.shp')
+
+hotspot_counties <- filter(unresolved_shp, PctCnty > 0.983)
+plot(hotspot_counties[1]); print(length(hotspot_counties$geometry))
+
+
+# join together polygons that are the same county (into multipart)
+hotspot_counties <- hotspot_counties %>%
+  dplyr::group_by(FIPS, STATE, COUNTY) %>%
+  dplyr::summarize(geometry = sf::st_union(geometry)) 
+plot(hotspot_counties[1]); print(length(hotspot_counties$geometry))
+
+
+intersect_all <- sf::st_intersects(hotspot_counties, hotspot_counties)
+
+fips_list <- unique(hotspot_counties$FIPS)
+
+
+# Merging each polygon with its neighbors
+use_distance <- T
+for (fips in unique(hotspot_counties$FIPS)) {
+  
+  if (fips == hotspot_counties$FIPS[1]) {
+    fewer_polys <- hotspot_counties
+  }
+  # first check
+  start_len <- length(fewer_polys$geometry)
+  
+  intersect <- sf::st_intersects(fewer_polys[fewer_polys$FIPS == fips,], fewer_polys, sparse=F)
+
+  within_dist <- sf::st_is_within_distance(fewer_polys[fewer_polys$FIPS == fips,], fewer_polys, dist=100000, sparse=F)
+
+  if (use_distance == F) {
+    fips_to_intersect <- fewer_polys$FIPS[intersect]
+  } else if (use_distance == T) {
+    fips_to_intersect <- fewer_polys$FIPS[within_dist]
+  }
+  
+  fewer_polys <- fewer_polys %>%
+    dplyr::mutate(merge_with_focal = if_else(FIPS %in% fips_to_intersect, 
+                                             paste0(fips_to_intersect, collapse=","), FIPS)) %>%
+    dplyr::group_by(merge_with_focal) %>%
+    dplyr::summarize(geometry = sf::st_union(geometry), 
+                     FIPS=paste0(FIPS, collapse=", "), 
+                     STATE=paste0(STATE, collapse=", "),
+                     COUNTY=paste0(COUNTY, collapse=", ")) 
+  
+  end_len <- length(fewer_polys$geometry)
+  print(end_len)
+}
+
+plot(hotspot_counties[1])
+plot(fewer_polys[,3])
+
+
+# convert polygons to bbox for each group
+library(tidyverse)
+
+bbox_wrap <- function(x) st_as_sfc(st_bbox(x))
+box_sf <- fewer_polys %>% 
+  mutate(bbox = map(geometry, .f=bbox_wrap))
+
+box_sf <- box_sf %>% 
+  mutate(geometry = st_as_sfc(do.call(rbind, bbox))) %>% 
+  select(-bbox) %>% 
+  st_as_sf()
+
+st_crs(box_sf) <- st_crs(fewer_polys)
+
+plot(box_sf[1])
+
+# filter to 3-4 largest bounding boxes
+
+largest_boxes <- box_sf %>% 
+  dplyr::mutate(box_area = sf::st_area(box_sf)) %>%
+  dplyr::filter(box_area > quantile(box_area)[3]) # filter down to largest 25% quantile
+
+plot(hotspot_counties[1])
+plot(box_sf[1])
+plot(largest_boxes[1])
+```
+```{r load_merged_raster}
+CDLYear <- 2017
+# load merged raster, cdl, and nvc
+merged <- terra::rast('../../SpatialData/Merged_CDL_NVC/CDL2017NVC_NationalRaster.tif')
+cdl <- terra::rast(paste0('../../SpatialData/NASS_CDL/CDL', CDLYear, '/', CDLYear, '_30m_cdls.img')) %>%
+  terra::crop(merged)
+nvc <- terra::rast('../../SpatialData/LandFire/US_200NVC/Tif/us_200nvc.tif') %>%
+  terra::crop(merged)
+
+# convert 3 rasters to a raster stack
+rasters <- terra::rast(list(merged, cdl, nvc))
+rasters
+
+# project polygon layer of regional boundaries to match rasters
+regions <- largest_boxes %>% sf::st_transform(sf::st_crs(cdl))
+
+# save raster stack (took a while to crop cdl and nvc to match merged raster)
+saveRDS(rasters, paste0('./data/SpatialData/RasterStack_Merged_NVC_CDL', CDLYear, '.rds'))
+
+for (i in 1:length(regions$FIPS)) {
+  poly <- regions[i,]
+  
+  # crop all rasters to regional polygon
+  region_rasters <- rasters %>%
+    terra::crop(poly)
+  region_rasters
+  
+  # make raster that indicates if a pixels is unresolved data class
+  unresolved_filter <- region_rasters[[1]] == -1001
+  
+  # multiply all rasters by unresolved filter
+  values_at_unresolved <- region_rasters * unresolved_filter
+  values_at_unresolved[values_at_unresolved == 0] <- NA
+  
+  # maps of unresolved pixels
+  plot(values_at_unresolved, main=paste0(paste0(substr(poly$STATE, start=1, stop=2), " ", poly$FIPS), 
+                                         c(" Merged", " CDL", " NVC")))
+  
+  # summarize which classes are most likely to mismatch causing unresolved pixels
+  pixel_pairs <- values_at_unresolved %>% terra::as.data.frame(xy=T, na.rm=T, cells=F)
+  
+  pair_freq <- as.data.frame(table(paste(pixel_pairs$Class_Names, pixel_pairs$VALUE_1, sep=", ")))
+  
+  pair_freq_clean <- pair_freq %>% dplyr::mutate(PctUnresolvedPixels = Freq/sum(Freq) * 100) %>%
+    tidyr::separate(Var1, sep=", ", into=c("CDL_CLass", "NVC_Class"), remove=F)
+  
+  top_mismatch <- pair_freq_clean %>%
+    dplyr::group_by(NVC_Class) %>%
+    dplyr::mutate(PctUnresolved_byNVC= sum(PctUnresolvedPixels)) %>%
+    dplyr::filter(PctUnresolved_byNVC > 6 & PctUnresolvedPixels > 1) %>%
+    dplyr::mutate(FIPS=poly$FIPS, STATE=poly$STATE, COUNTY=poly$COUNTY)
+  
+  if (i == 1){
+    allregions_top_pairs <- top_mismatch
+  } else {
+    allregions_top_pairs <- rbind(allregions_top_pairs, top_mismatch)
+  }
+  logger::log_info("Finished ", i, ": ", substr(poly$STATE, start=1, stop=2))
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

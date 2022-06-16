@@ -1,0 +1,146 @@
+---
+title: "Deeper dive into counties with many mismatched pixels"
+author: "Melanie Kammerer"
+date: '2022-06-16'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Identify regions with many mismatched pixels
+
+```{r tabulate_validation}
+library(dplyr); library(ggplot2)
+
+rm(list=ls())
+
+nprocess <- 'all'
+increment <- 10270
+#increment <- 2054
+parallel <- T
+
+if (parallel == T) {
+  ptext <- 'parallel'
+} else {
+  ptext <- 'notparallel'
+}
+
+# read LANDFIRE and CDL keys
+lf_key <- read.csv('../../SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
+cdl_key <- read.csv('../../SpatialData/NASS_CDL/NASS_classes_simple.csv')
+states1 <- sf::st_read('../../SpatialData/state_boundaries/cb_2016_us_state_500k.shp') 
+counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
+  dplyr::filter(!is.na(COUNTY))
+
+
+# counties with most pixel mismatch
+worst_counties <- readRDS('./data/TechnicalValidation/counties_with_highest_mismatch_2017.rds')
+
+# read dataset of number of mis-matched pixels by county
+# join with information on CDL and NVC classes
+freq <- read.csv(paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byCounty_run', 
+    nprocess, '_group', increment, '_' , ptext, '.csv')) %>%
+  dplyr::select(-X, -State) %>% # drop state name because some county FIPS codes and State names to not match (tile from close to state boundary)
+  dplyr::filter(!is.na(FIPS)) %>% # for now, just filter out FIPS with NA values
+  dplyr::left_join(cdl_key, by=c('CDL_Class' = 'VALUE')) %>%
+  dplyr::rename(CDL_Name = CLASS_NAME) %>%
+  dplyr::left_join(dplyr::select(lf_key, VALUE, NVC_Name), by=c('NVC_Class' = 'VALUE')) %>%
+  tidyr::separate(NVC_Name, sep=" ", into=c("Region", "Temperature", "Biome", "NVC_SpecificClass"), 
+                  remove=F, extra='merge') %>%
+  dplyr::mutate(FIPS=as.factor(stringr::str_pad(FIPS, 5, pad = "0")))  %>%# convert FIPS to factor, add leading zeros match county shp
+  dplyr::filter(FIPS %in% worst_counties$FIPS)
+
+##### load data on # nvc pixels per class per state
+nvc_per_county <- read.csv('./data/PixelFreq/NVC_CountyPixelFreq.csv') %>%
+  dplyr::left_join(dplyr::select(counties, STATE, COUNTY, FIPS), by = c('State'='STATE', 'County'='COUNTY')) %>%
+  dplyr::select(-geometry) %>%
+  dplyr::rename(NCells_Class = NCells) %>%
+  dplyr::left_join(dplyr::select(lf_key, VALUE, NVC_Name), by= c('Class'= 'VALUE')) %>% # add landfire class names
+  dplyr::filter(Class %in% freq$NVC_Class) %>% # filter to only agriculture classes
+  tidyr::separate(NVC_Name, sep=" ", into=c("Region", "Temperature", "Biome", "NVC_SpecificClass"), remove=F, extra='merge') %>% # create grouped NVC name (removes east/west and warm/cool designations)
+  dplyr::group_by(NVC_SpecificClass, State, County, FIPS) %>%
+  dplyr::summarise(NCells_Class= sum(NCells_Class)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(STUSPS=State, FIPS=as.factor(FIPS))
+
+
+# summarize number of cells in each NVC grouping worst_counties (groups exclude region and temperature)
+nvc_worst_counties <- nvc_per_county %>%
+  dplyr::filter(FIPS %in% worst_counties$FIPS) %>%
+  dplyr::group_by(NVC_SpecificClass) %>%
+    dplyr::summarise(NCells_Class= sum(NCells_Class))
+
+
+# ##### summarize mis-matched pixels by cdl-nvc pairs & county
+# cdl_nvc_bycounty <- dplyr::group_by(freq, CDL_Class, CDL_Name, NVC_SpecificClass, CDLYear, FIPS) %>%
+#   dplyr::summarise(NCells_Mismatch = sum(Mismatch_NCells)) %>%
+#   dplyr::ungroup() %>%
+#   left_join(dplyr::select(nvc_per_county, NVC_SpecificClass, NCells_Class, STUSPS, FIPS),
+#             by=c('NVC_SpecificClass', 'FIPS')) %>%
+#   dplyr::rename(State = STUSPS) %>%
+#   dplyr::mutate(CDL_Class = as.factor(CDL_Class), NVC_CDL_Named=paste0(NVC_SpecificClass, "_", CDL_Name)) %>%
+#   dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells_Class)*100)
+
+
+```
+## For counties with a lot of conflict, look at identify of mismatched pixels
+
+```{r hotspot_counties}
+##### summarize mis-matched pixels by cdl-nvc pairs for entire country
+cdl_nvc_worst_counties_byYear <- freq %>%
+  dplyr::group_by(CDL_Class, CDL_Name, NVC_SpecificClass, CDLYear) %>%
+  dplyr::summarise(NCells_Mismatch = sum(Mismatch_NCells)) %>%
+  dplyr::ungroup() %>%
+  left_join(nvc_worst_counties) %>%
+  dplyr::mutate(CDL_Class = as.factor(CDL_Class), NVC_CDL_Named=paste0(NVC_SpecificClass, "_", CDL_Name)) %>%
+  dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells_Class)*100) %>%
+  dplyr::ungroup()
+
+pairs_to_keep <- cdl_nvc_worst_counties_byYear %>% filter(Pct_Mismatch > 4 | NCells_Mismatch > 3000000)
+length(unique(pairs_to_keep$CDL_Class))
+
+cdl_nvc_worst_counties_byYear$CDL_Name_N <- if_else(!cdl_nvc_worst_counties_byYear$CDL_Class %in% pairs_to_keep$CDL_Class, 'Other', cdl_nvc_worst_counties_byYear$CDL_Name)
+
+# take out row crop- close grown crop for visualization
+cdl_nvc_worst_counties_byYear <- dplyr::filter(cdl_nvc_worst_counties_byYear, NVC_SpecificClass != "Row Crop - Close Grown Crop")
+
+```
+
+```{r worstcounties_figure}
+cols <- c("#aee39a", "#26496d", "#4cf185", "#D3D3D3", "#77c4d3", "#1c5e39", "#bce333", "#572b9e", "#8699ee", "#9f0b64", "#f597fa", "#6c3357", "#6e9d50")
+
+
+# try on same graph
+var.labs <- c('Number of mismatched pixels', 'Percent mismatched pixels')
+names(var.labs) <- c("NCells_Mismatch", "Pct_Mismatch")
+
+la <- cdl_nvc_worst_counties_byYear %>% tidyr::pivot_longer(cols=c(NCells_Mismatch, Pct_Mismatch), names_to='variable_type')
+
+
+byclass_2017_worst <- la %>% dplyr::filter(CDLYear == 2017) %>% 
+  ggplot() + geom_col(aes(x=stringr::str_wrap(NVC_SpecificClass, width=12), y=value, 
+  fill=stringr::str_wrap(CDL_Name_N, width=12), width=0.85), 
+  position="stack", stat="identity") +
+  ylab('') +
+  xlab('NVC agriculture classes (grouped)') +
+  coord_flip() +
+  guides(fill=guide_legend(nrow=2, byrow=T, reverse=T)) +
+  facet_grid(~variable_type, scales='free', labeller = labeller(variable_type=var.labs)) +
+  scale_fill_manual(values=cols, name='CDL\nClass') +
+  theme_classic(base_size=14) +
+  theme(legend.spacing.y = unit(0.05, "cm"),
+        legend.spacing.x = unit(0.15, "cm"),
+        # panel.border = element_rect(fill = NA, color = "black"),
+        panel.spacing.x = unit(0,"line"),
+        panel.spacing.y = unit(0,"line"),
+        legend.position = 'bottom', 
+        legend.justification = 'left',
+        strip.text.x = element_text(size = 14))
+
+byclass_2017_worst 
+```
+
+
+
