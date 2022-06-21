@@ -337,15 +337,10 @@ ggsave(plot=wellrep_map_jenks, filename= paste0('./figures/DataCoverage3Panel_un
 
 ## Make bivariate maps of NVC & CDL accuracy
 ```{r bivariate_accuracy, fig.width=14.5, fig.height=8}
-toplot_long <- toplot_both %>%
-  dplyr::select(-starts_with('no'), -present) %>%
-  tidyr::pivot_longer(cols=WtdProdAcc:WtdUserAcc, names_to='Accuracy Type', values_to='Accuracy') %>%
-  dplyr::mutate(`Accuracy Type` = if_else(`Accuracy Type` == 'WtdProdAcc', 'Producer Accuracy', 'User Accuracy'))
-
 toplot2_long <- dplyr::filter(toplot_both,  Dataset_Name != 'NVC+CDL') %>%
   dplyr::select(-starts_with('no'), -present) %>%
-  tidyr::pivot_longer(cols=WtdProdAcc:WtdUserAcc, names_to='Accuracy Type', values_to='Accuracy') %>%
-  dplyr::mutate(`Accuracy Type` = if_else(`Accuracy Type` == 'WtdProdAcc', 'Producer Accuracy', 'User Accuracy'))
+  tidyr::pivot_longer(cols=WtdProdAcc:WtdUserAcc, names_to='Accuracy_Type', values_to='Accuracy') %>%
+  dplyr::mutate(`Accuracy_Type` = if_else(`Accuracy_Type` == 'WtdProdAcc', 'Producer Accuracy', 'User Accuracy'))
 
 # bi-variate choropleth map showing amount of agriculture and accuracy of NVC and CDL
 
@@ -358,7 +353,7 @@ acc_both <- ggplot() + geom_sf(data=data_acc, mapping = aes(fill = bi_class),
   theme_classic() +
   theme(strip.text.x = element_text(size = 13),
         strip.text.y = element_text(size = 13)) +
-  facet_grid(Dataset_Name ~`Accuracy Type`)
+  facet_grid(Dataset_Name ~`Accuracy_Type`)
 
 #coverage_both
 
@@ -415,6 +410,15 @@ finalPlot_acc
 
 ggsave(plot=finalPlot_acc, filename=paste0('./figures/AccuracyInput_bivariate', CDLYear, '.pdf'),  width=14.5, height=8)
 
+
+toplot2_long %>% 
+  dplyr::rename(Accuracy_Type =`Accuracy_Type`) %>%
+  ggplot() +
+  geom_point(aes(y=FocalGroup_PctCounty, x=Accuracy, color=Accuracy_Type)) +
+  facet_wrap(~Dataset_Name+Accuracy_Type)
+
+View(dplyr::filter(toplot2_long, Dataset_Name == 'NVC'))
+
 ```
 
 ## Try univariate map of data coverage. Are these easier to interpret?
@@ -429,7 +433,7 @@ accuracy_map_jenks <- ggplot() + geom_sf(data=toplot_long, aes(fill=accuracy.jen
   guides(fill=guide_legend(title='Accuracy \n(area-weighted)')) +
   theme_classic(base_size=14) +
   scale_fill_viridis(discrete=T, option='inferno') +
-  facet_grid(Dataset_Name ~`Accuracy Type`) +
+  facet_grid(Dataset_Name ~`Accuracy_Type`) +
   theme(strip.text.x = element_text(size = 14),
         strip.text.y = element_text(size = 14))
 

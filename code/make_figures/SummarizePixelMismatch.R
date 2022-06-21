@@ -51,15 +51,87 @@ unresolved_conflicts <- read.csv('./data/TechnicalValidation/FinalRaster_FreqPix
 length(unique(unresolved_conflicts$FIPS[unresolved_conflicts$PctCounty < 0.4]))/length(unique(unresolved_conflicts$FIPS))
 length(unique(unresolved_conflicts$FIPS[unresolved_conflicts$PctCounty > 4.55]))
 
+
+rm(list=ls())
+library(dplyr); library(spatstat); library(ggplot2)
 # summarize accuracy data too 
 
 # national weighted average
 accuracy <- readRDS('./data/TechnicalValidation/summarized_accuracy_data_CDL_NVC_Merged.rds')
+                    
+user_bystate <- accuracy %>% filter(WtdUserAcc < 0.368 & Dataset_Name == 'NVC') %>%
+  as.data.frame() %>%
+  dplyr::group_by(STATE) %>%
+  dplyr::summarise(NCounties = n())
 
-national_accuracy <- accuracy %>% group_by(Dataset_Name) %>%
-  dplyr::mutate(RelArea = NCells_County/sum(NCells_County), temp=WtdUserAcc*RelArea) %>%
-  dplyr::summarise(WtdUserAcc = sum(temp))
+prod_bystate <- accuracy %>% filter(WtdProdAcc < 0.368 & Dataset_Name == 'NVC') %>%
+  as.data.frame() %>%
+  dplyr::group_by(STATE) %>%
+  dplyr::summarise(NCounties = n())
+
+national_accuracy <- accuracy %>%
+  as.data.frame() %>%
+  group_by(Dataset_Name) %>%
+  dplyr::mutate(RelArea = NCells_County/sum(NCells_County)) %>%
+  dplyr::summarize(WtdMeanUser = sum(WtdUserAcc*RelArea), 
+                   WtdMeanProd = sum(WtdProdAcc*RelArea),
+                   WtdMedianUser = weighted.median(WtdUserAcc, w=RelArea), 
+                   WtdMedianProd = weighted.median(WtdProdAcc, w=RelArea),
+                   WtdMedianDC = weighted.median(WithData_PctFocalGroup, w=RelArea))
   
 
+long_accuracy <- accuracy %>% 
+  as.data.frame() %>%
+  dplyr::select(FIPS, Dataset_Name, WtdProdAcc, WtdUserAcc) %>%
+  tidyr::pivot_longer(contains('Wtd'), names_to='AccuracyType')
 
+long_accuracy %>% ggplot(aes(AccuracyType, value, fill=AccuracyType)) +
+  geom_boxplot() +
+  facet_wrap(~Dataset_Name) +
+  xlab("") +
+  theme_classic(base_size=16) +
+  theme(legend.position="none")
 
+accuracy_hist <- long_accuracy %>% ggplot(aes(value, col=AccuracyType)) +
+  geom_density(lwd=1) +
+  xlab("Classification accuracy by county,\n area-weighted") +
+  theme_classic(base_size=14) +
+  facet_wrap(~Dataset_Name, ncol=1) + 
+  scale_color_discrete(name = "Accuracy type", labels = c("producer's", "user's"))
+
+ggplot2::ggsave(plot=accuracy_hist, filename='./figures/AccuracyHistogram.svg', device='svg', width=5, height=6)
+
+# data coverage histogram
+accuracy %>% ggplot(aes(Dataset_Name, WithData_PctFocalGroup, fill=Dataset_Name)) +
+  geom_boxplot() +
+  #facet_wrap(~Dataset_Name) +
+  xlab("") +
+  theme_classic(base_size=16) +
+  theme(legend.position="none")
+
+dc_hist <- accuracy %>% ggplot(aes(WithData_PctFocalGroup)) +
+  geom_density(lwd=1) +
+  xlab("Data coverage by county") +
+  theme_classic(base_size=14) +
+  facet_wrap(~Dataset_Name, ncol=1, scales='free')
+dc_hist
+
+ggplot2::ggsave(plot=dc_hist, filename='./figures/DataCoverageHistogram.svg', device='svg', width=4.1, height=6)
+
+# look at accuracy vs data coverage
+toplot_long <- toplot_both %>%
+  dplyr::select(-starts_with('no'), -present) %>%
+  tidyr::pivot_longer(cols=WtdProdAcc:WtdUserAcc, names_to='Accuracy_Type', values_to='Accuracy') %>%
+  dplyr::mutate(`Accuracy_Type` = if_else(`Accuracy_Type` == 'WtdProdAcc', 'Producer Accuracy', 'User Accuracy'))
+
+library(ggplot2)
+coverage_accuracy <- toplot_long %>%
+  #dplyr::filter(Dataset_Name == 'NVC') %>%
+  ggplot(aes(x=WithData_PctFocalGroup, y=Accuracy)) +
+  geom_point() +
+  geom_smooth(formula = y ~ s(x, bs = "tp")) +
+  theme_classic(base_size=14) +
+  xlab("Data Coverage") +
+  facet_wrap(~Dataset_Name + Accuracy_Type, ncol=2)
+
+ggsave(plot=coverage_accuracy, filename= paste0('./figures/Accuracy_vs_DataCoverage_', CDLYear, '.svg'),  width=6.5, height=8)
