@@ -1,5 +1,13 @@
+library(dplyr)
+rm(list=ls())
+
+la <- readRDS('./data/summary_pct_mismatch_la.RDS')
+toplot <- readRDS('./data/summary_pct_mismatch_toplot.RDS')
+toplot_both <- readRDS('./data/TechnicalValidation/summarized_accuracy_data_CDL_NVC_Merged.rds')
+CDLYear <- 2017
+
 # summary by class
-mismatch_summary <- filter(la, CDLYear == 2017) %>% 
+mismatch_summary <- filter(la, CDLYear == CDLYear) %>% 
   dplyr::group_by(NVC_SpecificClass, variable_type) %>% 
   summarize(NCells_Class = unique(NCells_Class), value = sum(value)) %>%
   dplyr::ungroup() %>%
@@ -33,7 +41,7 @@ sum_land <- filter(mismatch_summary, variable_type == 'NCells_Mismatch') %>%
   dplyr::mutate(PercentArea = NCells_Group/sum(NCells_Group) * 100)
   
 
-summap2017 <- dplyr::filter(toplot, CDLYear == 2017)
+summap2017 <- dplyr::filter(toplot, CDLYear == CDLYear)
 
 
 length(unique(summap2017$FIPS[summap2017$Pct_Mismatch < 24]))
@@ -52,7 +60,6 @@ length(unique(unresolved_conflicts$FIPS[unresolved_conflicts$PctCounty < 0.4]))/
 length(unique(unresolved_conflicts$FIPS[unresolved_conflicts$PctCounty > 4.55]))
 
 
-rm(list=ls())
 library(dplyr); library(spatstat); library(ggplot2)
 # summarize accuracy data too 
 
@@ -111,7 +118,7 @@ accuracy %>% ggplot(aes(Dataset_Name, WithData_PctFocalGroup, fill=Dataset_Name)
 
 dc_hist <- accuracy %>% ggplot(aes(WithData_PctFocalGroup)) +
   geom_density(lwd=1) +
-  xlab("Data coverage by county") +
+  xlab("Coverage of reference data, by county") +
   theme_classic(base_size=14) +
   facet_wrap(~Dataset_Name, ncol=1, scales='free')
 dc_hist
@@ -131,7 +138,7 @@ coverage_accuracy <- toplot_long %>%
   geom_point() +
   geom_smooth(formula = y ~ s(x, bs = "tp")) +
   theme_classic(base_size=14) +
-  xlab("Data Coverage") +
+  xlab("Coverage of reference data") +
   facet_wrap(~Dataset_Name + Accuracy_Type, ncol=2)
 
 ggsave(plot=coverage_accuracy, filename= paste0('./figures/Accuracy_vs_DataCoverage_', CDLYear, '.svg'),  width=6.5, height=8)

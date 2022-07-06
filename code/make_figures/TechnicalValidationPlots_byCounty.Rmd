@@ -99,22 +99,27 @@ cdl_nvc_national_byYear <- dplyr::filter(cdl_nvc_national_byYear, NVC_SpecificCl
 ## Plot nvc group-cdl mismatch over time
 ```{r graphs, fig.width=12, fig.height=14}
 # colors
-cols <- cols <- c("#69ef7b", "#2c457d", "#edb1ff", "#6c36a3", "#4cccb7", "#224f3e", "#bbe272", "#84241a", "#e9bf98", "#378811", "#8bc0dd", "#5d4030", "#f8d147")
-
-set.seed(9) # 7 is OK
-cols <- sample(cols, size=length(cols), replace=F)
-
-
-# cols <- c("#b4ddd4", "#20502e", "#40cf9b", "#D3D3D3", "#808080", "#10558a", "#7cce1e", "#834cd0", "#c7acf9", "#932764", "#38b5fc", "#ea2db9", "#09f54c", "#eb1138", "#80995a")
-
-cols <- c("#aee39a", "#26496d", "#4cf185", "#D3D3D3", "#77c4d3", "#1c5e39", "#bce333", "#572b9e", "#8699ee", "#9f0b64", "#f597fa", "#6c3357", "#6e9d50")
-
+# cols <- c("#aee39a", "#26496d", "#4cf185", "#D3D3D3", "#77c4d3", "#1c5e39", "#bce333", "#572b9e", "#8699ee", "#9f0b64", "#f597fa", "#6c3357", "#6e9d50")
 
 # try on same graph
 var.labs <- c('Number of mismatched pixels', 'Percent mismatched pixels')
 names(var.labs) <- c("NCells_Mismatch", "Pct_Mismatch")
 
 la <- tidyr::pivot_longer(cdl_nvc_national_byYear, cols=c(NCells_Mismatch, Pct_Mismatch), names_to='variable_type')
+saveRDS(la, './data/summary_pct_mismatch_la.RDS')
+
+# save CDL names (to match with CDL color scheme)
+other <- data.frame(CLASS_NAME = 'Other', hex = "#8699ee") # save color code for 'Other' class
+
+cdl_classes_smallmap <- read.csv(paste0('./data/TabularData/NASS_classes_pasture_is_arable.csv')) %>% 
+  dplyr::mutate(VALUE = as.character(-VALUE)) %>%
+  dplyr::select(VALUE, CLASS_NAME, RED, GREEN, BLUE) %>%
+  dplyr::filter(CLASS_NAME %in% la$CDL_Name_N) %>%
+  dplyr::mutate(hex = rgb(RED, GREEN, BLUE)) %>%
+  dplyr::full_join(other) %>%
+  dplyr::arrange(CLASS_NAME)
+
+cols <- cdl_classes_smallmap$hex
 
 combined <- la %>% ggplot() + geom_bar(aes(x=NVC_SpecificClass, y=value, 
                                            fill=stringr::str_wrap(CDL_Name_N, width=12)), 
@@ -164,6 +169,9 @@ toplot <- counties %>%
   tidyr::replace_na(list(NCells_Mismatch=0, NCells=1)) %>% # if NA value for NCells_Mismatch, assume no mismatched pixels for that year-county combo
   # set NCells = NA to 1 to avoid divide by zero error
   dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells)*100)
+
+saveRDS(toplot, './data/summary_pct_mismatch_toplot.RDS')
+
 
 # identify counties with the highest percent mismatch
 worst_counties <- dplyr::filter(toplot, CDLYear == 2017) %>%
@@ -236,14 +244,18 @@ seventeen
 
 ```{r oneyear_multi3, fig.width=10, fig.height=15}
 library(cowplot); library(gridExtra)
-
+CDLYear <- 2017
 # read ggplot object generated in 'WrangleMergedAccuracyByCounty.Rmd'
 nodata_map_jenks <- readRDS(paste0('./nodata_map_jenks_CDL', CDLYear, '.rds'))
 
 seventeen3 <- ggdraw() +
   draw_plot(byclass_2017, x=0, y=0.63, 1, 0.325) +
   draw_plot(map2017, x=0.01, y=0.3, 1, 0.32) +
-  draw_plot(nodata_map_jenks, x=0.01, y=0, 1, 0.32)
+  draw_plot(nodata_map_jenks, x=0.01, y=0, 1, 0.32) +
+  annotate("text", label="A)", x=0.06, y=0.94, size=7) +
+  annotate("text", label="B)", x=0.06, y=0.605, size=7) +
+  annotate("text", label="C)", x=0.06, y=0.305, size=7)
+
 
 seventeen3
 
