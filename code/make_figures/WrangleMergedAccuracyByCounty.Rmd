@@ -24,7 +24,7 @@ mymax <- function(...,def=NA,na.rm=FALSE) {
       x } else {def}
 }
 
-CDLYear <- 2017
+CDLYear <- 2019
 
 # specify classes that COULD have plots in auto-key (are non-managed, not agriculture or NLCD developed)
 nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
@@ -108,7 +108,7 @@ nodata_map_jenks <- ggplot() + geom_sf(data=nodata, aes(fill=PctCounty.jenks),  
 
 nodata_map_jenks
 
-saveRDS(nodata_map_jenks, paste0('./nodata_map_jenks_CDL', CDLYear, '.rds'))
+saveRDS(nodata_map_jenks, paste0('./data/nodata_map_jenks_CDL', CDLYear, '.rds'))
 
 ```
 
@@ -198,7 +198,7 @@ toplot <- dplyr::mutate(ncells, PropCDL = NCells_CDL/NCells_County,
                         WellRep_PctCounty = ((`well-represented`)/NCells_County)*100)
 ```
 
-## Make maps of combined data coverage and accuracy 
+## Write data files for combined data coverage and accuracy 
 ```{r datacoverage_maps}
 library(classInt); library(ggplot2); library(viridis)
 

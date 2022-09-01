@@ -233,32 +233,40 @@ library(classInt); library(ggplot2); library(viridis); library(dplyr)
 toplot_nvc <- dplyr::left_join(toplot, acc) %>%
   dplyr::left_join(acc) %>%
   dplyr::select(-starts_with('absent'), -contains('represented')) %>%
-  dplyr::mutate(Dataset='Natural land', Dataset_Name='NVC',
-                FocalGroup_PctCounty=(NCells_Unmanaged/NCells_County)*100,
-                WithData_PctFocalGroup=WellRep_PctUnmanaged) %>%
-  dplyr::rename(State=STATE, County=COUNTY)
+  dplyr::mutate(Dataset='Natural land', 
+                Dataset_Name='NVC',
+                FocalGroup_PctCounty=(NCells_Unmanaged/NCells_County)*100) %>%
+  dplyr::mutate(WithData_PctFocalGroup=WellRep_PctUnmanaged,
+                NCells_FocalGroup = NCells_Unmanaged) %>%
+  dplyr::rename(State=STATE, County=COUNTY)                 
 
 # join results to spatial object for mapping
 toplot_cdl <- dplyr::left_join(acc_cdl, ncells_cdl) %>%
-  dplyr::mutate(Dataset='Agricultural land', Dataset_Name='CDL',
-                FocalGroup_PctCounty=CountyPctArable, WithData_PctFocalGroup=PresentGT_PctArable) %>%
+  dplyr::mutate(Dataset='Agricultural land', 
+                Dataset_Name='CDL') %>%
+  dplyr::mutate(FocalGroup_PctCounty=CountyPctArable, 
+                WithData_PctFocalGroup=PresentGT_PctArable,
+                NCells_FocalGroup=NCells_Arable) %>%
   dplyr::select(-Year)
 
+# read data on merged accuracy calculated in 'WrangleMergedAccuracyByCounty.Rmd'
 toplot_merged <- read.csv(paste0('./data/MergedAccuracy_', CDLYear, ".csv")) %>%
   dplyr::select(STATE, COUNTY, NCells_County, NCells_CDL, starts_with('Wtd'), well.represented) %>%
   dplyr::rename(County=COUNTY, State=STATE) %>%
-  dplyr::mutate(Dataset_Name = 'NVC+CDL') %>%
+  dplyr::mutate(Dataset='Natural + Agricultural land',
+                Dataset_Name = 'NVC+CDL') %>%
   dplyr::left_join(dplyr::select(toplot_nvc, State, County, NCells_Unmanaged)) %>%
   dplyr::mutate(WithData_PctFocalGroup = (well.represented / (NCells_Unmanaged + NCells_CDL))*100, 
-                FocalGroup_PctCounty = ((NCells_Unmanaged + NCells_CDL)/NCells_County)*100)
-
+                FocalGroup_PctCounty = ((NCells_Unmanaged + NCells_CDL)/NCells_County)*100,
+                NCells_FocalGroup = (NCells_Unmanaged + NCells_CDL)) %>%
+  dplyr::select(-NCells_Unmanaged)
 
 toplot_both <- dplyr::full_join(toplot_nvc, toplot_cdl) %>%
   dplyr::full_join(toplot_merged)
 
 toplot_both <- dplyr::left_join(county, toplot_both, by = c('STATE'='State', 'COUNTY'='County'))
 
-saveRDS(toplot_both, './data/TechnicalValidation/summarized_accuracy_data_CDL_NVC_Merged.rds')
+saveRDS(toplot_both, paste0('./data/TechnicalValidation/summarized_accuracy_data_CDL', CDLYear, '_NVC_Merged.rds'))
 ```
 
 ## Bi-variate choropleth map showing amount of agriculture and data coverage of NVC and CDL
