@@ -45,12 +45,12 @@ all <- dplyr::rename(all, Pct_Row_Pixels = X__of_Row_Pixels, Row_Total_Pixels= R
 ```
 
 ```{r readcdl}
-for (year in 2012:2020) {
+for (year in 2012:2021) {
     
   if (year < 2018 & year != 2016) {
     files <- list.files(paste0('./data/CDL_Accuracy/CDL_', year, '_accuracy_assessments/CDL_', year,
     '_accuracy_assessments/'), full.names = T)
-  } else if (year %in% c(2018, 2019, 2020)) {
+  } else if (year > 2018) {
       files <- list.files(paste0('./data/CDL_Accuracy/CDL_', year, '_accuracy_assessments/'), full.names = T)
   } else if (year == 2016) {
       files <- list.files(paste0('./data/CDL_Accuracy/CDL_', year, '_accuracy_assessments/CDL_', year,
@@ -108,7 +108,7 @@ towrite <- allstates %>%
   transform(State = strsplit(State, ",")) %>%
   tidyr::unnest(State)
 
-write.csv(towrite, './data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv', row.names = F)
+write.csv(towrite, './data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2021.csv', row.names = F)
 
 ```
 

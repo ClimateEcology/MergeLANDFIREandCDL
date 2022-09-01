@@ -17,6 +17,9 @@ I start by loading accuracy data for EVT and NVC. We need NVC and EVT because NV
 ```{r loadtabulardata, echo=F}
 library(dplyr); library(logger); library(future); library(terra)
 rm(list=ls())
+
+CDLYear <- 2020
+
 # load accuracy data from LANDFIRE and USDA NASS (aggregated & formatted in 'WrangleMergedAccuracyByCounty.Rmd' script)
 evt <- read.csv('./data/LANDFIRE_Accuracy/EVT_Accuracy_allregions.csv')
 nvc <- read.csv('./data/LANDFIRE_Accuracy/NVC_Accuracy_allregions.csv')
@@ -177,7 +180,6 @@ toplot <- dplyr::mutate(ncells, NCells_Unmanaged = (NCells_County - `absent, man
 ## Wrangle CDL accuracy data
 ```{r wrangle_cdl}
 names(county)
-CDLYear <- 2017
 
 # load accuracy data
 cdl <- read.csv('./data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv')
@@ -346,6 +348,12 @@ ggsave(plot=wellrep_map_jenks, filename= paste0('./figures/DataCoverage3Panel_un
 ## Make bivariate maps of NVC & CDL accuracy
 ```{r bivariate_accuracy, fig.width=14.5, fig.height=8}
 toplot2_long <- dplyr::filter(toplot_both,  Dataset_Name != 'NVC+CDL') %>%
+  dplyr::select(-starts_with('no'), -present) %>%
+  tidyr::pivot_longer(cols=WtdProdAcc:WtdUserAcc, names_to='Accuracy_Type', values_to='Accuracy') %>%
+  dplyr::mutate(`Accuracy_Type` = if_else(`Accuracy_Type` == 'WtdProdAcc', 'Producer Accuracy', 'User Accuracy'))
+
+
+toplot_long <- toplot_both %>%
   dplyr::select(-starts_with('no'), -present) %>%
   tidyr::pivot_longer(cols=WtdProdAcc:WtdUserAcc, names_to='Accuracy_Type', values_to='Accuracy') %>%
   dplyr::mutate(`Accuracy_Type` = if_else(`Accuracy_Type` == 'WtdProdAcc', 'Producer Accuracy', 'User Accuracy'))

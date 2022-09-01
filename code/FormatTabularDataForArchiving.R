@@ -91,10 +91,22 @@ sort(unique(allyears$FIPS))
 
 
 ###### accuracy and data coverage of cdl, nvc, and merged dataset
-accuracy_datacoverage <- readRDS(paste0('./data/TechnicalValidation/summarized_accuracy_data_CDL', 
-                                        CDLYear, '_NVC_Merged.rds')) %>%
-  dplyr::select(FIPS, STATE, CDL_Year, COUNTY,
-  )
+for (CDLYear in c(2012:2021)) {
+  
+  accuracy_datacoverage <- readRDS(paste0('./data/TechnicalValidation/summarized_accuracy_data_CDL', 
+                                          CDLYear, '_NVC_Merged.rds')) %>%
+    sf::st_drop_geometry() %>%
+    mutate(CDL_Year = CDLYear) %>%
+    dplyr::select(FIPS, STATE, CDL_Year, COUNTY, Dataset, Dataset_Name, 
+                  NCells_County, NCells_FocalGroup,
+                  FocalGroup_PctCounty, WithData_PctFocalGroup, 
+                  WtdProdAcc, WtdUserAcc)
 
-names(accuracy_datacoverage)
+  if (CDLYear == 2012)
+    allyears_accuracy <- accuracy_datacoverage
+  else {
+    allyears_accuracy <- rbind(allyears_accuracy, accuracy_datacoverage)
+  }
+}
 
+allyears_accuracy %>% data.table::fwrite('./data/DataToArchive/accuracy_datacoverage_byyear_bycounty.csv')

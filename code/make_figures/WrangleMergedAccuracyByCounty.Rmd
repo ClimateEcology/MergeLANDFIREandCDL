@@ -24,7 +24,7 @@ mymax <- function(...,def=NA,na.rm=FALSE) {
       x } else {def}
 }
 
-CDLYear <- 2019
+CDLYear <- 2021
 
 # specify classes that COULD have plots in auto-key (are non-managed, not agriculture or NLCD developed)
 nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
