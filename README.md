@@ -1,4 +1,9 @@
 # MergeLANDFIREandCDL- Building an integrated land cover map for agricultural and natural areas
+
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7065750.svg)](https://doi.org/10.5281/zenodo.7065750)
+
+
 The goal of this project was to merge two major datasets, the LANDFIRE National Vegetation Classification (NVC) and USDA-NASS Cropland Data Layer (CDL), to produce an integrated land cover map. Our workflow leveraged strengths of the NVC and the CDL to produce detailed rasters comprising both agricultural and natural land-cover classes. We generated these maps for each year from 2012-2021 for the conterminous United States, quantified agreement between input layers and accuracy of our merged product, and herein publish the complete workflow necessary to update these data.
 
 The details of these analyses are described in Kammerer et al (in prep) "Not just crop or forest: building an integrated land cover map for agricultural and natural areas." The complete dataset will be archived on the USDA Ag Data Commons and linked here when publicly available.
