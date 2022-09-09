@@ -11,5 +11,5 @@ Our workflow used the following hierarchical structure:
 
 Run scripts and SLURM scripts are located in the main project directory and geospatial scripts and functions in the 'code' and 'code/functions' directories, respectively. 
 
-Please refer to the code hierarchy table ('CodeHierarchyTable.xlsx') for a description of each step of our workflow and associated run scripts, SLURM scripts, geospatial scripts and functions.
+Please refer to the code hierarchy table ('CodeHierarchyTable.xlsx') for a description of each step of our workflow and associated run scripts, SLURM scripts, geospatial scripts, and functions.
 
