@@ -136,7 +136,7 @@ nvc_accuracy$RFDB_Status <- if_else(nvc_accuracy$Class %in% managed_classes, 'ab
 
 ## Join CDL accuracy metrics with pixel frequency
 ```{r joincdl}
-cdl <- read.csv('./data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv')  %>%
+cdl <- read.csv('./data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2021.csv')  %>%
   dplyr::mutate(GT_Status = if_else(is.na(Producer), "no ground-truth", "present")) %>%
   dplyr::rename(ProducerAccuracy=Producer, UserAccuracy=User) %>%
   dplyr::mutate(CDL_Class = -CDL_Class)

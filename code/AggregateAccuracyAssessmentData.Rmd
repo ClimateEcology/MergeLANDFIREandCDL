@@ -91,8 +91,21 @@ for (year in 2012:2021) {
     
     toretain <- cbind(AL17_user, AL17_producer) %>%
       dplyr::mutate(State = state, Year = year) %>%
-      dplyr::select(Year, State, everything()) #%>%
-      #dplyr::filter(!(is.na(Producer) | is.na(User))) # take out rows that do not have ground truth data OR CDL class was not represented in points to compare
+      dplyr::select(Year, State, everything()) 
+    
+    # some years spreadsheets are missing CDL class names
+    # this causes errors later on, so add them back here
+    if (all(is.na(toretain$CDL_Name)))  {
+      cdl_key <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+        rename(CDL_Name = CLASS_NAME, CDL_Class=VALUE) %>%
+        dplyr::select(CDL_Name, CDL_Class) %>%
+        dplyr::mutate(CDL_Class = as.character(CDL_Class))
+      
+      toretain <- toretain %>%
+        dplyr::select(-CDL_Name) %>%
+        left_join(cdl_key) %>%
+        dplyr::select(Year, State, CDL_Name, CDL_Class, everything())
+    }
     
     if (path == files[1] & year == 2012) {
       allstates <- toretain

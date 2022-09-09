@@ -1,0 +1,97 @@
+---
+title: "Make Attribute Table for Combined Vegetation Layer"
+author: "Melanie Kammerer"
+date: "3/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F)
+```
+
+## Objective
+
+The objective of this script is to generate an attribute table for the combined LANDFIRE vegetation and USDA NASS CDL raster layer.
+
+## Specify which LANDFIRE vegetation map to use (EVT or NVC)
+The two (main) options here are Existing Vegetation Type (LANDFIRE 1.0.5) or National Vegetation Classification (2.0).
+```{r whichveglayer}
+rm(list=ls())
+library(dplyr)
+
+veglayer <- 'nvc'
+```
+
+## Load tabular data for NASS CDL and LANDFIRE EVT land cover classes
+For either EVT or NVC, I specify which column of the data contains the vegetation class name. We will use this later to filter the data.
+```{r loadtabular}
+#load tabular data for NVC
+
+vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
+name_column <- 'NVC_Name'; name_column <- rlang::sym(name_column)
+
+
+#read CDL class names
+cdl_classes_old <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+  dplyr::select(VALUE, GROUP)
+
+cdl_classes <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+  dplyr::rename(VALUE = Codes, CLASS_NAME = Class_Names,
+                RED=Erdas_Red, GREEN=Erdas_Green, BLUE=Erdas_Blue) %>%
+  dplyr::left_join(cdl_classes_old) %>%
+  dplyr::select(-contains('ESRI'))
+
+cdl_classes$CLASS_NAME[cdl_classes$CLASS_NAME != " " & is.na(cdl_classes$GROUP)]
+
+cdl_classes$GROUP[cdl_classes$CLASS_NAME %in% c('Shrubland', 'Avocados', 'Dbl Crop Triticale/Corn') & is.na(cdl_classes$GROUP)] <- c("N", "A", "A")
+
+cdl_classes %>% write.csv('./data/TabularData/CDL_codes_names_colors_2022_updated.csv', row.names = F)
+
+```
+
+## Load combined vegetation map
+```{r loadvegmap}
+library(terra)
+vegmap <- terra::rast('../../SpatialData/Merged_CDL_NVC/CDL2020NVC_NationalRaster.tif')
+```
+
+## Create attribute table for combined raster
+```{r attributes}
+
+#create new version of CDL class table with negative values to match raster
+cdl_tomerge <- dplyr::mutate(cdl_classes, VALUE = -VALUE) %>%
+  dplyr::filter(GROUP == 'A'|VALUE %in% c(-176, -61, -37, -111)) %>%
+  dplyr::select(VALUE, CLASS_NAME, RED, GREEN, BLUE)
+
+nvc_tomerge <- dplyr::select(vegclasses_key, VALUE, !!name_column, r, g, b, Red, Green, Blue) %>%
+  dplyr::filter(!VALUE %in% c(7960:7999)) %>%
+  dplyr::rename(RED=Red, GREEN=Green, BLUE=Blue) %>%
+  dplyr::select(-r, -g, -b)
+
+#merge CDL attribute table with LANDFIRE
+#create 'ID' column so this data frame plays nice with format raster package expects
+all_classes <- nvc_tomerge %>%
+  dplyr::rename(CLASS_NAME = !!name_column) %>%
+  dplyr::full_join(cdl_tomerge, by=c('VALUE', 'CLASS_NAME', 'RED', 'GREEN', 'BLUE')) %>%
+  dplyr::rename(Class_Name = CLASS_NAME) %>%
+  dplyr::filter(!duplicated(VALUE)) #take out extra 'background, value = 0' row
+
+# add created class for 'no data, mis-matched pixel'
+toadd <- all_classes[1,] %>%
+  dplyr::mutate(VALUE=-1001, Class_Name='CDL/NVC mismatch, unresolved conflict')
+
+all_classes <- rbind(all_classes, toadd) %>%
+  dplyr::rename(Value = VALUE, ClassName = Class_Name, Red=RED, Blue=BLUE, Green=GREEN)
+```
+## Save tables
+```{r save}
+#write attribute table to csv
+write.csv(all_classes, './data/TabularData/CombinedRasterAttributeTable_CDLNVC.csv', row.names=F)
+write.csv(all_classes, './data/DataToArchive/CombinedRasterAttributeTable_CDLNVC.csv', row.names=F)
+
+```
+
+
+
+
+

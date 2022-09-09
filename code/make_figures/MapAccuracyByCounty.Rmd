@@ -18,7 +18,7 @@ I start by loading accuracy data for EVT and NVC. We need NVC and EVT because NV
 library(dplyr); library(logger); library(future); library(terra)
 rm(list=ls())
 
-CDLYear <- 2020
+CDLYear <- 2021
 
 # load accuracy data from LANDFIRE and USDA NASS (aggregated & formatted in 'WrangleMergedAccuracyByCounty.Rmd' script)
 evt <- read.csv('./data/LANDFIRE_Accuracy/EVT_Accuracy_allregions.csv')
@@ -182,7 +182,7 @@ toplot <- dplyr::mutate(ncells, NCells_Unmanaged = (NCells_County - `absent, man
 names(county)
 
 # load accuracy data
-cdl <- read.csv('./data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2020.csv')
+cdl <- read.csv('./data/CDL_Accuracy/CDL_accuracy_long_allstates_2012to2021.csv')
 # filter cdl to selected year to match pixel freq data
 cdl_oneyear <- dplyr::filter(cdl, Year %in% CDLYear)
 
@@ -432,9 +432,6 @@ toplot2_long %>%
   ggplot() +
   geom_point(aes(y=FocalGroup_PctCounty, x=Accuracy, color=Accuracy_Type)) +
   facet_wrap(~Dataset_Name+Accuracy_Type)
-
-View(dplyr::filter(toplot2_long, Dataset_Name == 'NVC'))
-
 ```
 
 ## Try univariate map of data coverage. Are these easier to interpret?

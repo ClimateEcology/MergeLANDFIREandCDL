@@ -2,10 +2,11 @@ rm(list=ls())
 
 ##### pixel mis-match (after step 1 of geospatial workflow) as number of cells and proportion
 
-mismatch_byyearcounty <- readRDS('./data/DataToReformat/pixel_mismatch_byyear_bycounty.RDS')
+mismatch_byyearcounty <- readRDS('./data/TechnicalValidation/pixel_mismatch_byyear_bycounty.RDS')
 
 head(mismatch_byyearcounty)
 
+any(is.na(mismatch_byyearcounty$CDL_Name))
 
 mismatch_byyearcounty <- mismatch_byyearcounty %>%
   dplyr::arrange(FIPS) %>%
@@ -17,13 +18,31 @@ mismatch_byyearcounty <- mismatch_byyearcounty %>%
                 STATE = State) %>%
   dplyr::select(FIPS, STATE, CDL_Year, everything())
 
+# some years spreadsheets are missing CDL class names
+if (any(is.na(mismatch_byyearcounty$CDL_Name)))  {
+  cdl_key <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+    rename(CDL_Name = Class_Names, CDL_Class=Codes) %>%
+    dplyr::select(CDL_Name, CDL_Class) %>%
+    dplyr::mutate(CDL_Class = as.character(CDL_Class))
+  
+  mismatch_byyearcounty <- mismatch_byyearcounty %>%
+    dplyr::select(-CDL_Name) %>%
+    left_join(cdl_key) %>%
+    dplyr::select(FIPS, STATE, CDL_Year, CDL_Class, CDL_Name, NVC_Name, everything())
+}
+
 
 if (!dir.exists('./data/DataToArchive')) {
   dir.create('./data/DataToArchive')
 }
 
-mismatch_byyearcounty %>% data.table::fwrite('./data/DataToArchive/pixel_mismatch_byyear_bycounty.csv')
+mismatch_byyearcounty <- mismatch_byyearcounty %>%
+  dplyr::rename(State = STATE) 
 
+mismatch_byyearcounty %>% data.table::fwrite('./data/DataToArchive/pixel_mismatch_byyear_bycounty.csv')
+any(is.na(mismatch_byyearcounty))
+
+names(which(colSums(is.na(mismatch_byyearcounty))>0))
 
 ###### unresolved pixels
 
@@ -62,16 +81,16 @@ for (CDLYear in c(2012:2021)) {
     sf::st_drop_geometry() %>%
     dplyr::filter(Class == -1001)
   
-  nodata <- counties %>%
-    dplyr::select(FIPS, STATE, COUNTY) %>%
-    dplyr::left_join(nodata_freq) %>%
-    tidyr::replace_na(list(PctCounty=0))
+  # nodata <- counties %>%
+  #   dplyr::select(FIPS, STATE, COUNTY) %>%
+  #   dplyr::left_join(nodata_freq) %>%
+  #   tidyr::replace_na(list(PctCounty=0, NCells=0))
   
-  oneyear <- sf::st_drop_geometry(nodata) %>%
-    dplyr::rename(MergedRasterClass = Class) %>%
+  oneyear <- sf::st_drop_geometry(nodata_freq) %>%
+    dplyr::rename(MergedRasterClassName = Class) %>%
     dplyr::mutate(CDL_Year = CDLYear,
                   MergedRasterName = 'CDL/NVC mismatch, unresolved conflict') %>%
-    dplyr::select(FIPS, STATE, CDL_Year, COUNTY, LF2010_Region, MergedRasterClass, MergedRasterName, everything())
+    dplyr::select(FIPS, STATE, CDL_Year, COUNTY, LF2010_Region, MergedRasterClassName, MergedRasterName, everything())
   
   if (CDLYear == 2012) {
     allyears <- oneyear
@@ -85,10 +104,16 @@ head(mismatch_byyearcounty)
 
 unique(allyears$CDL_Year)
 
+allyears <- allyears %>%
+  dplyr::rename(State = STATE, County = COUNTY, 
+                MergedRaster_Class = MergedRasterClassName, MergedRaster_ClassName = MergedRasterName,
+                Pct_Unresolved = PctCounty)
+
 allyears %>% data.table::fwrite('./data/DataToArchive/unresolved_conflict_byyear_bycounty.csv')
 
 sort(unique(allyears$FIPS))
 
+any(is.na(allyears))
 
 ###### accuracy and data coverage of cdl, nvc, and merged dataset
 for (CDLYear in c(2012:2021)) {
@@ -96,8 +121,9 @@ for (CDLYear in c(2012:2021)) {
   accuracy_datacoverage <- readRDS(paste0('./data/TechnicalValidation/summarized_accuracy_data_CDL', 
                                           CDLYear, '_NVC_Merged.rds')) %>%
     sf::st_drop_geometry() %>%
-    mutate(CDL_Year = CDLYear) %>%
-    dplyr::select(FIPS, STATE, CDL_Year, COUNTY, Dataset, Dataset_Name, 
+    mutate(CDL_Year = CDLYear,
+           FocalGroup=Dataset) %>%
+    dplyr::select(FIPS, STATE, CDL_Year, COUNTY, FocalGroup, Dataset_Name, 
                   NCells_County, NCells_FocalGroup,
                   FocalGroup_PctCounty, WithData_PctFocalGroup, 
                   WtdProdAcc, WtdUserAcc)
@@ -109,4 +135,11 @@ for (CDLYear in c(2012:2021)) {
   }
 }
 
+
+allyears_accuracy <- allyears_accuracy %>%
+  dplyr::rename(State = STATE, County = COUNTY)
+
 allyears_accuracy %>% data.table::fwrite('./data/DataToArchive/accuracy_datacoverage_byyear_bycounty.csv')
+
+any(is.na(allyears_accuracy))
+

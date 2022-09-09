@@ -35,8 +35,8 @@ counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
 # join with information on CDL and NVC classes
 freq <- read.csv(paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byCounty_run', 
     nprocess, '_group', increment, '_' , ptext, '.csv')) %>%
-  dplyr::select(-X, -State) %>% # drop state name because some county FIPS codes and State names to not match (tile from close to state boundary)
-  dplyr::filter(!is.na(FIPS)) %>% # for now, just filter out FIPS with NA values
+  dplyr::select(-X, -State) %>% # drop state name because some county FIPS codes and State names do not match (tile from close to state boundary)
+  dplyr::filter(!is.na(FIPS)) %>% # filter out FIPS with NA values
   dplyr::left_join(cdl_key, by=c('CDL_Class' = 'VALUE')) %>%
   dplyr::rename(CDL_Name = CLASS_NAME) %>%
   dplyr::left_join(dplyr::select(lf_key, VALUE, NVC_Name), by=c('NVC_Class' = 'VALUE')) %>%
