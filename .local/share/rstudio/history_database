@@ -1,0 +1,516 @@
+0:}
+0:}
+0:View(nodata_freq)
+0:###### unresolved pixels
+0:for (CDLYear in c(2012:2021)) {
+0:library(dplyr)
+0:# read county shapefile with LANDFIRE regions
+0:county <- sf::st_read('./data/SpatialData/us_counties_better_coasts_LFregion.shp') %>%
+0:dplyr::rename(LF2010_Region=LF2010_) # fix column name that was abbreviated by shp driver
+0:# read NVC/CDL pixel frequency data
+0:merged_freq <- read.csv(paste0('./data/PixelFreq/CDL', CDLYear, 'NVC_CountyPixelFreq.csv')) %>%
+0:dplyr::filter(!is.na(County)) %>%
+0:dplyr::group_by(State, County) %>%
+0:dplyr::mutate(PctCounty = (NCells/sum(NCells)) *100) %>%
+0:dplyr::ungroup()
+0:# are there any counties in county shapefile that are NOT in dataset on NVC pixel frequency?
+0:paste0(county$COUNTY, ", ", county$STATE)[!paste0(county$COUNTY, ", ", county$STATE) %in% paste0(merged_freq$County, ", ", merged_freq$State)]
+0:# join pixel frequency with LF regions
+0:merged_freq_sf <- county %>%
+0:dplyr::select(FIPS, STATE, COUNTY, LF2010_Region) %>%
+0:dplyr::left_join(merged_freq, by=c('STATE'='State', 'COUNTY'='County'))
+0:# join pixel frequency with LF regions
+0:merged_freq <- sf::st_drop_geometry(county) %>%
+0:dplyr::select(STATE, COUNTY, LF2010_Region) %>%
+0:dplyr::left_join(merged_freq, by=c('STATE'='State', 'COUNTY'='County'))
+0:# fill in a few missing polygons that show up on no data map
+0:counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
+0:dplyr::filter(!is.na(COUNTY))
+0:nodata_freq <- merged_freq_sf %>%
+0:sf::st_drop_geometry() %>%
+0:dplyr::filter(Class == -1001)
+0:# nodata <- counties %>%
+0:#   dplyr::select(FIPS, STATE, COUNTY) %>%
+0:#   dplyr::left_join(nodata_freq) %>%
+0:#   tidyr::replace_na(list(PctCounty=0, NCells=0))
+0:oneyear <- sf::st_drop_geometry(nodata_freq) %>%
+0:dplyr::rename(MergedRasterClassName = Class) %>%
+0:dplyr::mutate(CDL_Year = CDLYear,
+0:MergedRasterName = 'CDL/NVC mismatch, unresolved conflict') %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, COUNTY, LF2010_Region, MergedRasterClassName, MergedRasterName, everything())
+0:if (CDLYear == 2012) {
+0:allyears <- oneyear
+0:} else if (CDLYear > 2012) {
+0:allyears <- rbind(allyears, oneyear)
+0:}
+0:}
+0:allyears %>% data.table::fwrite('./data/DataToArchive/unresolved_conflict_byyear_bycounty.csv')
+0:allyears %>% data.table::fwrite('./data/DataToArchive/unresolved_conflict_byyear_bycounty.csv')
+0:any(is.na(allyears))
+0:any(is.na(allyears_accuracy)
+0:)
+0:any(is.na(mismatch_byyearcounty))
+0:##### pixel mis-match (after step 1 of geospatial workflow) as number of cells and proportion
+0:mismatch_byyearcounty <- readRDS('./data/DataToReformat/pixel_mismatch_byyear_bycounty.RDS')
+0:mismatch_byyearcounty <- readRDS('./data/TechnicalValidation/pixel_mismatch_byyear_bycounty.RDS')
+0:head(mismatch_byyearcounty)
+0:mismatch_byyearcounty <- mismatch_byyearcounty %>%
+0:dplyr::arrange(FIPS) %>%
+0:dplyr::mutate(FIPS = stringr::str_pad(FIPS, 5, pad="0")) %>%# reformat FIPS to have leading zeros
+0:dplyr::rename(NVC_Name = NVC_SpecificClass,
+0:NCells_NVCClass_perCounty = NCells_Class,
+0:NVC_CDL_Pair = NVC_CDL_Named,
+0:CDL_Year = CDLYear,
+0:STATE = State) %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, everything())
+0:if (!dir.exists('./data/DataToArchive')) {
+0:dir.create('./data/DataToArchive')
+0:}
+0:any(is.na(mismatch_byyearcounty))
+0:names(which(colSums(is.na(mismatch_byyearcounty))>0))
+0:library(dplyr); library(ggplot2)
+0:nprocess <- 'all'
+0:increment <- 10270
+0:#increment <- 2054
+0:parallel <- T
+0:if (parallel == T) {
+0:ptext <- 'parallel'
+0:} else {
+0:ptext <- 'notparallel'
+0:}
+0:# read LANDFIRE and CDL keys
+0:lf_key <- read.csv('../../SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
+0:cdl_key <- read.csv('../../SpatialData/NASS_CDL/NASS_classes_simple.csv')
+0:states1 <- sf::st_read('../../SpatialData/state_boundaries/cb_2016_us_state_500k.shp')
+0:counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
+0:dplyr::filter(!is.na(COUNTY))
+0:# read dataset of number of mis-matched pixels by county
+0:# join with information on CDL and NVC classes
+0:freq <- read.csv(paste0('./data/TechnicalValidation/run', nprocess, '/Mismatched_Cells_byCounty_run',
+0:nprocess, '_group', increment, '_' , ptext, '.csv')) %>%
+0:dplyr::select(-X, -State) %>% # drop state name because some county FIPS codes and State names to not match (tile from close to state boundary)
+0:dplyr::filter(!is.na(FIPS)) %>% # for now, just filter out FIPS with NA values
+0:dplyr::left_join(cdl_key, by=c('CDL_Class' = 'VALUE')) %>%
+0:dplyr::rename(CDL_Name = CLASS_NAME) %>%
+0:dplyr::left_join(dplyr::select(lf_key, VALUE, NVC_Name), by=c('NVC_Class' = 'VALUE')) %>%
+0:tidyr::separate(NVC_Name, sep=" ", into=c("Region", "Temperature", "Biome", "NVC_SpecificClass"),
+0:remove=F, extra='merge') %>%
+0:dplyr::mutate(FIPS=as.factor(stringr::str_pad(FIPS, 5, pad = "0"))) # convert FIPS to factor and add leading zeros to match county shp
+0:byyear <- dplyr::ungroup(freq) %>%
+0:dplyr::group_by(CDLYear) %>%
+0:dplyr::summarise(Mismatch_NCells = sum(Mismatch_NCells), NCounties = length(unique(FIPS)))
+0:##### load data on # nvc pixels per class per state
+0:nvc_per_county <- read.csv('./data/PixelFreq/NVC_CountyPixelFreq.csv') %>%
+0:dplyr::left_join(dplyr::select(counties, STATE, COUNTY, FIPS), by = c('State'='STATE', 'County'='COUNTY')) %>%
+0:dplyr::select(-geometry) %>%
+0:dplyr::rename(NCells_Class = NCells) %>%
+0:dplyr::left_join(dplyr::select(lf_key, VALUE, NVC_Name), by= c('Class'= 'VALUE')) %>% # add landfire class names
+0:dplyr::filter(Class %in% freq$NVC_Class) %>% # filter to only agriculture classes
+0:tidyr::separate(NVC_Name, sep=" ", into=c("Region", "Temperature", "Biome", "NVC_SpecificClass"), remove=F, extra='merge') %>% # create grouped NVC name (removes east/west and warm/cool designations)
+0:dplyr::group_by(NVC_SpecificClass, State, County, FIPS) %>%
+0:dplyr::summarise(NCells_Class= sum(NCells_Class)) %>%
+0:dplyr::ungroup() %>%
+0:dplyr::mutate(STUSPS=State, FIPS=as.factor(FIPS))
+0:# summarize number of cells in each NVC grouping nationally (groups exclude region and temperature)
+0:nvc_national <- dplyr::group_by(nvc_per_county, NVC_SpecificClass) %>%
+0:dplyr::summarise(NCells_Class= sum(NCells_Class))
+0:##### summarize mis-matched pixels by cdl-nvc pairs & county
+0:cdl_nvc_bycounty <- dplyr::group_by(freq, CDL_Class, CDL_Name, NVC_SpecificClass, CDLYear, FIPS) %>%
+0:dplyr::summarise(NCells_Mismatch = sum(Mismatch_NCells)) %>%
+0:dplyr::ungroup() %>%
+0:left_join(dplyr::select(nvc_per_county, NVC_SpecificClass, NCells_Class, STUSPS, FIPS),
+0:by=c('NVC_SpecificClass', 'FIPS')) %>%
+0:dplyr::rename(State = STUSPS) %>%
+0:dplyr::mutate(CDL_Class = as.factor(CDL_Class), NVC_CDL_Named=paste0(NVC_SpecificClass, "_", CDL_Name)) %>%
+0:dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells_Class)*100)
+0:saveRDS(cdl_nvc_bycounty,'./data/TechnicalValidation/pixel_mismatch_byyear_bycounty.RDS')
+0:##### summarize mis-matched pixels by cdl-nvc pairs for entire country
+0:cdl_nvc_national_byYear <- dplyr::group_by(freq, CDL_Class, CDL_Name, NVC_SpecificClass, CDLYear) %>%
+0:dplyr::summarise(NCells_Mismatch = sum(Mismatch_NCells)) %>%
+0:dplyr::ungroup() %>%
+0:left_join(nvc_national) %>%
+0:dplyr::mutate(CDL_Class = as.factor(CDL_Class), NVC_CDL_Named=paste0(NVC_SpecificClass, "_", CDL_Name)) %>%
+0:dplyr::mutate(Pct_Mismatch = (NCells_Mismatch/NCells_Class)*100) %>%
+0:dplyr::ungroup()
+0:pairs_to_keep <- filter(cdl_nvc_national_byYear, Pct_Mismatch > 2.5 | NCells_Mismatch > 3000000)
+0:length(unique(pairs_to_keep$CDL_Class))
+0:cdl_nvc_national_byYear$CDL_Name_N <- if_else(!cdl_nvc_national_byYear$CDL_Class %in% pairs_to_keep$CDL_Class, 'Other', cdl_nvc_national_byYear$CDL_Name)
+0:# take out row crop- close grown crop for visualization
+0:cdl_nvc_national_byYear <- dplyr::filter(cdl_nvc_national_byYear, NVC_SpecificClass != "Row Crop - Close Grown Crop")
+0:head(freq)
+0:any(is.na(freq$CDL_Class))
+0:any(is.na(cdl_nvc_bycounty$CDL_Class))
+0:mismatch_byyearcounty <- readRDS('./data/TechnicalValidation/pixel_mismatch_byyear_bycounty.RDS')
+0:head(mismatch_byyearcounty)
+0:any(is.na(mismatch_byyearcounty$CDL_Class))
+0:mismatch_byyearcounty <- mismatch_byyearcounty %>%
+0:dplyr::arrange(FIPS) %>%
+0:dplyr::mutate(FIPS = stringr::str_pad(FIPS, 5, pad="0")) %>%# reformat FIPS to have leading zeros
+0:dplyr::rename(NVC_Name = NVC_SpecificClass,
+0:NCells_NVCClass_perCounty = NCells_Class,
+0:NVC_CDL_Pair = NVC_CDL_Named,
+0:CDL_Year = CDLYear,
+0:STATE = State) %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, everything())
+0:any(is.na(mismatch_byyearcounty$CDL_Class))
+0:any(is.na(mismatch_byyearcounty))
+0:names(which(colSums(is.na(mismatch_byyearcounty))>0))
+0:any(is.na(mismatch_byyearcounty$CDL_Name))
+0:names(mismatch_byyearcounty <- mismatch_byyearcounty)
+0:# some years spreadsheets are missing CDL class names
+0:if (any(is.na(mismatch_byyearcounty$CDL_Name)))  {
+0:cdl_key <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+0:rename(CDL_Name = CLASS_NAME, CDL_Class=VALUE) %>%
+0:dplyr::select(CDL_Name, CDL_Class) %>%
+0:dplyr::mutate(CDL_Class = as.character(CDL_Class))
+0:mismatch_byyearcounty <- mismatch_byyearcounty %>%
+0:dplyr::select(-CDL_Name) %>%
+0:left_join(cdl_key) %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, CDL_Class, CDL_Name, NVC_Name, everything())
+0:}
+0:any(is.na(mismatch_byyearcounty))
+0:names(which(colSums(is.na(mismatch_byyearcounty))>0))
+0:sort(unique(values(mismatch_byyearcounty$CDL_Class)))
+0:sort(unique(mismatch_byyearcounty$CDL_Class))
+0:cdl_key
+0:(any(is.na(mismatch_byyearcounty$CDL_Name)))
+0:mismatch_byyearcounty$CDL_Class[!mismatch_byyearcounty$CDL_Class %in% cdl_key$CDL_Class]
+0:unique(mismatch_byyearcounty$CDL_Class[!mismatch_byyearcounty$CDL_Class %in% cdl_key$CDL_Class])
+0:View(cdl_key)
+0:mismatch_byyearcounty <- readRDS('./data/TechnicalValidation/pixel_mismatch_byyear_bycounty.RDS')
+0:head(mismatch_byyearcounty)
+0:any(is.na(mismatch_byyearcounty$CDL_Name))
+0:mismatch_byyearcounty <- mismatch_byyearcounty %>%
+0:dplyr::arrange(FIPS) %>%
+0:dplyr::mutate(FIPS = stringr::str_pad(FIPS, 5, pad="0")) %>%# reformat FIPS to have leading zeros
+0:dplyr::rename(NVC_Name = NVC_SpecificClass,
+0:NCells_NVCClass_perCounty = NCells_Class,
+0:NVC_CDL_Pair = NVC_CDL_Named,
+0:CDL_Year = CDLYear,
+0:STATE = State) %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, everything())
+0:# some years spreadsheets are missing CDL class names
+0:if (any(is.na(mismatch_byyearcounty$CDL_Name)))  {
+0:cdl_key <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:rename(CDL_Name = Class_Names, CDL_Class=Codes) %>%
+0:dplyr::select(CDL_Name, CDL_Class) %>%
+0:dplyr::mutate(CDL_Class = as.character(CDL_Class))
+0:mismatch_byyearcounty <- mismatch_byyearcounty %>%
+0:dplyr::select(-CDL_Name) %>%
+0:left_join(cdl_key) %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, CDL_Class, CDL_Name, NVC_Name, everything())
+0:}
+0:any(is.na(mismatch_byyearcounty))
+0:names(which(colSums(is.na(mismatch_byyearcounty))>0))
+0:knitr::opts_chunk$set(echo = TRUE, message = F)
+0:rm(list=ls())
+0:library(dplyr)
+0:veglayer <- 'nvc'
+0:#load tabular data for NVC
+0:vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
+0:name_column <- 'NVC_Name'; name_column <- rlang::sym(name_column)
+0:#read CDL class names
+0:cdl_classes <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv')
+0:library(terra)
+0:vegmap <- terra::rast('D:/MergeLANDFIRECDL_Rasters/NationalRasters/CDL2020NVC_NationalRaster.tif')
+0:library(terra)
+0:vegmap <- terra::rast('../SpatialData/Merged_CDL_NVC/CDL2020NVC_NationalRaster.tif')
+0:library(terra)
+0:vegmap <- terra::rast('../../SpatialData/Merged_CDL_NVC/CDL2020NVC_NationalRaster.tif')
+0:View(cdl_classes)
+0:#load tabular data for NVC
+0:vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
+0:name_column <- 'NVC_Name'; name_column <- rlang::sym(name_column)
+0:#read CDL class names
+0:cdl_classes <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:dplyr::mutate(VALUE = Codes, CLASS_NAME = Class_Names)
+0:#read CDL class names
+0:cdl_classes <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv')
+0:cdl_classes_new <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:dplyr::mutate(VALUE = Codes, CLASS_NAME = Class_Names)
+0:View(cdl_classes)
+0:#load tabular data for NVC
+0:vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
+0:name_column <- 'NVC_Name'; name_column <- rlang::sym(name_column)
+0:#read CDL class names
+0:cdl_classes <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+0:dplyr::select(VALUE, GROUP)
+0:cdl_classes_new <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:dplyr::mutate(VALUE = Codes, CLASS_NAME = Class_Names) %>%
+0:dplyr::left_join(cdl_classes)
+0:View(cdl_classes_new)
+0:#load tabular data for NVC
+0:vegclasses_key <- read.csv('D:/SpatialData/LandFire/US_200NVC/CSV_Data/LF_200NVC_05142020.csv')
+0:name_column <- 'NVC_Name'; name_column <- rlang::sym(name_column)
+0:#read CDL class names
+0:cdl_classes <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+0:dplyr::select(VALUE, GROUP)
+0:cdl_classes_new <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:dplyr::rename(VALUE = Codes, CLASS_NAME = Class_Names) %>%
+0:dplyr::left_join(cdl_classes)
+0:View(cdl_classes_new)
+0:cdl_classes_new$CLASS_NAME[cdl_classes_new$CLASS_NAME != "" & is.na(cdl_classes_new$GROUP)]
+0:cdl_classes_new$CLASS_NAME[cdl_classes_new$CLASS_NAME != " " & is.na(cdl_classes_new$GROUP)]
+0:cdl_classes_new$GROUP[cdl_classes_new$CLASS_NAME %in% c('Shrubland', 'Avocados', 'Dbl Crop Triticale/Corn') & is.na(cdl_classes_new$GROUP)] <- c("N", "A", "A")
+0:cdl_classes_new$CLASS_NAME[cdl_classes_new$CLASS_NAME != " " & is.na(cdl_classes_new$GROUP)]
+0:cdl_classes_new %>% write.csv('./data/TabularData/CDL_codes_names_colors_2022.csv', row.names = F)
+0:library(terra)
+0:vegmap <- terra::rast('../../SpatialData/Merged_CDL_NVC/CDL2020NVC_NationalRaster.tif')
+0:names(cdl_classes_new)
+0:#read CDL class names
+0:cdl_classes_old <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+0:dplyr::select(VALUE, GROUP)
+0:head(cdl_classes_old)
+0:#read CDL class names
+0:cdl_classes_old <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv')
+0:#read CDL class names
+0:head(cdl_classes_old)
+0:names(cdl_classes)
+0:#read CDL class names
+0:cdl_classes_old <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+0:dplyr::select(VALUE, GROUP)
+0:cdl_classes <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:dplyr::rename(VALUE = Codes, CLASS_NAME = Class_Names,
+0:) %>%
+0:dplyr::left_join(cdl_classes_old)
+0:#read CDL class names
+0:cdl_classes_old <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+0:dplyr::select(VALUE, GROUP)
+0:cdl_classes <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:dplyr::rename(VALUE = Codes, CLASS_NAME = Class_Names,
+0:) %>%
+0:dplyr::left_join(cdl_classes_old)
+0:cdl_classes$CLASS_NAME[cdl_classes$CLASS_NAME != " " & is.na(cdl_classes$GROUP)]
+0:cdl_classes$GROUP[cdl_classes$CLASS_NAME %in% c('Shrubland', 'Avocados', 'Dbl Crop Triticale/Corn') & is.na(cdl_classes$GROUP)] <- c("N", "A", "A")
+0:cdl_classes %>% write.csv('./data/TabularData/CDL_codes_names_colors_2022_updated.csv', row.names = F)
+0:names(cdl_classes)
+0:#read CDL class names
+0:cdl_classes_old <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+0:dplyr::select(VALUE, GROUP)
+0:cdl_classes <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:dplyr::rename(VALUE = Codes, CLASS_NAME = Class_Names,
+0:RED=Erdas_Red, GREEN=Erdas_Green, BLUE=Erdas_Blue) %>%
+0:dplyr::left_join(cdl_classes_old) %>%
+0:dplyr::select(contains('ESRI'))
+0:cdl_classes$CLASS_NAME[cdl_classes$CLASS_NAME != " " & is.na(cdl_classes$GROUP)]
+0:cdl_classes$GROUP[cdl_classes$CLASS_NAME %in% c('Shrubland', 'Avocados', 'Dbl Crop Triticale/Corn') & is.na(cdl_classes$GROUP)] <- c("N", "A", "A")
+0:#read CDL class names
+0:cdl_classes_old <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+0:dplyr::select(VALUE, GROUP)
+0:cdl_classes <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:dplyr::rename(VALUE = Codes, CLASS_NAME = Class_Names,
+0:RED=Erdas_Red, GREEN=Erdas_Green, BLUE=Erdas_Blue) %>%
+0:dplyr::left_join(cdl_classes_old) %>%
+0:dplyr::select(contains('ESRI'))
+0:cdl_classes$CLASS_NAME[cdl_classes$CLASS_NAME != " " & is.na(cdl_classes$GROUP)]
+0:View(cdl_classes)
+0:#read CDL class names
+0:cdl_classes_old <- read.csv('./data/TabularData/NASS_classes_pasture_is_arable.csv') %>%
+0:dplyr::select(VALUE, GROUP)
+0:cdl_classes <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:dplyr::rename(VALUE = Codes, CLASS_NAME = Class_Names,
+0:RED=Erdas_Red, GREEN=Erdas_Green, BLUE=Erdas_Blue) %>%
+0:dplyr::left_join(cdl_classes_old) %>%
+0:dplyr::select(-contains('ESRI'))
+0:cdl_classes$CLASS_NAME[cdl_classes$CLASS_NAME != " " & is.na(cdl_classes$GROUP)]
+0:cdl_classes$GROUP[cdl_classes$CLASS_NAME %in% c('Shrubland', 'Avocados', 'Dbl Crop Triticale/Corn') & is.na(cdl_classes$GROUP)] <- c("N", "A", "A")
+0:cdl_classes %>% write.csv('./data/TabularData/CDL_codes_names_colors_2022_updated.csv', row.names = F)
+0:library(terra)
+0:vegmap <- terra::rast('../../SpatialData/Merged_CDL_NVC/CDL2020NVC_NationalRaster.tif')
+0:#create new version of CDL class table with negative values to match raster
+0:cdl_tomerge <- dplyr::mutate(cdl_classes, VALUE = -VALUE) %>%
+0:dplyr::filter(GROUP == 'A'|VALUE %in% c(-176, -61, -37, -111)) %>%
+0:dplyr::select(VALUE, CLASS_NAME, RED, GREEN, BLUE)
+0:nvc_tomerge <- dplyr::select(vegclasses_key, VALUE, !!name_column, r, g, b, Red, Green, Blue) %>%
+0:dplyr::filter(!VALUE %in% c(7960:7999)) %>%
+0:dplyr::rename(RED=Red, GREEN=Green, BLUE=Blue) %>%
+0:dplyr::select(-r, -g, -b)
+0:#create new version of CDL class table with negative values to match raster
+0:cdl_tomerge <- dplyr::mutate(cdl_classes, VALUE = -VALUE) %>%
+0:dplyr::filter(GROUP == 'A'|VALUE %in% c(-176, -61, -37, -111)) %>%
+0:dplyr::select(VALUE, CLASS_NAME, RED, GREEN, BLUE)
+0:nvc_tomerge <- dplyr::select(vegclasses_key, VALUE, !!name_column, r, g, b, Red, Green, Blue) %>%
+0:dplyr::filter(!VALUE %in% c(7960:7999)) %>%
+0:dplyr::rename(RED=Red, GREEN=Green, BLUE=Blue) %>%
+0:dplyr::select(-r, -g, -b)
+0:#merge CDL attribute table with LANDFIRE
+0:#create 'ID' column so this data frame plays nice with format raster package expects
+0:all_classes <- nvc_tomerge %>%
+0:dplyr::rename(CLASS_NAME = !!name_column) %>%
+0:dplyr::full_join(cdl_tomerge, by=c('VALUE', 'CLASS_NAME', 'RED', 'GREEN', 'BLUE')) %>%
+0:dplyr::rename(Class_Name = CLASS_NAME) %>%
+0:dplyr::mutate(ID = VALUE) %>%
+0:dplyr::select(ID, tidyr::everything()) %>%
+0:dplyr::filter(!duplicated(VALUE)) #take out extra 'background, value = 0' row
+0:# add created class for 'no data, mis-matched pixel'
+0:toadd <- all_classes[1,] %>%
+0:dplyr::mutate(ID=-1001, VALUE=-1001, Class_Name='CDL/NVC mismatch, unresolved conflict')
+0:all_classes <- rbind(all_classes, toadd)
+0:View(all_classes)
+0:#write attribute table to csv
+0:write.csv(all_classes, './data/TabularData/CombinedRasterAttributeTable_CDLNVC.csv', row.names=F)
+0:#merge CDL attribute table with LANDFIRE
+0:#create 'ID' column so this data frame plays nice with format raster package expects
+0:all_classes <- nvc_tomerge %>%
+0:dplyr::rename(CLASS_NAME = !!name_column) %>%
+0:dplyr::full_join(cdl_tomerge, by=c('VALUE', 'CLASS_NAME', 'RED', 'GREEN', 'BLUE')) %>%
+0:dplyr::rename(Class_Name = CLASS_NAME) %>%
+0:dplyr::filter(!duplicated(VALUE)) #take out extra 'background, value = 0' row
+0:# add created class for 'no data, mis-matched pixel'
+0:toadd <- all_classes[1,] %>%
+0:dplyr::mutate(ID=-1001, VALUE=-1001, Class_Name='CDL/NVC mismatch, unresolved conflict')
+0:all_classes <- rbind(all_classes, toadd)
+0:#merge CDL attribute table with LANDFIRE
+0:#create 'ID' column so this data frame plays nice with format raster package expects
+0:all_classes <- nvc_tomerge %>%
+0:dplyr::rename(CLASS_NAME = !!name_column) %>%
+0:dplyr::full_join(cdl_tomerge, by=c('VALUE', 'CLASS_NAME', 'RED', 'GREEN', 'BLUE')) %>%
+0:dplyr::rename(Class_Name = CLASS_NAME) %>%
+0:dplyr::filter(!duplicated(VALUE)) #take out extra 'background, value = 0' row
+0:# add created class for 'no data, mis-matched pixel'
+0:toadd <- all_classes[1,] %>%
+0:dplyr::mutate(VALUE=-1001, Class_Name='CDL/NVC mismatch, unresolved conflict')
+0:all_classes <- rbind(all_classes, toadd)
+0:#write attribute table to csv
+0:write.csv(all_classes, './data/TabularData/CombinedRasterAttributeTable_CDLNVC.csv', row.names=F)
+0:write.csv(all_classes, './data/DataToArchive/CombinedRasterAttributeTable_CDLNVC.csv', row.names=F)
+0:#merge CDL attribute table with LANDFIRE
+0:#create 'ID' column so this data frame plays nice with format raster package expects
+0:all_classes <- nvc_tomerge %>%
+0:dplyr::rename(CLASS_NAME = !!name_column) %>%
+0:dplyr::full_join(cdl_tomerge, by=c('VALUE', 'CLASS_NAME', 'RED', 'GREEN', 'BLUE')) %>%
+0:dplyr::rename(Class_Name = CLASS_NAME) %>%
+0:dplyr::filter(!duplicated(VALUE)) #take out extra 'background, value = 0' row
+0:# add created class for 'no data, mis-matched pixel'
+0:toadd <- all_classes[1,] %>%
+0:dplyr::mutate(VALUE=-1001, Class_Name='CDL/NVC mismatch, unresolved conflict')
+0:all_classes <- rbind(all_classes, toadd) %>%
+0:dplyr::rename(Value = VALUE, ClassName = Class_Name, Red=RED, Blue=BLUE, Green=GREEN)
+0:#write attribute table to csv
+0:write.csv(all_classes, './data/TabularData/CombinedRasterAttributeTable_CDLNVC.csv', row.names=F)
+0:write.csv(all_classes, './data/DataToArchive/CombinedRasterAttributeTable_CDLNVC.csv', row.names=F)
+0:rm(list=ls())
+0:##### pixel mis-match (after step 1 of geospatial workflow) as number of cells and proportion
+0:mismatch_byyearcounty <- readRDS('./data/TechnicalValidation/pixel_mismatch_byyear_bycounty.RDS')
+0:head(mismatch_byyearcounty)
+0:any(is.na(mismatch_byyearcounty$CDL_Name))
+0:mismatch_byyearcounty <- mismatch_byyearcounty %>%
+0:dplyr::arrange(FIPS) %>%
+0:dplyr::mutate(FIPS = stringr::str_pad(FIPS, 5, pad="0")) %>%# reformat FIPS to have leading zeros
+0:dplyr::rename(NVC_Name = NVC_SpecificClass,
+0:NCells_NVCClass_perCounty = NCells_Class,
+0:NVC_CDL_Pair = NVC_CDL_Named,
+0:CDL_Year = CDLYear,
+0:STATE = State) %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, everything())
+0:# some years spreadsheets are missing CDL class names
+0:if (any(is.na(mismatch_byyearcounty$CDL_Name)))  {
+0:cdl_key <- read.csv('./data/TabularData/CDL_codes_names_colors_2022.csv') %>%
+0:rename(CDL_Name = Class_Names, CDL_Class=Codes) %>%
+0:dplyr::select(CDL_Name, CDL_Class) %>%
+0:dplyr::mutate(CDL_Class = as.character(CDL_Class))
+0:mismatch_byyearcounty <- mismatch_byyearcounty %>%
+0:dplyr::select(-CDL_Name) %>%
+0:left_join(cdl_key) %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, CDL_Class, CDL_Name, NVC_Name, everything())
+0:}
+0:if (!dir.exists('./data/DataToArchive')) {
+0:dir.create('./data/DataToArchive')
+0:}
+0:mismatch_byyearcounty <- mismatch_byyearcounty %>%
+0:dplyr::rename(State = STATE)
+0:mismatch_byyearcounty %>% data.table::fwrite('./data/DataToArchive/pixel_mismatch_byyear_bycounty.csv')
+0:any(is.na(mismatch_byyearcounty))
+0:names(which(colSums(is.na(mismatch_byyearcounty))>0))
+0:###### unresolved pixels
+0:for (CDLYear in c(2012:2021)) {
+0:library(dplyr)
+0:# read county shapefile with LANDFIRE regions
+0:county <- sf::st_read('./data/SpatialData/us_counties_better_coasts_LFregion.shp') %>%
+0:dplyr::rename(LF2010_Region=LF2010_) # fix column name that was abbreviated by shp driver
+0:# read NVC/CDL pixel frequency data
+0:merged_freq <- read.csv(paste0('./data/PixelFreq/CDL', CDLYear, 'NVC_CountyPixelFreq.csv')) %>%
+0:dplyr::filter(!is.na(County)) %>%
+0:dplyr::group_by(State, County) %>%
+0:dplyr::mutate(PctCounty = (NCells/sum(NCells)) *100) %>%
+0:dplyr::ungroup()
+0:# are there any counties in county shapefile that are NOT in dataset on NVC pixel frequency?
+0:paste0(county$COUNTY, ", ", county$STATE)[!paste0(county$COUNTY, ", ", county$STATE) %in% paste0(merged_freq$County, ", ", merged_freq$State)]
+0:# join pixel frequency with LF regions
+0:merged_freq_sf <- county %>%
+0:dplyr::select(FIPS, STATE, COUNTY, LF2010_Region) %>%
+0:dplyr::left_join(merged_freq, by=c('STATE'='State', 'COUNTY'='County'))
+0:# join pixel frequency with LF regions
+0:merged_freq <- sf::st_drop_geometry(county) %>%
+0:dplyr::select(STATE, COUNTY, LF2010_Region) %>%
+0:dplyr::left_join(merged_freq, by=c('STATE'='State', 'COUNTY'='County'))
+0:# fill in a few missing polygons that show up on no data map
+0:counties <- sf::st_read('./data/SpatialData/us_counties_better_coasts.shp') %>%
+0:dplyr::filter(!is.na(COUNTY))
+0:nodata_freq <- merged_freq_sf %>%
+0:sf::st_drop_geometry() %>%
+0:dplyr::filter(Class == -1001)
+0:# nodata <- counties %>%
+0:#   dplyr::select(FIPS, STATE, COUNTY) %>%
+0:#   dplyr::left_join(nodata_freq) %>%
+0:#   tidyr::replace_na(list(PctCounty=0, NCells=0))
+0:oneyear <- sf::st_drop_geometry(nodata_freq) %>%
+0:dplyr::rename(MergedRasterClassName = Class) %>%
+0:dplyr::mutate(CDL_Year = CDLYear,
+0:MergedRasterName = 'CDL/NVC mismatch, unresolved conflict') %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, COUNTY, LF2010_Region, MergedRasterClassName, MergedRasterName, everything())
+0:if (CDLYear == 2012) {
+0:allyears <- oneyear
+0:} else if (CDLYear > 2012) {
+0:allyears <- rbind(allyears, oneyear)
+0:}
+0:}
+0:head(allyears)
+0:head(mismatch_byyearcounty)
+0:unique(allyears$CDL_Year)
+0:allyears <- allyears %>%
+0:dplyr::rename(State = STATE, County = COUNTY,
+0:MergedRaster_Class = MergedRasterClass, MergedRaster_ClassName = MergedRasterClassName,
+0:Pct_Unresolved = PctCounty)
+0:names(allyears)
+0:allyears <- allyears %>%
+0:dplyr::rename(State = STATE, County = COUNTY,
+0:MergedRaster_Class = MergedRasterClass, MergedRaster_ClassName = MergedRasterName,
+0:Pct_Unresolved = PctCounty)
+0:names(allyears)
+0:head(allyears)
+0:allyears <- allyears %>%
+0:dplyr::rename(State = STATE, County = COUNTY,
+0:MergedRaster_Class = MergedRasterClassName, MergedRaster_ClassName = MergedRasterName,
+0:Pct_Unresolved = PctCounty)
+0:allyears %>% data.table::fwrite('./data/DataToArchive/unresolved_conflict_byyear_bycounty.csv')
+0:allyears %>% data.table::fwrite('./data/DataToArchive/unresolved_conflict_byyear_bycounty.csv')
+0:mismatch_byyearcounty %>% data.table::fwrite('./data/DataToArchive/pixel_mismatch_byyear_bycounty.csv')
+0:allyears %>% data.table::fwrite('./data/DataToArchive/unresolved_conflict_byyear_bycounty.csv')
+0:sort(unique(allyears$FIPS))
+0:any(is.na(allyears))
+0:###### accuracy and data coverage of cdl, nvc, and merged dataset
+0:for (CDLYear in c(2012:2021)) {
+0:accuracy_datacoverage <- readRDS(paste0('./data/TechnicalValidation/summarized_accuracy_data_CDL',
+0:CDLYear, '_NVC_Merged.rds')) %>%
+0:sf::st_drop_geometry() %>%
+0:mutate(CDL_Year = CDLYear,
+0:FocalGroup=Dataset) %>%
+0:dplyr::select(FIPS, STATE, CDL_Year, COUNTY, FocalGroup, Dataset_Name,
+0:NCells_County, NCells_FocalGroup,
+0:FocalGroup_PctCounty, WithData_PctFocalGroup,
+0:WtdProdAcc, WtdUserAcc)
+0:if (CDLYear == 2012)
+0:allyears_accuracy <- accuracy_datacoverage
+0:else {
+0:allyears_accuracy <- rbind(allyears_accuracy, accuracy_datacoverage)
+0:}
+0:}
+0:allyears_accuracy <- allyears_accuracy %>%
+0:dplyr::rename(State = STATE, County = COUNTY)
+0:allyears_accuracy %>% data.table::fwrite('./data/DataToArchive/accuracy_datacoverage_byyear_bycounty.csv')
+0:any(is.na(allyears_accuracy))
+1663615763772:library(SpeedyBeeModel)
+1663700445119:library(SpeedyBeeModel)
+1663857128874:library(beecoSp)
+1663857145018:mosaic_tiles

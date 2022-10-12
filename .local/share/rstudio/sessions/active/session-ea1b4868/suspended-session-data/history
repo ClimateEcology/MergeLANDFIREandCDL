@@ -1,0 +1,2 @@
+library(beecoSp)
+mosaic_tiles

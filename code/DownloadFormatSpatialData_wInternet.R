@@ -89,16 +89,22 @@ for (regionName in c('Northeast', 'Southeast', 'Midwest', 'West')) {
   }
 }
 
+# increase timeout for file download to 10 minutes
+options(timeout=600)
+
 # download spatial data
 # Cropland Data layer from USDA NASS
-for (year in c(2012:2021)) {
+years_todownload <- c(2008:2011)
+
+for (year in years_todownload) {
   url_oneyear <- paste0('https://www.nass.usda.gov/Research_and_Science/Cropland/Release/datasets/', year, '_30m_cdls.zip')
   destination_oneyear <- paste0('./data/SpatialData/CDL/', year, '_30m_cdls.zip')
   download.file(url= url_oneyear, destfile= destination_oneyear)
 }
 
 # unzip downloaded CDL
-zip_archives <- list.files('./data/SpatialData/CDL', pattern='.zip', full.names = T)
+zip_archives <- list.files('./data/SpatialData/CDL', pattern=paste0(years_todownload, collapse="|"), full.names = T)
+zip_archives <- zip_archives[grepl(zip_archives, pattern=".zip")]
 
 for (i in 1:length(zip_archives)) {
   logger::log_info('Starting ', zip_archives[i])

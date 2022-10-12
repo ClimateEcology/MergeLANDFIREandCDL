@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # download necessary spatial data
-module load singularity/3.5.2
+module load singularity
 singularity exec --bind /90daydata:/90daydata geospatial_extend_latest.sif Rscript code/DownloadFormatSpatialData_wInternet.R
 
 

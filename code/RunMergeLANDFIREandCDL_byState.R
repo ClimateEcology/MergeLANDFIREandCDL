@@ -26,9 +26,10 @@ target_area <- 1000 # desired size (in km2) of each tile
 nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
 chunksize1 <- 40
 
-if (CDLYear < 2020) {
+# specify file type for CDL rasters (based on available format from USDA NASS)
+if (CDLYear >= 2012 & CDLYear < 2020) {
   cdl_format <- '.img'
-} else if (CDLYear >= 2020) {
+} else if (CDLYear >= 2020 | CDLYear < 2012) {
   cdl_format <- '.tif'
 }
 

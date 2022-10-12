@@ -247,15 +247,15 @@ seventeen
 library(cowplot); library(gridExtra)
 CDLYear <- 2017
 # read ggplot object generated in 'WrangleMergedAccuracyByCounty.Rmd'
-nodata_map_jenks <- readRDS(paste0('./nodata_map_jenks_CDL', CDLYear, '.rds'))
+nodata_map_jenks <- readRDS(paste0('./data/nodata_map_jenks_CDL', CDLYear, '.rds'))
 
 seventeen3 <- ggdraw() +
   draw_plot(byclass_2017, x=0, y=0.63, 1, 0.325) +
   draw_plot(map2017, x=0.01, y=0.3, 1, 0.32) +
   draw_plot(nodata_map_jenks, x=0.01, y=0, 1, 0.32) +
-  annotate("text", label="A)", x=0.06, y=0.94, size=7) +
-  annotate("text", label="B)", x=0.06, y=0.605, size=7) +
-  annotate("text", label="C)", x=0.06, y=0.305, size=7)
+  annotate("text", label="(a)", x=0.06, y=0.94, size=7) +
+  annotate("text", label="(b)", x=0.06, y=0.605, size=7) +
+  annotate("text", label="(c)", x=0.06, y=0.305, size=7)
 
 
 seventeen3

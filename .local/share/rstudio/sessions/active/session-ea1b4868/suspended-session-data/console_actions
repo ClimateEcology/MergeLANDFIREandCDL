@@ -1,0 +1,36 @@
+{
+    "type": [
+        0,
+        1,
+        0,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+    ],
+    "data": [
+        "> ",
+        "library(beecoSp)",
+        "> ",
+        "mosaic_tiles",
+        "function (tiledir, chunksize1, ID, outdir, season = NA, compress = T, \n    verbose = F) \n{\n    library(terra)\n    if (is.na(season)) {\n        compress_filename <- paste0(outdir, \"/\", ID, \"_FinalRasterCompress.tif\")\n        rawsize_filename <- paste0(outdir, \"/\", ID, \"_FinalRaster.tif\")\n    }\n    else {\n        compress_filename <- paste0(outdir, \"/\", ID, \"_\", season, \n            \"_FinalRasterCompress.tif\")\n        rawsize_filename <- paste0(outdir, \"/\", ID, \"_\", season, \n            \"_FinalRaster.tif\")\n    }\n",
+        "    tile_paths <- list.files(tiledir, full.names = T)\n    logger::log_info(\"Make mega: Identified \", length(tile_paths), \n        \" raster files before filtering.\")\n    tile_paths <- tile_paths[!grepl(tile_paths, pattern = \".tif.aux\")]\n    tile_paths <- tile_paths[!grepl(tile_paths, pattern = \"MegaTile\")]\n    tile_paths <- tile_paths[!grepl(tile_paths, pattern = \"Final\")]\n    if (!is.na(season)) {\n        tile_paths <- tile_paths[grepl(tile_paths, pattern = season)]\n    }\n    if (!is.na(ID)) {\n        tile_paths <- tile_paths[grepl(tile_paths, pattern = ID)]\n",
+        "    }\n    logger::log_info(\"Make mega: Trying to load \", length(tile_paths), \n        \" raster files after filtering.\")\n    if (length(tile_paths) == 1) {\n        onetile <- terra::rast(tile_paths[[1]])\n        if (compress == T) {\n            terra::writeRaster(onetile, filename = compress_filename, \n                overwrite = T, wopt = list(gdal = c(\"COMPRESS=DEFLATE\", \n                  \"PREDICTOR=3\")))\n        }\n        else {\n            terra::writeRaster(onetile, filename = rawsize_filename, \n                overwrite = T)\n",
+        "        }\n    }\n    if (length(tile_paths) > 1) {\n        tile_list <- vector(\"list\", length(tile_paths))\n        for (i in 1:length(tile_paths)) {\n            tile_list[[i]] <- terra::rast(tile_paths[i])\n        }\n        end <- length(tile_list)\n        clusters <- beecoSp::calc_tile_clusters(tile_list = tile_list, \n            chunksize = chunksize1, plot_clusters = F)\n        ngroups <- length(unique(clusters))\n        logger::log_info(\"Make mega: starting mosaic-ing.\")\n        for (i in 1:ngroups) {\n            assign(x = paste0(\"args\", i), value = tile_list[clusters == \n",
+        "                i])\n            if (!is.na(season)) {\n                megatile_filename <- paste0(tiledir, \"/\", ID, \n                  \"_\", season, \"_MegaTile\", i, \"_\", chunksize1, \n                  \".tif\")\n            }\n            else if (is.na(season)) {\n                megatile_filename <- paste0(tiledir, \"/\", ID, \n                  \"_MegaTile\", i, \"_\", chunksize1, \".tif\")\n            }\n            assign(x = paste0(\"MT\", i), value = base::eval(rlang::call2(\"mosaic\", \n                !!!get(paste0(\"args\", i)), .ns = \"terra\", fun = \"mean\", \n",
+        "                filename = megatile_filename, overwrite = T)))\n            if (verbose == T) {\n                logger::log_info(paste0(\"Mega tile \", i, \" is finished.\"))\n            }\n        }\n        logger::log_info(\"Make mega: Finished creating mega tiles.\")\n        rm(tile_list)\n        rm(tile_paths)\n        rm(list = ls(pattern = \"args\"))\n        mega_paths <- list.files(tiledir, full.names = T)\n        logger::log_info(\"Make final: Identified \", length(mega_paths), \n            \" raster files before filtering.\")\n",
+        "        mega_paths <- mega_paths[!grepl(mega_paths, pattern = \".tif.aux\")]\n        mega_paths <- mega_paths[grepl(mega_paths, pattern = \"MegaTile\")]\n        mega_paths <- mega_paths[!grepl(mega_paths, pattern = \"MegaMega\")]\n        mega_paths <- mega_paths[grepl(mega_paths, pattern = paste0(\"_\", \n            chunksize1, \".tif\"))]\n        if (!is.na(ID)) {\n            mega_paths <- mega_paths[grepl(mega_paths, pattern = ID)]\n        }\n        if (!is.na(season)) {\n            mega_paths <- mega_paths[grepl(mega_paths, pattern = season)]\n",
+        "        }\n        logger::log_info(\"Make final: Trying to load \", length(mega_paths), \n            \" raster files after filtering.\")\n        mega_list <- vector(\"list\", length(mega_paths))\n        for (i in 1:length(mega_paths)) {\n            mega_list[[i]] <- terra::rast(mega_paths[i])\n        }\n        rsrc <- terra::src(mega_list)\n        logger::log_info(\"Loaded \", length(mega_list), \" raster files.\")\n        a <- Sys.time()\n        if (length(mega_paths) == 1) {\n            logger::log_info(\"This state only has one mega-tile. Writing this raster as final output.\")\n",
+        "            onetile <- terra::rast(mega_paths[[1]])\n            if (compress == T) {\n                terra::writeRaster(onetile, filename = compress_filename, \n                  overwrite = T, wopt = list(gdal = c(\"COMPRESS=DEFLATE\", \n                    \"PREDICTOR=3\")))\n            }\n            else {\n                terra::writeRaster(onetile, filename = rawsize_filename, \n                  overwrite = T)\n            }\n        }\n        else if (length(mega_paths) > 1) {\n            logger::log_info(\"Make final: Attempting mosaic.\")\n",
+        "            if (compress == T) {\n                file1 <- compress_filename\n                gdalUtils::mosaic_rasters(gdalfile = mega_paths, \n                  dst_dataset = compress_filename, overwrite = T, \n                  ot = \"Int16\", co = c(\"COMPRESS=DEFLATE\", \"BIGTIFF=YES\"))\n            }\n            else if (compress == F) {\n                file1 <- rawsize_filename\n                base::eval(rlang::call2(\"mosaic\", rsrc, .ns = \"terra\", \n                  fun = \"mean\", filename = rawsize_filename, \n",
+        "                  overwrite = T))\n            }\n            b <- Sys.time()\n            logger::log_info(paste0(\"Make final: Final raster exists? \", \n                file.exists(file1)))\n            logger::log_info(paste0(\"Make final: \", difftime(b, \n                a, units = \"mins\"), \" minutes  to execute mosaic.\"))\n        }\n    }\n}\n<bytecode: 0x55aa2364bed0>\n<environment: namespace:beecoSp>\n"
+    ]
+}

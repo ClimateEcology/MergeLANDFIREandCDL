@@ -5,18 +5,13 @@ args <- commandArgs(trailingOnly = T)
 CDLYear <- args[2] # year of NASS Cropland Data Layer
     
 # save directory paths
-dir_path <- paste0('/90daydata/geoecoservices/MergeLANDFIREandCDL/StateRasters/', CDLYear) 
+dir_path <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRasters'
 temprst_dir <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRastersTemp'
-outrst_dir <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRasters'
-
-# local laptop file paths
-# dir_path <- 'D:/MergeLANDFIRECDL_Rasters/'
-# outrst_dir <- 'D:/MergeLANDFIRECDL_Rasters/NationalRasters'
+outrst_dir <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRastersSetNoData'
 
 
 files <- list.files(dir_path, full.names = T)
 files <- files[!grepl(files, pattern= ".tif.aux")]
-files <- files[grepl(files, pattern= "Tier3.tif")]
 files <- files[grepl(files, pattern= CDLYear)]
 
 
@@ -28,7 +23,7 @@ if (!dir.exists(temprst_dir)) {
   dir.create(temprst_dir)
 }
 
-outrst_name <- gsub(basename(files), pattern='_Tier3', replacement="")
+outrst_name <- basename(files)
 
 logger::log_info('Starting gdal_calc for ', CDLYear, '.')
 
