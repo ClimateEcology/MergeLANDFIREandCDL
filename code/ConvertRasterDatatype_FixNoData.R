@@ -36,11 +36,11 @@ for (i in 1:length(calc_command)) {
   logger::log_info('gdal_calc: completed ', outrst_name[i])
 }
 
-logger::log_info('Created temporary rasters for', CDLYear, ' (original raster with no data set to -9999).')
+logger::log_info('Created temporary rasters for ', CDLYear, ' (original raster with no data set to -9999).')
 
 tmp_files <- list.files(temprst_dir, full.names = T)
-tmp_files <- files[!grepl(tmp_files, pattern= ".tif.aux")]
-tmp_files <- files[grepl(tmp_files, pattern= CDLYear)]
+tmp_files <- tmp_files [!grepl(tmp_files, pattern= ".tif.aux")]
+tmp_files <- tmp_files [grepl(tmp_files, pattern= CDLYear)]
 
 # move raster to national rasters file and convert to signed Int16 instead of float32
 gdalUtils::gdal_translate(src_dataset=tmp_files, dst_dataset = paste0(outrst_dir, "/", outrst_name),
