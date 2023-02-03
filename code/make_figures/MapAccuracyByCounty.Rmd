@@ -16,9 +16,9 @@ I start by loading accuracy data for EVT and NVC. We need NVC and EVT because NV
 
 ```{r loadtabulardata, echo=F}
 library(dplyr); library(logger); library(future); library(terra)
-rm(list=ls())
+#rm(list=ls())
 
-CDLYear <- 2021
+CDLYear <- 2017
 
 # load accuracy data from LANDFIRE and USDA NASS (aggregated & formatted in 'WrangleMergedAccuracyByCounty.Rmd' script)
 evt <- read.csv('./data/LANDFIRE_Accuracy/EVT_Accuracy_allregions.csv')
@@ -277,19 +277,22 @@ First, I start with a bivariate choropleth map showing data coverage and the per
 # bi-variate choropleth map showing amount of agriculture and data coverage of NVC and CDL
 library(biscale); library(ggplot2)
 
-data <- dplyr::filter(toplot_both,  Dataset_Name != 'NVC+CDL') %>%
+data <- 
+  toplot_both %>%
+  sf::st_transform("ESRI:102003") %>%
+  dplyr::filter(Dataset_Name != 'NVC+CDL') %>%
   bi_class(y=FocalGroup_PctCounty, x=WithData_PctFocalGroup, style='jenks', dim=3, keep_factors=T)
 
-coverage_both <- ggplot() + geom_sf(data=data, mapping = aes(fill = bi_class), 
+coverage_both <- data %>%
+  ggplot() + geom_sf(mapping = aes(fill = bi_class), 
                                    color=NA, show.legend = FALSE) +
-  #geom_sf(data=data, fill=NA, color='white', lwd=0.05) +
   bi_scale_fill(pal = "DkBlue", dim = 3)  +
-  theme_classic(base_size=14) +
+  theme_minimal(base_size=14) +
   theme(strip.text.x = element_text(size = 13),
         strip.text.y = element_text(size = 13)) +
   facet_wrap(~ Dataset_Name, ncol=1)
 
-#coverage_both
+coverage_both
 
 legend_ag <- bi_legend(pal = "DkBlue",
                     dim = 3,
@@ -320,7 +323,7 @@ finalPlot <- ggdraw() +
 
 finalPlot
 
-ggsave(plot=finalPlot, filename= paste0('./figures/DataCoverageInput_bivariate', CDLYear, '.pdf'),  width=7, height=8)
+ggsave(plot=finalPlot, filename= paste0('./figures/FigS6_DataCoverageInput_bivariate', CDLYear, '.pdf'),  width=7, height=8)
 ```
 
 ## Univariate map of data coverage. Are these easier to interpret?
@@ -331,16 +334,18 @@ ggsave(plot=finalPlot, filename= paste0('./figures/DataCoverageInput_bivariate',
 natural.interval = BAMMtools::getJenksBreaks(toplot_both$WithData_PctFocalGroup, k = 7)
 toplot_both$data.coverage.jenks = cut(toplot_both$WithData_PctFocalGroup, breaks=natural.interval, include.lowest = TRUE)
 
-wellrep_map_jenks <- ggplot() + geom_sf(data=toplot_both, aes(fill=data.coverage.jenks),  color=NA) +
+wellrep_map_jenks <- toplot_both %>%
+  sf::st_transform("ESRI:102003") %>%
+  ggplot() + geom_sf(aes(fill=data.coverage.jenks),  color=NA) +
   guides(fill=guide_legend(title='Percent classes with\n ground-truth data')) +
-  theme_classic(base_size=14) +
+  theme_minimal(base_size=14) +
   theme(strip.text.x = element_text(size = 13),
       strip.text.y = element_text(size = 13)) +
   scale_fill_viridis(discrete=T, option='cividis') +
   facet_wrap(~Dataset_Name, ncol=1)
 wellrep_map_jenks
 
-ggsave(plot=wellrep_map_jenks, filename= paste0('./figures/DataCoverage3Panel_univariate', CDLYear, '.pdf'),  width=8.5, height=10)
+ggsave(plot=wellrep_map_jenks, filename= paste0('./figures/Fig4_DataCoverage3Panel_univariate', CDLYear, '.pdf'),  width=8.5, height=10)
 
 ```
 
@@ -361,12 +366,14 @@ toplot_long <- toplot_both %>%
 # bi-variate choropleth map showing amount of agriculture and accuracy of NVC and CDL
 
 # producer accuracy
-data_acc <- bi_class(toplot2_long, y=FocalGroup_PctCounty, x=Accuracy, style='jenks', dim=3, keep_factors=T)
+data_acc <- toplot2_long %>%
+  sf::st_transform("ESRI:102003") %>%
+  bi_class(y=FocalGroup_PctCounty, x=Accuracy, style='jenks', dim=3, keep_factors=T)
 
 acc_both <- ggplot() + geom_sf(data=data_acc, mapping = aes(fill = bi_class), 
                                    color=NA, show.legend = FALSE) +
   bi_scale_fill(pal = "DkCyan", dim = 3)  +
-  theme_classic() +
+  theme_minimal() +
   theme(strip.text.x = element_text(size = 13),
         strip.text.y = element_text(size = 13)) +
   facet_grid(Dataset_Name ~`Accuracy_Type`)
@@ -442,9 +449,11 @@ natural.interval.accuracy <- BAMMtools::getJenksBreaks(toplot_long$Accuracy, k =
 toplot_long$accuracy.jenks = cut(toplot_long$Accuracy, breaks=natural.interval.accuracy , include.lowest = TRUE)
 
 # map producer accuracy of NVC by county
-accuracy_map_jenks <- ggplot() + geom_sf(data=toplot_long, aes(fill=accuracy.jenks),  color=NA) +  
+accuracy_map_jenks <- toplot_long %>%
+  sf::st_transform("ESRI:102003") %>%
+  ggplot() + geom_sf(aes(fill=accuracy.jenks),  color=NA) +  
   guides(fill=guide_legend(title='Accuracy \n(area-weighted)')) +
-  theme_classic(base_size=14) +
+  theme_minimal(base_size=14) +
   scale_fill_viridis(discrete=T, option='inferno') +
   facet_grid(Dataset_Name ~`Accuracy_Type`) +
   theme(strip.text.x = element_text(size = 14),
@@ -452,6 +461,6 @@ accuracy_map_jenks <- ggplot() + geom_sf(data=toplot_long, aes(fill=accuracy.jen
 
 accuracy_map_jenks
 
-ggsave(plot=accuracy_map_jenks, filename=paste0('./figures/Accuracy3panel_univariate', CDLYear, '.pdf'), width=15, height=10)
+ggsave(plot=accuracy_map_jenks, filename=paste0('./figures/Fig3_Accuracy3panel_univariate', CDLYear, '.pdf'), width=15, height=10)
 
 ```

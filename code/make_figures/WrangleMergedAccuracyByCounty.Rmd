@@ -16,7 +16,7 @@ I start by loading accuracy data for EVT and NVC. We need NVC and EVT because NV
 
 ```{r loadtabulardata, echo=F}
 library(dplyr); library(logger); library(future); library(terra)
-rm(list=ls())
+#rm(list=ls())
 
 # custom max function that returns NA if both input values are NA
 mymax <- function(...,def=NA,na.rm=FALSE) {
@@ -24,7 +24,7 @@ mymax <- function(...,def=NA,na.rm=FALSE) {
       x } else {def}
 }
 
-CDLYear <- 2021
+CDLYear <- 2017
 
 # specify classes that COULD have plots in auto-key (are non-managed, not agriculture or NLCD developed)
 nvc_agclasses <- c(7960:7999) # classes in LANDFIRE NVC that are agriculture
@@ -97,12 +97,14 @@ library(ggplot2); library(viridis)
 natural.interval.nodata <- BAMMtools::getJenksBreaks(nodata$PctCounty, k = 7)
 nodata$PctCounty.jenks = cut(nodata$PctCounty, breaks=natural.interval.nodata , include.lowest = TRUE)
 
-# map producer accuracy of NVC by county
-nodata_map_jenks <- ggplot() + geom_sf(data=nodata, aes(fill=PctCounty.jenks),  color=NA) +  
+# map unresolved pixels by county
+nodata_map_jenks <- nodata %>%
+  sf::st_transform("ESRI:102003") %>%
+  ggplot() + geom_sf(aes(fill=PctCounty.jenks),  color=NA) +  
   guides(fill=guide_legend(title='Percent county\nunresolved pixels')) +
-  theme_classic(base_size=13) +
+  theme_minimal(base_size=13) +
   scale_fill_viridis(discrete=T, option='inferno') +
-  theme(legend.position=c(0.925,0.27),
+  theme(legend.position=c(0.98,0.27),
         strip.text.x = element_text(size = 14),
         strip.text.y = element_text(size = 14))
 

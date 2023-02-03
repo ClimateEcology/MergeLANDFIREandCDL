@@ -188,23 +188,26 @@ library(classInt); library(viridis)
 natural.interval = classIntervals(toplot$Pct_Mismatch, n = 6, style = 'jenks')$brks
 toplot$population.natural = cut(toplot$Pct_Mismatch, breaks=natural.interval, include.lowest = TRUE)
 
-pct_map_jenks <- ggplot() + geom_sf(data=toplot, aes(fill=population.natural), color=NA) +  
+pct_map_jenks <- toplot %>%
+  sf::st_transform("ESRI:102003") %>%
+  ggplot() + geom_sf(aes(fill=population.natural), color=NA) +  
   guides(fill=guide_legend(title='Percent NVC agriculture\nmismatched with CDL')) +
-  theme_classic() + 
+  theme_minimal() + 
   scale_fill_viridis(discrete=T) +
   facet_wrap(~CDLYear, ncol=2)
 pct_map_jenks
-ggplot2::ggsave(plot=pct_map_jenks, './figures/TechnicalValidation_current/MismatchedPixels_ByCounty_2012_to_2021.pdf', width=10, height=12)
+ggplot2::ggsave(plot=pct_map_jenks, './figures/TechnicalValidation_current/MismatchedPixelsMap_ByCounty_2012_to_2021.pdf', width=10, height=12)
 
 ```
 
 ```{r oneyear, fig.width=10, fig.height=5}
 map2017 <- dplyr::filter(toplot, CDLYear == 2017) %>%
+  sf::st_transform("ESRI:102003") %>%
   ggplot() + geom_sf(aes(fill=population.natural), color=NA) +  
   guides(fill=guide_legend(title='Percent NVC agriculture\nmismatched with CDL')) +
-  theme_classic(base_size=13) + 
+  theme_minimal(base_size=13) + 
   scale_fill_viridis(discrete=T, option='viridis') +
-  theme(legend.position=c(0.95,0.25))
+  theme(legend.position=c(1.02,0.25))
 map2017 
 
 byclass_2017 <- dplyr::filter(la, CDLYear == 2017) %>% 
@@ -260,7 +263,7 @@ seventeen3 <- ggdraw() +
 
 seventeen3
 
-ggplot2::ggsave(plot=seventeen3, paste0('./figures/TechnicalValidation_current/CombinedFigMap3Panel_MismatchedPixels_', CDLYear, 'Only.pdf'),
+ggplot2::ggsave(plot=seventeen3, paste0('./figures/TechnicalValidation_current/Fig2_CombinedFigMap3Panel_MismatchedPixels_', CDLYear, 'Only.pdf'),
                 width=10, height=15)
 ```
 
