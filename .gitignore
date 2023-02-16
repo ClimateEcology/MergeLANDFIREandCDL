@@ -18,7 +18,7 @@
 **/data/*
 data/TechnicalValidation/ValidationData*
 !data/TabularData
-!data/TechnicalValidation
+!data/TechnicalValidation/*
 !data/PixelFreq
 !data/SpatialData/ExampleSmallRasters
 **/google_keys*
