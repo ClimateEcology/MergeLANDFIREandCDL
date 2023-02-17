@@ -3,20 +3,27 @@ library(RSQLite)
 library(DBI)
 library(readr)
 
-for (year in as.character(c(2015:2021))) {
-  #regions <- c('Midwest', 'Northeast', 'West', 'Southeast')
-  regions <- c('Southeast')
-  
+for (year in as.character(c(2012:2021))) {
+  #regions <- c('WestN', 'WestS', 'Southeast', 'Northeast')
+  regions <- c('WestS') 
+
   for (regionName in regions) {
     tictoc::tic()
     logger::log_info(year, ": Starting ", regionName, ".")
 
-    # load shapefile for state/region 
-    regionalextent <- sf::st_read(paste0('./data/SpatialData/', regionName , '.shp'))
-    states <- regionalextent$STUSPS
-    
-    if(regionName == 'Southeast') {
-      states <- c(states, "TX")
+    if (regionName %in% c('WestN')) {
+      states <- c('MT', 'WY', 'OR', 'WA', 'ID')
+    } else if (regionName %in% c('WestS')) {
+      states <- c('CA', 'NV', 'UT', 'CO', 'AZ', 'NM')
+    } else {
+      
+      # load shapefile for state/region 
+      regionalextent <- sf::st_read(paste0('./data/SpatialData/', regionName , '.shp'))
+      states <- regionalextent$STUSPS
+      
+      if(regionName == 'Southeast') {
+        states <- c(states, "TX")
+      }
     }
     
     # save names before creating (database and table within the database)
@@ -50,7 +57,7 @@ for (year in as.character(c(2015:2021))) {
     mismatch_oneyear <- tbl(db, table_name)
     
     # to decrease file size, remove unnecessary attributes 
-    # and filter down to one year and one county as test dataset
+    # and filter down to one year and group of states
     tictoc::tic()
     data <- mismatch_oneyear  %>% 
       select(-Empty, -ncells_tile, -STATE2, -COUNTY) %>% 
@@ -65,16 +72,7 @@ for (year in as.character(c(2015:2021))) {
     
     # define crs for spatial points
     sf::st_crs(data_sp) <- 5070
-      
-    # # explore reducing file size by decreasing precision of lat/long
-    # sf::st_precision(data_sp)
-    #   
-    # 
-    # outdata <- sf::st_set_precision(data_sp, precision=10^6)
-    # st_write(outdata, "/path/to/file.shp")
-    # indata <- st_read("/path/to/file.shp")
-    #   
-      
+
     if (!dir.exists('./data/TechnicalValidation/Mismatch_spatial')) {
       dir.create('./data/TechnicalValidation/Mismatch_spatial')
     }

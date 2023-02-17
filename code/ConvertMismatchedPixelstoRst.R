@@ -9,24 +9,21 @@ setwd('/project/geoecoservices/MergeLANDFIREandCDL')
 year <- 2021
 n <- 20
 
-rst_template <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRastersSetNoData/CDL2021NVC_NationalRaster.tif' %>%
-  terra::rast()
-
 vct_dir <- paste0('./data/TechnicalValidation/Mismatch_spatial/', year)
 vct_paths <- list.files(vct_dir, full.names=T)
 
-# create directory for mismatched pixels rasters, if necessary
+# create directories for mismatched pixels rasters, if necessary
 if (!dir.exists('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/')) {
   dir.create('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/')
 }
-
+if (!dir.exists('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/Regional')) {
+  dir.create('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/Regional')
+}
 
 # file paths for later
 infile <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/NationalRastersSetNoData/CDL2021NVC_NationalRaster.tif'
 empty_template_national <-'/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/EmptyTemplateRaster.tif'
 tmpfile <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/temp.tif'
-target_file <- paste0('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/MismatchedPixels_',
-                      r, '_CDL2021_NVC2016.tif')
 
 if (!file.exists(empty_template_national)) {
   # create national template raster (later, I'll clip this down to individual regions)
@@ -36,27 +33,48 @@ if (!file.exists(empty_template_national)) {
                                   " --NoDataValue=255 --type=Byte")) 
 }
 
-#regions <- c('West', 'Southeast', Midwest', 'Northeast')
-regions <- c('West', 'Southeast', 'Northeast')
+regions <- c('WestN', 'WestS', 'Southeast', 'Northeast')
 
 
 for (r in regions) {
   
   # increase number of chunks for large regions
-  if (r %in% c('West', 'Southeast')) {
-    n <- 40
+  if (r %in% c('WestN', 'WestS', 'Southeast')) {
+    n <- 70
   }
   # file paths for later
   empty_template_region <- paste0('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/EmptyTemplateRaster_', 
                                   r, '.tif')
-  region_boundary <- paste0('/project/geoecoservices/MergeLANDFIREandCDL/data/SpatialData/', r, '_boundary.shp')
+  region_boundary <- paste0('/project/geoecoservices/MergeLANDFIREandCDL/data/SpatialData/', r, '_boundary.shp') 
   
   # if regional templates don't exist, create them by clipping national template
   if (!file.exists(empty_template_region)) {
-    # load shapefile for state/region 
-    regionalextent <- sf::st_read(paste0('./data/SpatialData/', r , '.shp')) %>%
-      sf::st_union() %>%
-      sf::st_write(region_boundary)
+    
+    if(!file.exists(region_boundary)) {
+      # Need to handle West separately to divide into north/south. Too big to run entire section.
+      if (r %in% c('WestN', 'WestS')) {
+        # load shapefile for state/region 
+        regionalextent <- sf::st_read(paste0('./data/SpatialData/West.shp'))
+      
+        if (r == 'WestN') {
+          regionalextent <- regionalextent %>%
+            dplyr::filter(STUSPS %in% c('MT', 'WY', 'OR', 'WA', 'ID')) %>%    
+            sf::st_union() %>%
+            sf::st_write(region_boundary)
+        } else if (r == 'WestS'){
+          regionalextent <- regionalextent %>%
+            dplyr::filter(STUSPS %in% c('CA', 'NV', 'UT', 'CO', 'AZ', 'NM')) %>%    
+            sf::st_union() %>%
+            sf::st_write(region_boundary)
+        }
+      } else {
+      
+      # load shapefile for state/region 
+      regionalextent <- sf::st_read(paste0('./data/SpatialData/', r , '.shp')) %>%
+        sf::st_union() %>%
+        sf::st_write(region_boundary)
+      }
+    }
     
     # clip national template down to region of interest
     logger::log_info("Creating regional template for ", r, ".")
@@ -67,50 +85,54 @@ for (r in regions) {
   ##### CREATE SOURCE RASTERS 
   # raster version of vector data in small chunks that we will combine later
   
+  ##### SAVE FILE NAMES
+  vct_paths <- list.files(vct_dir, full.names=T)
   region_vct_path <- vct_paths[grepl(vct_paths, pattern=r)]
   
   bsename <- gsub(basename(region_vct_path), pattern='.gpkg', replacement='')
   
-  target_file <- paste0('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/', bsename, '.tif')
+  target_file <- paste0('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/Regional/', bsename, '.tif')
   
   # make series of file names for source rasters (number of names is equal to n, for number of chunks to split for processing)
   out_rst <- paste0(paste0('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/', 
                            bsename, paste0("_", 1:n, '.tif'))) 
 
+  ##### LOAD DATA (to avoid doing it inside loop for each chunk)
+  
+  # load regional template raster
+  template_region_rst <- empty_template_region %>%
+    terra::rast()
+  
+  # read vector data for specified region  
+  vct <- region_vct_path %>%
+    terra::vect() 
+  
+  ##### EXECUTE LOOP TO CREATE SOURCE RASTERS FOR CHUNKS OF VECTOR DATA
   for (i in 1:n) {
     logger::log_info("Generating chunk ", i, " for ", r, ".")
-  
-    # read vector data for specified region  
-    vct <- region_vct_path %>%
-      terra::vect()
     
     # divide into smaller chunks to rasterize
     nrows_chunk <- nrow(vct)/n
     
-    logger::log_info(r, "chunk ", i, ": filtering vector data.")
+    logger::log_info(r, " chunk ", i, ": filtering vector data.")
     vct_sub <- vct[((nrows_chunk)*(i-1)+1):((nrows_chunk)*(i)),]
-
-    # remove large vector object to free memory
-    rm(vct)
     
-    # crop raster template for entire county to extent of vector chunk
-    small_template <- rst_template %>%
+    # crop raster template to extent of vector chunk
+    small_template <- template_region_rst %>%
       terra::crop(vct_sub)
     
-    logger::log_info(r, "chunk ", i, ": rasterizing.")
+    logger::log_info(r, " chunk ", i, ": rasterizing.")
     mismatch_rst1 <- terra::rasterize(x=vct_sub, y=small_template, field=1,
                          background=0, filename=out_rst[i], overwrite=T, 
                          wopt=list(progress=T, memfrac=0.9, NAflag=NA))
     rm(small_template)
     rm(mismatch_rst1)
-
   }
   
+  ##### TRANSFER DATA FROM SOURCE RASTERS TO REGIONAL TEMPLATE
   for (i in 1:n) {
     logger::log_info("Transferring chunk ", i, " for ", r, ".")
     
-    ##### Transfer values from source raster to template!
-  
     # change no data value for source chunk so expansion below fills with zeros
     system(paste0('gdal_edit.py -unsetnodata ', out_rst[i]))
     system(paste0('gdal_edit.py -a_nodata 0 ', out_rst[i]))
