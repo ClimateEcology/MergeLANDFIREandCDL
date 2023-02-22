@@ -11,6 +11,6 @@
 #SBATCH --mail-type=BEGIN,END,FAIL #will receive an email when job starts, ends or fails
 
 export OPENBLAS_NUM_THREADS=1
-module load singularity/3.5.2
-singularity exec --bind /90daydata:/90daydata $container Rscript code/ConvertRasterDatatype.R\
+module load singularity
+singularity exec --bind /90daydata:/90daydata $container Rscript code/ConvertMismatchedPixelstoRst.R\
  --args ${cdlyear}

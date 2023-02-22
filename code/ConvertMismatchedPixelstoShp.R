@@ -4,9 +4,8 @@ library(DBI)
 library(readr)
 
 for (year in as.character(c(2012:2021))) {
-  #regions <- c('WestN', 'WestS', 'Southeast', 'Northeast')
-  regions <- c('WestS') 
-
+  regions <- c('Northeast', 'SoutheastW', 'SoutheastE','WestN', 'WestS', 'Midwest')
+  
   for (regionName in regions) {
     tictoc::tic()
     logger::log_info(year, ": Starting ", regionName, ".")
@@ -15,22 +14,23 @@ for (year in as.character(c(2012:2021))) {
       states <- c('MT', 'WY', 'OR', 'WA', 'ID')
     } else if (regionName %in% c('WestS')) {
       states <- c('CA', 'NV', 'UT', 'CO', 'AZ', 'NM')
+    } else if (regionName %in% c('SoutheastW')) {
+        states <- c('TX_West', 'TX_East', 'TX', 'OK', 'LA', 'AR') # include all variants of TX name
+    } else if (regionName %in% c('SoutheastE')) {
+        states <- c('MS', 'TN', 'KY', 'AL', 'GA', 'FL', 'NC', 'SC', 'VA', 'WV', 'MD', 'DE', 'DC')
     } else {
       
       # load shapefile for state/region 
       regionalextent <- sf::st_read(paste0('./data/SpatialData/', regionName , '.shp'))
       states <- regionalextent$STUSPS
       
-      if(regionName == 'Southeast') {
-        states <- c(states, "TX")
-      }
     }
     
     # save names before creating (database and table within the database)
     db_name <- "./data/mismatchedpixels.sqlite"
     table_name <- "mismatch_bycell"
     
-    geo_path <- paste0('./data/TechnicalValidation/Mismatch_spatial/MismatchedPixels_', regionName, '_CDL', year,'_NVC2016.gpkg')
+    geo_path <- paste0('./data/TechnicalValidation/Mismatch_spatial/', year, '/MismatchedPixels_', regionName, '_CDL', year,'_NVC2016.gpkg')
     
     
     db <- dbConnect(SQLite(), dbname = db_name)
@@ -59,6 +59,8 @@ for (year in as.character(c(2012:2021))) {
     # to decrease file size, remove unnecessary attributes 
     # and filter down to one year and group of states
     tictoc::tic()
+    logger::log_info(year, ": Filtering by year and states.")
+    
     data <- mismatch_oneyear  %>% 
       select(-Empty, -ncells_tile, -STATE2, -COUNTY) %>% 
       filter(CDLYear == year & State %in% states) %>%
@@ -75,6 +77,10 @@ for (year in as.character(c(2012:2021))) {
 
     if (!dir.exists('./data/TechnicalValidation/Mismatch_spatial')) {
       dir.create('./data/TechnicalValidation/Mismatch_spatial')
+    }
+    
+    if (!dir.exists(paste0('./data/TechnicalValidation/Mismatch_spatial/', year))) {
+      dir.create(paste0('./data/TechnicalValidation/Mismatch_spatial/', year))
     }
     
     data_sp %>% sf::st_write(geo_path, 
