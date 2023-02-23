@@ -11,7 +11,7 @@ tictoc::tic("All regions")
 setwd('/project/geoecoservices/MergeLANDFIREandCDL')    
          
 # set up names to use for input and & output files
-generate_source <- T
+generate_source <- F
 movetotemplate <- T
 
 
@@ -187,11 +187,8 @@ for (r in regions) {
                                    bsename, paste0("_", i, "_", h, '.tif'))) 
           
           # append new name to set of rasters
-          if (h == 1) {
-            out_rst <- c(out_rst[-i], out_name)
-          } else {
-            out_rst <- c(out_rst, out_name)
-          }
+          out_rst <- c(out_rst, out_name)
+
           
           logger::log_info(r, " chunk ", i, " pt", h, ": filtering vector data.")
           
@@ -224,6 +221,12 @@ for (r in regions) {
   
   ##### TRANSFER DATA FROM SOURCE RASTERS TO REGIONAL TEMPLATE
   if (movetotemplate == T) {
+    
+    # make list of raster chunks to accomodates those split in half in previous step
+    out_rst <- list.files('/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/', full.names=T)
+    # filter raster chunks to appropriate year and region
+    out_rst <- out_rst[grepl(out_rst, pattern= paste0('CDL', year)) & grepl(out_rst, pattern=r)] 
+    
     for (i in 1:length(out_rst)) {
       logger::log_info("Transferring chunk ", i, " for ", r, ".")
       
