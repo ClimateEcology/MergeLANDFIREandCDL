@@ -1,8 +1,7 @@
 # # get CDL year from sbatch file
-# args <- commandArgs(trailingOnly = T)
-# CDLYear <- args[2] # year of NASS Cropland Data Layer
+args <- commandArgs(trailingOnly = T)
+CDLYear <- args[2] # year of NASS Cropland Data Layer
 
-CDLYear <- 2021
 # save necessary file paths and parameters
 regional_dir <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/Regional/'
 outdir <- '/90daydata/geoecoservices/MergeLANDFIREandCDL/MismatchedPixelRasters/National/'
@@ -14,10 +13,16 @@ if (!dir.exists(outdir)) {
   dir.create(outdir)
 }
 
+# take out megatile(s) from previous mosaic attempt
+regional_files <- list.files(regional_dir, full.names=T)
+to_remove <- regional_files[grepl(regional_files, pattern='NationalMegaTile')]
+file.remove(to_remove)
+
+
 logger::log_info(CDLYear, ": joining regions into one national raster of mismatched pixels.")
 
 # mosaic regions to national raster
-mosaic_states(statedir=regional_dir,
+beecoSp::mosaic_states(statedir=regional_dir,
                        outdir=outdir, 
                        tier=3, 
                        ID=ID, 

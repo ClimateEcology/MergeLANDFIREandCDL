@@ -11,7 +11,7 @@ tictoc::tic("All regions")
 setwd('/project/geoecoservices/MergeLANDFIREandCDL')    
          
 # set up names to use for input and & output files
-generate_source <- F
+generate_source <- T
 movetotemplate <- T
 
 
