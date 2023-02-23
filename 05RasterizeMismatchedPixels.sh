@@ -6,9 +6,7 @@ container='/project/geoecoservices/Containers/geospatial_extend_v1.58.sif'
 
 jobids="" # declare empty string for all job ids (converting data type)
 
-########## Part 3.11: convert data type to Int16 for final, national rasters
-# run this section first, only start other jobs when these are complete
-
+# loop through years to generate regional rasters of mismatched pixels
 for year in "${years[@]}"
 do
     convert_id=$(sbatch --job-name="MismatchedPixels$year" --export=ALL,cdlyear=$year,container=$container 05_RasterizeMismatchedPixels.sbatch | cut -d ' ' -f4)
